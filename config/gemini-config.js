@@ -3,7 +3,7 @@ class GeminiConfig {
     constructor() {
         this.config = {
             // API Configuration
-            apiKey: 'AIzaSyA2skLFA5n2Lb628UL2CJwXK50EXk_3API', // Your Gemini API key
+            apiKey: 'AIzaSyDhKGOJhJGKJHGKJHGKJHGKJHGKJHGKJHG', // Replace with your actual Gemini API key
             baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
             model: 'gemini-1.5-flash', // Fast responses for chatbot
             

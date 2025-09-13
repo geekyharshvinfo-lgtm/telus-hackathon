@@ -61,16 +61,25 @@ class TelusChatbot {
                 this.geminiService = new GeminiAPIService();
                 console.log('Gemini AI service initialized successfully');
                 
-                // For now, disable AI to ensure chatbot works reliably
-                console.log('AI responses temporarily disabled - using keyword responses for reliability');
-                this.useAI = false;
+                // Check if API key is valid, if not use mock service
+                const isValidKey = await this.geminiService.healthCheck();
+                if (!isValidKey) {
+                    console.warn('Gemini API key invalid, using mock AI service for demo');
+                    this.geminiService = new MockGeminiService();
+                }
+                
+                // Enable AI responses
+                this.useAI = true;
+                console.log('Gemini AI responses enabled');
             } else {
                 console.warn('Gemini API service not available, using keyword responses only');
                 this.useAI = false;
             }
         } catch (error) {
             console.error('Failed to initialize Gemini service:', error);
-            this.useAI = false;
+            console.log('Using mock AI service for demo');
+            this.geminiService = new MockGeminiService();
+            this.useAI = true;
         }
     }
     
@@ -195,7 +204,7 @@ class TelusChatbot {
         // Show typing indicator and respond
         this.showTyping();
         setTimeout(() => {
-            this.hideTyping();
+            // Don't hide typing here - let addMessageWithTypewriter handle the transition
             this.respondToMessage(message);
         }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
     }
@@ -206,16 +215,73 @@ class TelusChatbot {
         this.sendMessage();
     }
     
-    addMessage(text, sender) {
+    addMessage(text, sender, useTypewriter = false) {
         const messagesContainer = document.getElementById('chatbotMessages');
         const messageDiv = document.createElement('div');
         messageDiv.className = `chatbot-message ${sender}`;
-        messageDiv.textContent = text;
         
+        if (useTypewriter && sender === 'bot') {
+            // For bot messages, use typewriter effect
+            messageDiv.textContent = '';
+            messagesContainer.appendChild(messageDiv);
+            this.scrollToBottom();
+            
+            // Start typewriter animation
+            this.typewriterEffect(messageDiv, text);
+        } else {
+            // For user messages or non-typewriter, show immediately
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            this.scrollToBottom();
+        }
+        
+        this.messages.push({ text, sender, timestamp: new Date() });
+    }
+    
+    // New method that handles typewriter with seamless transition from thinking animation
+    addMessageWithTypewriter(text, sender) {
+        const messagesContainer = document.getElementById('chatbotMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chatbot-message ${sender}`;
+        messageDiv.textContent = '';
+        
+        // Add the empty message div
         messagesContainer.appendChild(messageDiv);
         this.scrollToBottom();
         
+        // Hide the thinking animation just before starting typewriter
+        this.hideTyping();
+        
+        // Start typewriter effect immediately
+        this.typewriterEffect(messageDiv, text);
+        
         this.messages.push({ text, sender, timestamp: new Date() });
+    }
+    
+    // Typewriter effect for bot responses
+    typewriterEffect(element, text) {
+        const words = text.split(' ');
+        let currentWordIndex = 0;
+        
+        const typeNextWord = () => {
+            if (currentWordIndex < words.length) {
+                // Add the next word
+                if (currentWordIndex === 0) {
+                    element.textContent = words[currentWordIndex];
+                } else {
+                    element.textContent += ' ' + words[currentWordIndex];
+                }
+                
+                currentWordIndex++;
+                this.scrollToBottom();
+                
+                // Continue with next word after a delay
+                setTimeout(typeNextWord, 150 + Math.random() * 100); // 150-250ms per word
+            }
+        };
+        
+        // Start typing
+        typeNextWord();
     }
     
     addMessageWithButtons(text, sender, buttons) {
@@ -339,22 +405,15 @@ class TelusChatbot {
     
     async respondToMessage(message) {
         try {
-            // Handle confirmation responses
-            if (this.waitingForConfirmation) {
-                await this.handleConfirmationResponse(message);
-                return;
-            }
-            
-            // Always try AI first if available, regardless of query type
+            // Always try AI first if available
             if (this.useAI && this.geminiService) {
                 console.log('Attempting to use Gemini AI for response...');
                 
-                // Try AI response first
                 const aiResponse = await this.geminiService.generateResponse(message);
                 
                 if (aiResponse.success) {
                     console.log('Gemini AI response successful:', aiResponse.text);
-                    this.addMessage(aiResponse.text, 'bot');
+                    this.addMessageWithTypewriter(aiResponse.text, 'bot'); // Use new method
                     return;
                 } else {
                     console.warn('AI response failed, falling back to keyword response:', aiResponse.error);
@@ -363,12 +422,12 @@ class TelusChatbot {
             
             // Fallback to keyword-based response
             const response = this.generateResponse(message.toLowerCase());
-            this.addMessage(response, 'bot');
+            this.addMessageWithTypewriter(response, 'bot'); // Use new method
             
         } catch (error) {
             console.error('Error in respondToMessage:', error);
             // Ultimate fallback
-            this.addMessage(this.getRandomResponse('default'), 'bot');
+            this.addMessageWithTypewriter(this.getRandomResponse('default'), 'bot'); // Use new method
         }
     }
     

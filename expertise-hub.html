@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="dashboard">
     <!-- Left Navigation Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-header">
@@ -83,15 +83,134 @@
             <!-- Page Header -->
             <div class="page-header">
                 <h1 class="page-title">Expertise Hub</h1>
-                <p class="page-subtitle">Discover knowledge, skills, and expertise across the organization.</p>
+                <p class="page-subtitle">Connect with team members and track project expertise</p>
             </div>
 
-            <!-- Expertise Content -->
+            <!-- Navigation Cards -->
             <div class="content-section">
-                <div class="empty-state">
-                    <div class="empty-icon"><i class="fas fa-bullseye"></i></div>
-                    <h3>Expertise Hub Coming Soon</h3>
-                    <p>Connect with experts and discover knowledge resources to enhance your skills.</p>
+                <div class="section-header">
+                    <h2>Expertise Navigation</h2>
+                </div>
+                <div class="expertise-nav-grid">
+                    <div class="expertise-nav-card active" data-section="team" onclick="switchSection('team')">
+                        <div class="nav-card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="nav-card-content">
+                            <h3>My Team</h3>
+                            <p>View team hierarchy and structure</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expertise-nav-card" data-section="projects" onclick="switchSection('projects')">
+                        <div class="nav-card-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="nav-card-content">
+                            <h3>Projects</h3>
+                            <p>Browse team members by project</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expertise-nav-card" data-section="roles" onclick="switchSection('roles')">
+                        <div class="nav-card-icon">
+                            <i class="fas fa-user-tag"></i>
+                        </div>
+                        <div class="nav-card-content">
+                            <h3>Roles</h3>
+                            <p>Find experts by role and skills</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="expertise-content">
+                <!-- My Team Section -->
+                <div class="content-panel active" id="team-panel">
+                    <div class="team-hierarchy-section">
+                        <div class="section-header">
+                            <h2>Team Hierarchy</h2>
+                            <p class="section-subtitle">Visual representation of our team structure</p>
+                        </div>
+                        
+                        <div class="hierarchy-legend">
+                            <div class="legend-item">
+                                <i class="fas fa-crown legend-icon director"></i>
+                                <span>Director Level</span>
+                            </div>
+                            <div class="legend-item">
+                                <i class="fas fa-star legend-icon manager"></i>
+                                <span>Manager Level</span>
+                            </div>
+                            <div class="legend-item">
+                                <i class="fas fa-circle legend-icon individual"></i>
+                                <span>Individual Contributor</span>
+                            </div>
+                            <div class="status-legend">
+                                <div class="status-item">
+                                    <span class="status-dot online"></span>
+                                    <span>Online</span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-dot away"></span>
+                                    <span>Away</span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-dot offline"></span>
+                                    <span>Offline</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="team-hierarchy" id="teamHierarchy">
+                            <!-- Team hierarchy will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Section -->
+                <div class="content-panel" id="projects-panel">
+                    <div class="projects-section">
+                        <div class="section-header">
+                            <div class="project-selector">
+                                <select id="projectSelect" class="project-dropdown">
+                                    <option value="">Select a project...</option>
+                                </select>
+                                <i class="fas fa-chevron-down dropdown-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="project-content" id="projectContent">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-project-diagram"></i></div>
+                                <h3>Select a Project</h3>
+                                <p>Choose a project from the dropdown to view team members by department</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roles Section -->
+                <div class="content-panel" id="roles-panel">
+                    <div class="roles-section">
+                        <div class="section-header">
+                            <div class="role-selector">
+                                <select id="roleSelect" class="role-dropdown">
+                                    <option value="">Select a role...</option>
+                                </select>
+                                <i class="fas fa-chevron-down dropdown-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="role-content" id="roleContent">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-users"></i></div>
+                                <h3>Select a Role</h3>
+                                <p>Choose a role from the dropdown to view employees and their details</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -130,6 +249,8 @@
     </div>
 
     <script src="chatbot.js"></script>
+    <script src="data.js"></script>
+    <script src="expertise-hub-script.js"></script>
     <script>
         function toggleProfileMenu() {
             const menu = document.getElementById('profileMenu');

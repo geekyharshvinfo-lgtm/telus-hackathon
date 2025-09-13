@@ -1,33 +1,55 @@
-// User Dashboard Script for TELUS Digital
+// Enhanced User Dashboard Script with Overview Dashboard
 
+// Global variables
 let currentFilter = 'all';
 let userStats = {
     viewCount: 0,
-    favoriteCount: 0,
-    lastVisit: new Date().toLocaleDateString()
+    lastVisit: 'Today',
+    favoriteCount: 0
 };
 
-// Initialize the user dashboard
+// Dashboard overview data
+let dashboardData = {
+    tasks: {
+        pending: 2,
+        completed: 1,
+        total: 3
+    },
+    documents: {
+        pending: 2,
+        completed: 1,
+        total: 3
+    },
+    team: {
+        totalMembers: 12,
+        onlineMembers: 8,
+        awayMembers: 2,
+        offlineMembers: 2,
+        activeProjects: 3
+    }
+};
+
+// Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initializeUserDashboard();
+    initializeDashboard();
+    setupEventListeners();
+    loadUserStats();
+    updateOverviewStats();
 });
 
-function initializeUserDashboard() {
+// Initialize dashboard components
+function initializeDashboard() {
     checkUserAuth();
     loadUserInfo();
-    loadContent();
-    loadUserStats();
-    setupEventListeners();
+    updateOverviewStats();
     
-    // Update last visit time - consolidated here to avoid duplicate listeners
-    userStats.lastVisit = new Date().toLocaleDateString();
-    setTimeout(() => {
-        localStorage.setItem('userStats', JSON.stringify(userStats));
-    }, 1000);
-    
-    // setupRealTimeSync(); // Removed automatic sync - manual refresh only
+    // Log dashboard visit
+    if (window.DataManager) {
+        window.DataManager.logActivity('dashboard', 'User visited dashboard');
+    }
 }
 
+// Check user authentication
 function checkUserAuth() {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
@@ -45,6 +67,7 @@ function checkUserAuth() {
     }
 }
 
+// Load user information
 function loadUserInfo() {
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
@@ -56,11 +79,12 @@ function loadUserInfo() {
     }
 }
 
+// Setup event listeners
 function setupEventListeners() {
-    // Load user stats from localStorage if available
-    const savedStats = localStorage.getItem('userStats');
-    if (savedStats) {
-        userStats = { ...userStats, ...JSON.parse(savedStats) };
+    // Refresh button
+    const refreshBtn = document.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', refreshActivity);
     }
     
     // Close dropdown when clicking outside
@@ -68,240 +92,186 @@ function setupEventListeners() {
         const dropdown = document.getElementById('profileDropdown');
         const trigger = document.querySelector('.profile-trigger');
         
-        if (dropdown && !trigger.contains(e.target)) {
+        if (dropdown && trigger && !trigger.contains(e.target)) {
             dropdown.classList.remove('show');
         }
     });
 }
 
-function loadContent() {
-    const contentGrid = document.getElementById('contentGrid');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const emptyState = document.getElementById('emptyState');
+// Update overview statistics
+function updateOverviewStats() {
+    // Load task data from localStorage
+    loadTaskData();
+    loadDocumentData();
     
-    if (!contentGrid) return;
-    
-    // Show loading for manual refresh only
-    showLoading();
-    
-    setTimeout(() => {
-        try {
-            let content = DataManager.getAllContent();
-            
-            // Apply filters
-            content = applyContentFilter(content, currentFilter);
-            
-            hideLoading();
-            
-            if (content.length === 0) {
-                showEmptyState();
-                return;
+    // Update task statistics
+    updateTaskStats();
+    updateDocumentStats();
+    updateTeamStats();
+    updateProgressBars();
+    updateOverallProgress();
+}
+
+// Load task data from localStorage
+function loadTaskData() {
+    const taskData = localStorage.getItem('telus_task_status');
+    if (taskData) {
+        const tasks = JSON.parse(taskData);
+        let pending = 0;
+        let completed = 0;
+        
+        Object.values(tasks).forEach(task => {
+            if (task.status === 'pending') {
+                pending++;
+            } else if (task.status === 'completed') {
+                completed++;
             }
-            
-            hideEmptyState();
-            renderContentGrid(content);
-            
-        } catch (error) {
-            console.error('Error loading content:', error);
-            hideLoading();
-            showEmptyState();
-        }
-    }, 500); // Simulate loading delay
-}
-
-// Auto-refresh functions removed - manual refresh only
-
-function applyContentFilter(content, filter) {
-    const now = new Date();
-    const threeDaysAgo = new Date(now.getTime() - (3 * 24 * 60 * 60 * 1000));
-    
-    switch (filter) {
-        case 'recent':
-            return content.filter(item => new Date(item.dateCreated) >= threeDaysAgo);
-        case 'popular':
-            // Simulate popularity based on ID (lower ID = more popular)
-            return content.sort((a, b) => a.id - b.id);
-        case 'all':
-        default:
-            return content.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
-    }
-}
-
-function renderContentGrid(content) {
-    const contentGrid = document.getElementById('contentGrid');
-    contentGrid.innerHTML = '';
-    
-    content.forEach(item => {
-        const contentCard = createContentCard(item);
-        contentGrid.appendChild(contentCard);
-    });
-}
-
-function createContentCard(item) {
-    const cardDiv = document.createElement('div');
-    cardDiv.className = 'content-card';
-    cardDiv.onclick = () => openContentModal(item);
-    
-    cardDiv.innerHTML = `
-        <img src="${item.imageUrl}" alt="${item.title}" 
-             onerror="this.src='https://via.placeholder.com/300x200/6c757d/ffffff?text=Image+Not+Found'">
-        <div class="content-card-body">
-            <h3>${item.title}</h3>
-            <p>${item.description.length > 120 ? item.description.substring(0, 120) + '...' : item.description}</p>
-            <div class="content-card-meta">
-                Posted on ${formatDate(item.dateCreated)}
-            </div>
-        </div>
-    `;
-    
-    return cardDiv;
-}
-
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-}
-
-function filterContent(filter) {
-    currentFilter = filter;
-    
-    // Update filter buttons
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    filterBtns.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    // Reload content with new filter
-    loadContent();
-}
-
-function showLoading() {
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const contentGrid = document.getElementById('contentGrid');
-    const emptyState = document.getElementById('emptyState');
-    
-    if (loadingSpinner) loadingSpinner.style.display = 'block';
-    if (contentGrid) contentGrid.style.display = 'none';
-    if (emptyState) emptyState.style.display = 'none';
-}
-
-function hideLoading() {
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const contentGrid = document.getElementById('contentGrid');
-    
-    if (loadingSpinner) loadingSpinner.style.display = 'none';
-    if (contentGrid) contentGrid.style.display = 'grid';
-}
-
-function showEmptyState() {
-    const emptyState = document.getElementById('emptyState');
-    const contentGrid = document.getElementById('contentGrid');
-    
-    if (emptyState) emptyState.style.display = 'block';
-    if (contentGrid) contentGrid.style.display = 'none';
-}
-
-function hideEmptyState() {
-    const emptyState = document.getElementById('emptyState');
-    if (emptyState) emptyState.style.display = 'none';
-}
-
-function openContentModal(item) {
-    const modal = document.getElementById('contentModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalImage = document.getElementById('modalImage');
-    const modalDescription = document.getElementById('modalDescription');
-    const modalDate = document.getElementById('modalDate');
-    
-    if (!modal) return;
-    
-    // Update modal content
-    if (modalTitle) modalTitle.textContent = item.title;
-    if (modalDescription) modalDescription.textContent = item.description;
-    if (modalDate) modalDate.textContent = `Posted on ${formatDate(item.dateCreated)}`;
-    
-    if (modalImage && item.imageUrl) {
-        modalImage.src = item.imageUrl;
-        modalImage.alt = item.title;
-        modalImage.style.display = 'block';
-        modalImage.onerror = function() {
-            this.style.display = 'none';
+        });
+        
+        dashboardData.tasks = {
+            pending: pending,
+            completed: completed,
+            total: pending + completed
         };
     }
-    
-    // Show modal
-    modal.style.display = 'flex';
-    
-    // Update view count
-    userStats.viewCount++;
-    updateUserStats();
-    
-    // Store current item for favorites
-    modal.dataset.currentItemId = item.id;
 }
 
-function closeModal() {
-    const modal = document.getElementById('contentModal');
-    if (modal) {
-        modal.style.display = 'none';
-        delete modal.dataset.currentItemId;
-    }
-}
-
-function addToFavorites() {
-    const modal = document.getElementById('contentModal');
-    const itemId = modal?.dataset.currentItemId;
-    
-    if (!itemId) return;
-    
-    // Get or create favorites list
-    let favorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
-    
-    if (!favorites.includes(parseInt(itemId))) {
-        favorites.push(parseInt(itemId));
-        localStorage.setItem('userFavorites', JSON.stringify(favorites));
+// Load document data from localStorage
+function loadDocumentData() {
+    const docData = localStorage.getItem('telus_document_status');
+    if (docData) {
+        const documents = JSON.parse(docData);
+        let pending = 0;
+        let completed = 0;
         
-        userStats.favoriteCount++;
-        updateUserStats();
+        Object.values(documents).forEach(doc => {
+            if (doc.status === 'pending') {
+                pending++;
+            } else if (doc.status === 'completed') {
+                completed++;
+            }
+        });
         
-        showMessage('Added to favorites!', 'success');
-    } else {
-        showMessage('Already in favorites', 'info');
+        dashboardData.documents = {
+            pending: pending,
+            completed: completed,
+            total: pending + completed
+        };
     }
 }
 
-function loadUserStats() {
-    // Load saved stats
-    const savedStats = localStorage.getItem('userStats');
-    if (savedStats) {
-        userStats = { ...userStats, ...JSON.parse(savedStats) };
+// Update task statistics in UI
+function updateTaskStats() {
+    const tasksPending = document.getElementById('tasksPending');
+    const tasksCompleted = document.getElementById('tasksCompleted');
+    const tasksProgress = document.getElementById('tasksProgress');
+    const tasksProgressText = document.getElementById('tasksProgressText');
+    
+    if (tasksPending) tasksPending.textContent = dashboardData.tasks.pending;
+    if (tasksCompleted) tasksCompleted.textContent = dashboardData.tasks.completed;
+    
+    // Calculate progress percentage
+    const progressPercentage = dashboardData.tasks.total > 0 
+        ? Math.round((dashboardData.tasks.completed / dashboardData.tasks.total) * 100)
+        : 0;
+    
+    if (tasksProgress) tasksProgress.style.width = progressPercentage + '%';
+    if (tasksProgressText) tasksProgressText.textContent = progressPercentage + '% Complete';
+}
+
+// Update document statistics in UI
+function updateDocumentStats() {
+    const docsPending = document.getElementById('docsPending');
+    const docsCompleted = document.getElementById('docsCompleted');
+    const docsProgress = document.getElementById('docsProgress');
+    const docsProgressText = document.getElementById('docsProgressText');
+    
+    if (docsPending) docsPending.textContent = dashboardData.documents.pending;
+    if (docsCompleted) docsCompleted.textContent = dashboardData.documents.completed;
+    
+    // Calculate progress percentage
+    const progressPercentage = dashboardData.documents.total > 0 
+        ? Math.round((dashboardData.documents.completed / dashboardData.documents.total) * 100)
+        : 0;
+    
+    if (docsProgress) docsProgress.style.width = progressPercentage + '%';
+    if (docsProgressText) docsProgressText.textContent = progressPercentage + '% Complete';
+}
+
+// Update team statistics in UI
+function updateTeamStats() {
+    // Team stats are static for demo purposes
+    // In a real application, these would come from an API
+}
+
+// Update progress bars
+function updateProgressBars() {
+    // Don't reset progress bars - they should maintain their values
+    // The progress bars are already set with correct values in updateTaskStats() and updateDocumentStats()
+    // No animation needed as it causes the bars to reset to zero
+}
+
+// Update overall progress circular indicator
+function updateOverallProgress() {
+    const overallPercentage = document.getElementById('overallPercentage');
+    const progressRingCircle = document.querySelector('.progress-ring-circle');
+    
+    // Calculate overall progress as average of tasks and documents
+    const taskProgress = dashboardData.tasks.total > 0 
+        ? (dashboardData.tasks.completed / dashboardData.tasks.total) * 100
+        : 0;
+    
+    const docProgress = dashboardData.documents.total > 0 
+        ? (dashboardData.documents.completed / dashboardData.documents.total) * 100
+        : 0;
+    
+    // Average of both sections
+    const overallProgress = Math.round((taskProgress + docProgress) / 2);
+    
+    // Update percentage text
+    if (overallPercentage) {
+        overallPercentage.textContent = overallProgress + '%';
     }
     
-    // Load favorites count
-    const favorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
-    userStats.favoriteCount = favorites.length;
-    
-    // Update UI
-    updateStatsDisplay();
+    // Update circular progress ring
+    if (progressRingCircle) {
+        const radius = 32; // radius from SVG
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (overallProgress / 100) * circumference;
+        
+        progressRingCircle.style.strokeDasharray = circumference;
+        progressRingCircle.style.strokeDashoffset = offset;
+    }
 }
 
-function updateUserStats() {
-    // Save to localStorage
-    localStorage.setItem('userStats', JSON.stringify(userStats));
+// Refresh activity feed
+function refreshActivity() {
+    const refreshBtn = document.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.classList.add('loading');
+        refreshBtn.disabled = true;
+    }
     
-    // Update display
-    updateStatsDisplay();
+    // Simulate refresh delay
+    setTimeout(() => {
+        updateOverviewStats();
+        
+        if (refreshBtn) {
+            refreshBtn.classList.remove('loading');
+            refreshBtn.disabled = false;
+        }
+        
+        // Show success message
+        showMessage('Dashboard refreshed successfully!', 'success');
+        
+        // Log refresh activity
+        if (window.DataManager) {
+            window.DataManager.logActivity('refresh', 'User manually refreshed dashboard');
+        }
+    }, 1000);
 }
 
-function updateStatsDisplay() {
-    const viewCount = document.getElementById('viewCount');
-    const lastVisit = document.getElementById('lastVisit');
-    const favoriteCount = document.getElementById('favoriteCount');
-    
-    if (viewCount) viewCount.textContent = userStats.viewCount;
-    if (lastVisit) lastVisit.textContent = userStats.lastVisit;
-    if (favoriteCount) favoriteCount.textContent = userStats.favoriteCount;
-}
-
+// Show message function
 function showMessage(message, type) {
     // Remove existing messages
     const existingMessages = document.querySelectorAll('.dashboard-message');
@@ -313,7 +283,7 @@ function showMessage(message, type) {
     messageDiv.textContent = message;
     
     // Insert at top of dashboard content
-    const dashboardContent = document.querySelector('.dashboard-content .container');
+    const dashboardContent = document.querySelector('.content-container');
     if (dashboardContent) {
         dashboardContent.insertBefore(messageDiv, dashboardContent.firstChild);
     }
@@ -324,54 +294,112 @@ function showMessage(message, type) {
     }, 3000);
 }
 
-function logout() {
-    // Update last visit time
-    userStats.lastVisit = new Date().toLocaleDateString();
-    localStorage.setItem('userStats', JSON.stringify(userStats));
+// Load user stats from localStorage
+function loadUserStats() {
+    const savedStats = localStorage.getItem('userDashboardStats');
+    if (savedStats) {
+        userStats = { ...userStats, ...JSON.parse(savedStats) };
+    }
     
-    // Clear session
-    localStorage.removeItem('currentUser');
+    // Load favorites count
+    const favorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
+    userStats.favoriteCount = favorites.length;
     
-    // Redirect to landing page
-    window.location.href = 'index.html';
+    updateUserStatsDisplay();
 }
 
-// Close modal when clicking outside
-document.addEventListener('click', function(e) {
-    const modal = document.getElementById('contentModal');
-    if (e.target === modal) {
-        closeModal();
-    }
-});
+// Update user stats display
+function updateUserStatsDisplay() {
+    const viewCount = document.getElementById('viewCount');
+    const lastVisit = document.getElementById('lastVisit');
+    const favoriteCount = document.getElementById('favoriteCount');
+    
+    if (viewCount) viewCount.textContent = userStats.viewCount;
+    if (lastVisit) lastVisit.textContent = userStats.lastVisit;
+    if (favoriteCount) favoriteCount.textContent = userStats.favoriteCount;
+}
 
-// Keyboard navigation
-document.addEventListener('keydown', function(e) {
+// Save user stats to localStorage
+function saveUserStats() {
+    localStorage.setItem('userDashboardStats', JSON.stringify(userStats));
+}
+
+// Modal functions
+function openContentModal(contentId) {
+    const content = contentData.find(item => item.id == contentId);
+    if (!content) return;
+    
     const modal = document.getElementById('contentModal');
-    if (modal && modal.style.display === 'flex') {
-        if (e.key === 'Escape') {
-            closeModal();
+    const modalTitle = document.getElementById('modalTitle');
+    const modalImage = document.getElementById('modalImage');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalDate = document.getElementById('modalDate');
+    
+    if (modal && modalTitle && modalDescription && modalDate) {
+        modalTitle.textContent = content.title;
+        modalDescription.textContent = content.description;
+        modalDate.textContent = content.dateCreated;
+        
+        if (modalImage && content.imageUrl) {
+            modalImage.src = content.imageUrl;
+            modalImage.style.display = 'block';
+        } else if (modalImage) {
+            modalImage.style.display = 'none';
+        }
+        
+        modal.style.display = 'flex';
+        
+        // Update view count
+        userStats.viewCount++;
+        updateUserStatsDisplay();
+        saveUserStats();
+        
+        // Log view activity
+        if (window.DataManager) {
+            window.DataManager.logActivity('view', `Viewed content: ${content.title}`);
         }
     }
-});
+}
 
-// Setup real-time synchronization - COMPLETELY DISABLED
-// function setupRealTimeSync() {
-//     if (typeof DataManager !== 'undefined' && DataManager.setupRealTimeSync) {
-//         DataManager.setupRealTimeSync(function(detail) {
-//             console.log('Content data changed, refreshing user dashboard...');
-//             loadContent();
-//             showMessage('Content updated!', 'info');
-//         });
-//     }
-// }
+// Close modal
+function closeModal() {
+    const modal = document.getElementById('contentModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
 
-// Update last visit on page load - CONSOLIDATED INTO MAIN INITIALIZATION
-// document.addEventListener('DOMContentLoaded', function() {
-//     userStats.lastVisit = new Date().toLocaleDateString();
-//     setTimeout(() => {
-//         localStorage.setItem('userStats', JSON.stringify(userStats));
-//     }, 1000);
-// });
+// Add to favorites
+function addToFavorites() {
+    userStats.favoriteCount++;
+    updateUserStatsDisplay();
+    saveUserStats();
+    
+    // Log favorite activity
+    if (window.DataManager) {
+        window.DataManager.logActivity('favorite', 'Added content to favorites');
+    }
+    
+    showMessage('Added to favorites!', 'success');
+}
+
+// Logout function
+function logout() {
+    // Log logout activity
+    if (window.DataManager) {
+        window.DataManager.logActivity('logout', 'User logged out from dashboard');
+    }
+    
+    // Update last visit time
+    userStats.lastVisit = new Date().toLocaleDateString();
+    saveUserStats();
+    
+    // Clear user session
+    localStorage.removeItem('currentUser');
+    
+    // Redirect to login page
+    window.location.href = 'index.html';
+}
 
 // Profile dropdown functionality
 function toggleProfileDropdown() {
@@ -389,77 +417,35 @@ function goToProfile() {
         dropdown.classList.remove('show');
     }
     
-    // Placeholder for profile navigation
     showMessage('Profile section coming soon!', 'info');
 }
 
-// Manual refresh function with debounce to prevent multiple refreshes
-let isRefreshing = false;
-
-function manualRefresh() {
-    // Prevent multiple refreshes if already refreshing
-    if (isRefreshing) {
-        return;
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('contentModal');
+    if (modal && event.target === modal) {
+        closeModal();
     }
-    
-    isRefreshing = true;
-    showMessage('Refreshing content...', 'info');
-    
-    // Disable the refresh button temporarily
-    const refreshBtn = document.querySelector('.refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.disabled = true;
-        refreshBtn.style.opacity = '0.6';
-    }
-    
-    // Load content and re-enable after completion
-    loadContentOnce().then(() => {
-        isRefreshing = false;
-        if (refreshBtn) {
-            refreshBtn.disabled = false;
-            refreshBtn.style.opacity = '1';
-        }
-    });
-}
+});
 
-// Single refresh function that returns a promise
-function loadContentOnce() {
-    return new Promise((resolve) => {
-        const contentGrid = document.getElementById('contentGrid');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const emptyState = document.getElementById('emptyState');
-        
-        if (!contentGrid) {
-            resolve();
-            return;
-        }
-        
-        // Show loading for manual refresh only
-        showLoading();
-        
-        setTimeout(() => {
-            try {
-                let content = DataManager.getAllContent();
-                
-                // Apply filters
-                content = applyContentFilter(content, currentFilter);
-                
-                hideLoading();
-                
-                if (content.length === 0) {
-                    showEmptyState();
-                } else {
-                    hideEmptyState();
-                    renderContentGrid(content);
-                }
-                
-            } catch (error) {
-                console.error('Error loading content:', error);
-                hideLoading();
-                showEmptyState();
-            }
-            
-            resolve();
-        }, 500); // Simulate loading delay
-    });
-}
+// Handle escape key to close modal
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
+
+// Listen for storage changes to update dashboard when data changes
+window.addEventListener('storage', function(e) {
+    if (e.key === 'telus_task_status' || e.key === 'telus_document_status') {
+        updateOverviewStats();
+    }
+});
+
+// Export functions for global access
+window.refreshActivity = refreshActivity;
+window.closeModal = closeModal;
+window.addToFavorites = addToFavorites;
+window.logout = logout;
+window.toggleProfileDropdown = toggleProfileDropdown;
+window.goToProfile = goToProfile;

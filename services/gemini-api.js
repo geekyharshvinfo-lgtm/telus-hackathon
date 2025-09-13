@@ -207,43 +207,18 @@ class GeminiAPIService {
     
     // Check if message should use Gemini (vs existing keyword system)
     shouldUseGemini(message) {
-        const lowerMessage = message.toLowerCase();
+        // Use Gemini for all messages except very simple ones
+        const lowerMessage = message.toLowerCase().trim();
         
-        // Always use keyword responses for simple greetings and basic TELUS queries
+        // Only use keyword responses for very basic greetings
         const keywordOnlyPatterns = [
-            /^(hi|hello|hey|good morning|good afternoon|good evening)$/i,
+            /^(hi|hello|hey)$/i,
             /^(thanks?|thank you)$/i,
-            /^(bye|goodbye|see you)$/i,
-            /^(help|support)$/i,
-            /^(contact|phone|call)$/i
+            /^(bye|goodbye)$/i
         ];
         
         // If it matches keyword-only patterns, don't use Gemini
-        if (keywordOnlyPatterns.some(pattern => pattern.test(message))) {
-            return false;
-        }
-        
-        // Use Gemini for most other queries including:
-        const geminiIndicators = [
-            message.includes('?'), // Any question
-            message.includes('who'), // Who questions
-            message.includes('what'), // What questions  
-            message.includes('when'), // When questions
-            message.includes('where'), // Where questions
-            message.includes('how'), // How questions
-            message.includes('why'), // Why questions
-            message.includes('explain'), // Explanation requests
-            message.includes('tell me'), // Information requests
-            message.includes('describe'), // Description requests
-            message.includes('compare'), // Comparison requests
-            message.includes('difference'), // Difference questions
-            /\b(can you|could you|would you|please)\b/i.test(message), // Polite requests
-            message.split(' ').length > 3, // Multi-word queries (lowered threshold)
-            message.length > 20 // Longer messages
-        ];
-        
-        // Use Gemini if any indicator is met
-        return geminiIndicators.some(indicator => indicator);
+        return !keywordOnlyPatterns.some(pattern => pattern.test(lowerMessage));
     }
     
     // Clear conversation history
@@ -260,8 +235,12 @@ class GeminiAPIService {
     async healthCheck() {
         try {
             // Check if API key is properly configured
-            if (!this.config.getApiKey() || this.config.getApiKey() === 'YOUR_GEMINI_API_KEY_HERE') {
-                console.warn('Gemini API key not configured. Please set a valid API key in config/gemini-config.js');
+            if (!this.config.getApiKey() || 
+                this.config.getApiKey() === 'YOUR_GEMINI_API_KEY_HERE' ||
+                this.config.getApiKey() === 'AIzaSyA2skLFA5n2Lb628UL2CJwXK50EXk_3API' ||
+                this.config.getApiKey() === 'AIzaSyDhKGOJhJGKJHGKJHGKJHGKJHGKJHGKJHG') {
+                console.warn('Gemini API key not configured properly. Please set a valid API key in config/gemini-config.js');
+                console.warn('Current API key:', this.config.getApiKey());
                 return false;
             }
             

@@ -82,65 +82,238 @@
         <div class="content-container">
             <!-- Dashboard Header -->
             <div class="page-header">
-                <h1 class="page-title">Dashboard</h1>
-                <p class="page-subtitle">Welcome back! Here's what's happening today.</p>
+                <div class="header-content">
+                    <div class="header-text">
+                        <h1 class="page-title">Dashboard</h1>
+                        <p class="page-subtitle">Welcome back! Here's what's happening today.</p>
+                    </div>
+                    <div class="header-progress">
+                        <div class="circular-progress" id="overallProgress">
+                            <svg class="progress-ring" width="80" height="80">
+                                <circle class="progress-ring-circle-bg" cx="40" cy="40" r="32" stroke="#e6e6e6" stroke-width="6" fill="transparent"/>
+                                <circle class="progress-ring-circle" cx="40" cy="40" r="32" stroke="#663399" stroke-width="6" fill="transparent" stroke-dasharray="201.06" stroke-dashoffset="201.06"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span class="progress-percentage" id="overallPercentage">33%</span>
+                                <span class="progress-label">Overall</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Content Grid -->
+            <!-- Overview Dashboard -->
             <div class="content-section">
                 <div class="section-header">
-                    <h2>Latest Content</h2>
-                    <div class="content-controls">
-                        <div class="content-filters">
-                            <button class="filter-btn active" onclick="filterContent('all')">All</button>
-                            <button class="filter-btn" onclick="filterContent('recent')">Recent</button>
-                            <button class="filter-btn" onclick="filterContent('popular')">Popular</button>
+                    <h2>Overview Dashboard</h2>
+                    <p class="section-subtitle">Get a comprehensive view of your progress across all sections</p>
+                </div>
+                
+                <!-- Quick Stats Grid -->
+                <div class="overview-stats-grid">
+                    <div class="overview-stat-card tasks">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="stat-title">
+                                <h3>My Tasks</h3>
+                                <span class="stat-subtitle">Task Management</span>
+                            </div>
                         </div>
-                        <button class="refresh-btn" onclick="manualRefresh()">Refresh</button>
+                        <div class="stat-content">
+                            <div class="stat-numbers">
+                                <div class="stat-item">
+                                    <span class="stat-value" id="tasksPending">2</span>
+                                    <span class="stat-label">Pending</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="tasksCompleted">1</span>
+                                    <span class="stat-label">Completed</span>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="tasksProgress" style="width: 33%"></div>
+                            </div>
+                            <div class="stat-footer">
+                                <span class="progress-text" id="tasksProgressText">33% Complete</span>
+                                <a href="my-tasks.html" class="quick-action">View Tasks <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="content-grid" id="contentGrid">
-                    <!-- Content will be loaded here by JavaScript -->
-                </div>
-                
-                <div class="loading-spinner" id="loadingSpinner" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Loading content...</p>
-                </div>
-                
-                <div class="empty-state" id="emptyState" style="display: none;">
-                    <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                    <h3>No content available</h3>
-                    <p>Check back later for new content updates!</p>
+
+                    <div class="overview-stat-card documents">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-title">
+                                <h3>Documents</h3>
+                                <span class="stat-subtitle">Document Management</span>
+                            </div>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-numbers">
+                                <div class="stat-item">
+                                    <span class="stat-value" id="docsPending">2</span>
+                                    <span class="stat-label">Pending</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="docsCompleted">1</span>
+                                    <span class="stat-label">Approved</span>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="docsProgress" style="width: 33%"></div>
+                            </div>
+                            <div class="stat-footer">
+                                <span class="progress-text" id="docsProgressText">33% Complete</span>
+                                <a href="documents.html" class="quick-action">View Documents <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-stat-card team">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-title">
+                                <h3>Team Hub</h3>
+                                <span class="stat-subtitle">Team & Projects</span>
+                            </div>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-numbers">
+                                <div class="stat-item">
+                                    <span class="stat-value">12</span>
+                                    <span class="stat-label">Team Members</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">3</span>
+                                    <span class="stat-label">Active Projects</span>
+                                </div>
+                            </div>
+                            <div class="team-status">
+                                <div class="status-indicators">
+                                    <div class="status-item">
+                                        <span class="status-dot online"></span>
+                                        <span>8 Online</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-dot away"></span>
+                                        <span>2 Away</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-dot offline"></span>
+                                        <span>2 Offline</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <a href="expertise-hub.html" class="quick-action">View Team <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- Stats Section -->
-            <div class="stats-section">
-                <h2>Your Activity</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-eye"></i></div>
-                        <div class="stat-info">
-                            <h3 id="viewCount">0</h3>
-                            <p>Content Viewed</p>
+            <!-- Recent Activity Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Recent Activity</h2>
+                    <button class="refresh-btn" onclick="refreshActivity()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+                
+                <div class="activity-feed" id="activityFeed">
+                    <div class="activity-item">
+                        <div class="activity-icon tasks">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Task Completed</div>
+                            <div class="activity-description">Onboarding Process Documentation</div>
+                            <div class="activity-time">2 hours ago</div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
-                        <div class="stat-info">
-                            <h3 id="lastVisit">Today</h3>
-                            <p>Last Visit</p>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon documents">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Document Uploaded</div>
+                            <div class="activity-description">Emergency Contact Information</div>
+                            <div class="activity-time">1 day ago</div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-star"></i></div>
-                        <div class="stat-info">
-                            <h3 id="favoriteCount">0</h3>
-                            <p>Favorites</p>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon team">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Team Member Added</div>
+                            <div class="activity-description">Sarah Johnson joined Design Team</div>
+                            <div class="activity-time">2 days ago</div>
                         </div>
                     </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon tasks">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">New Task Assigned</div>
+                            <div class="activity-description">Customer Research Analysis</div>
+                            <div class="activity-time">3 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Quick Actions</h2>
+                    <p class="section-subtitle">Frequently used actions across all sections</p>
+                </div>
+                
+                <div class="quick-actions-grid">
+                    <a href="my-tasks.html" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="action-content">
+                            <h4>View My Tasks</h4>
+                            <p>Check pending and completed tasks</p>
+                        </div>
+                    </a>
+                    
+                    <a href="documents.html" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div class="action-content">
+                            <h4>Upload Document</h4>
+                            <p>Submit required documents</p>
+                        </div>
+                    </a>
+                    
+                    <a href="expertise-hub.html" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="action-content">
+                            <h4>Find Team Member</h4>
+                            <p>Browse team directory</p>
+                        </div>
+                    </a>
+                    
                 </div>
             </div>
         </div>
