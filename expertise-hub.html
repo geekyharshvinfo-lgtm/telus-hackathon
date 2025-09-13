@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELUS Digital - Expertise Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Left Navigation Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="https://via.placeholder.com/120x40/4B286D/ffffff?text=TELUS" alt="TELUS Logo" class="logo">
+            </div>
+        </div>
+        
+        <div class="sidebar-content">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="user-dashboard.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-home"></i></span>
+                        <span class="nav-text">Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="my-tasks.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-tasks"></i></span>
+                        <span class="nav-text">My Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="expertise-hub.html" class="nav-link active">
+                        <span class="nav-icon"><i class="fas fa-bullseye"></i></span>
+                        <span class="nav-text">Expertise Hub</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="documents.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-file-alt"></i></span>
+                        <span class="nav-text">Documents</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="help-support.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-question-circle"></i></span>
+                        <span class="nav-text">Help & Support</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="profile-section">
+                <div class="profile-trigger" onclick="toggleProfileMenu()">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">John Doe</span>
+                        <span class="profile-role">Product Design Intern</span>
+                    </div>
+                    <span class="profile-arrow"><i class="fas fa-chevron-up"></i></span>
+                </div>
+                <div class="profile-menu" id="profileMenu">
+                    <a href="#" class="profile-menu-item">
+                        <span class="menu-icon"><i class="fas fa-user"></i></span>
+                        Profile
+                    </a>
+                    <a href="index.html" class="profile-menu-item" onclick="logout()">
+                        <span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Expertise Hub</h1>
+                <p class="page-subtitle">Discover knowledge, skills, and expertise across the organization.</p>
+            </div>
+
+            <!-- Expertise Content -->
+            <div class="content-section">
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-bullseye"></i></div>
+                    <h3>Expertise Hub Coming Soon</h3>
+                    <p>Connect with experts and discover knowledge resources to enhance your skills.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            const profileSection = document.querySelector('.profile-section');
+            menu.classList.toggle('show');
+            profileSection.classList.toggle('open');
+        }
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileSection = document.querySelector('.profile-section');
+            const menu = document.getElementById('profileMenu');
+            
+            if (!profileSection.contains(event.target)) {
+                menu.classList.remove('show');
+                profileSection.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>

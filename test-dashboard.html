@@ -19,7 +19,7 @@
         <div class="sidebar-content">
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="user-dashboard.html" class="nav-link active">
+                    <a href="test-dashboard.html" class="nav-link active">
                         <span class="nav-icon"><i class="fas fa-home"></i></span>
                         <span class="nav-text">Home</span>
                     </a>
@@ -59,16 +59,16 @@
                     </div>
                     <div class="profile-info">
                         <span class="profile-name">John Doe</span>
-                        <span class="profile-role">Product Design Intern</span>
+                        <span class="profile-role">Employee</span>
                     </div>
-                    <span class="profile-arrow"><i class="fas fa-chevron-up"></i></span>
+                    <span class="profile-arrow"><i class="fas fa-ellipsis-v"></i></span>
                 </div>
                 <div class="profile-menu" id="profileMenu">
                     <a href="#" class="profile-menu-item">
                         <span class="menu-icon"><i class="fas fa-user"></i></span>
                         Profile
                     </a>
-                    <a href="#" class="profile-menu-item" onclick="logout(); return false;">
+                    <a href="index.html" class="profile-menu-item" onclick="logout()">
                         <span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>
                         Logout
                     </a>
@@ -92,27 +92,35 @@
                     <h2>Latest Content</h2>
                     <div class="content-controls">
                         <div class="content-filters">
-                            <button class="filter-btn active" onclick="filterContent('all')">All</button>
-                            <button class="filter-btn" onclick="filterContent('recent')">Recent</button>
-                            <button class="filter-btn" onclick="filterContent('popular')">Popular</button>
+                            <button class="filter-btn active">All</button>
+                            <button class="filter-btn">Recent</button>
+                            <button class="filter-btn">Popular</button>
                         </div>
-                        <button class="refresh-btn" onclick="manualRefresh()">Refresh</button>
+                        <button class="refresh-btn">Refresh</button>
                     </div>
                 </div>
                 
-                <div class="content-grid" id="contentGrid">
-                    <!-- Content will be loaded here by JavaScript -->
-                </div>
-                
-                <div class="loading-spinner" id="loadingSpinner" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Loading content...</p>
-                </div>
-                
-                <div class="empty-state" id="emptyState" style="display: none;">
-                    <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                    <h3>No content available</h3>
-                    <p>Check back later for new content updates!</p>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/300x200/4B286D/ffffff?text=Sample+Content" alt="Sample Content">
+                        <div class="content-card-body">
+                            <h3>Sample Content Item</h3>
+                            <p>This is a sample content item to demonstrate the layout and design of the dashboard.</p>
+                            <div class="content-card-meta">
+                                Posted on January 15, 2025
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/300x200/66CC00/ffffff?text=Another+Item" alt="Another Item">
+                        <div class="content-card-body">
+                            <h3>Another Content Item</h3>
+                            <p>Another example of content that would appear in the dashboard grid layout.</p>
+                            <div class="content-card-meta">
+                                Posted on January 14, 2025
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -123,21 +131,21 @@
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-eye"></i></div>
                         <div class="stat-info">
-                            <h3 id="viewCount">0</h3>
+                            <h3>12</h3>
                             <p>Content Viewed</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
                         <div class="stat-info">
-                            <h3 id="lastVisit">Today</h3>
+                            <h3>Today</h3>
                             <p>Last Visit</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-star"></i></div>
                         <div class="stat-info">
-                            <h3 id="favoriteCount">0</h3>
+                            <h3>5</h3>
                             <p>Favorites</p>
                         </div>
                     </div>
@@ -146,41 +154,15 @@
         </div>
     </main>
 
-    <!-- Content Detail Modal -->
-    <div class="modal" id="contentModal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Content Title</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <img id="modalImage" src="" alt="" style="display: none;">
-                <p id="modalDescription">Content description</p>
-                <div class="modal-meta">
-                    <span id="modalDate">Date</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeModal()">Close</button>
-                <button class="btn-primary" onclick="addToFavorites()">Add to Favorites</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="data.js"></script>
-    <script src="user-dashboard-script.js"></script>
-    <script src="config/gemini-config.js"></script>
-    <script src="services/gemini-api.js"></script>
-    <script src="chatbot.js"></script>
     <script>
         function toggleProfileMenu() {
             const menu = document.getElementById('profileMenu');
-            const profileSection = document.querySelector('.profile-section');
             menu.classList.toggle('show');
-            profileSection.classList.toggle('open');
         }
 
-        // Logout function is defined in user-dashboard-script.js
+        function logout() {
+            window.location.href = 'index.html';
+        }
 
         // Close profile menu when clicking outside
         document.addEventListener('click', function(event) {
@@ -189,7 +171,6 @@
             
             if (!profileSection.contains(event.target)) {
                 menu.classList.remove('show');
-                profileSection.classList.remove('open');
             }
         });
     </script>

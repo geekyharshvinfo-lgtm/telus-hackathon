@@ -3,33 +3,13 @@
 
 // Initialize default content data (prevent redeclaration)
 if (typeof defaultContentData === 'undefined') {
-    var defaultContentData = [
-        {
-            id: 1,
-            title: "Welcome to Our Platform",
-            description: "Discover amazing features and content managed by our team. This is a sample post to demonstrate the functionality.",
-            imageUrl: "https://via.placeholder.com/400x200/4B286D/ffffff?text=Welcome",
-            dateCreated: "2024-01-15",
-            status: "active"
-        },
-        {
-            id: 2,
-            title: "Latest Updates",
-            description: "Stay up to date with our latest features and improvements. We're constantly working to make your experience better.",
-            imageUrl: "https://via.placeholder.com/400x200/66CC00/ffffff?text=Updates",
-            dateCreated: "2024-01-20",
-            status: "active"
-        },
-        {
-            id: 3,
-            title: "Community Highlights",
-            description: "See what our amazing community has been up to. Join the conversation and share your own experiences.",
-            imageUrl: "https://via.placeholder.com/400x200/4285F4/ffffff?text=Community",
-            dateCreated: "2024-01-25",
-            status: "active"
-        }
-    ];
+    var defaultContentData = [];
 }
+
+// Clear any existing content from localStorage to ensure empty state
+localStorage.removeItem('telusDigitalContent');
+localStorage.removeItem('telusDigitalContentVersion');
+localStorage.removeItem('telusDigitalContentBackup');
 
 // User data for authentication simulation (prevent redeclaration)
 if (typeof users === 'undefined') {
@@ -68,17 +48,17 @@ function initializeContentData() {
     return JSON.parse(storedContent);
 }
 
-// Save content data to localStorage and trigger sync event
+// Save content data to localStorage - sync events disabled
 function saveContentData(data) {
     localStorage.setItem(STORAGE_KEYS.CONTENT, JSON.stringify(data));
-    // Update version to trigger sync across tabs/windows
-    const version = Date.now();
-    localStorage.setItem(STORAGE_KEYS.CONTENT_VERSION, version.toString());
+    // Update version to trigger sync across tabs/windows - DISABLED
+    // const version = Date.now();
+    // localStorage.setItem(STORAGE_KEYS.CONTENT_VERSION, version.toString());
     
-    // Dispatch custom event for real-time updates
-    window.dispatchEvent(new CustomEvent('contentDataChanged', {
-        detail: { data, version }
-    }));
+    // Dispatch custom event for real-time updates - DISABLED
+    // window.dispatchEvent(new CustomEvent('contentDataChanged', {
+    //     detail: { data, version }
+    // }));
 }
 
 // Get current content data
@@ -248,27 +228,27 @@ const DataManager = {
         return activities.slice(0, limit);
     },
 
-    // Setup real-time sync listeners
-    setupRealTimeSync: function(callback) {
-        // Listen for localStorage changes (cross-tab sync)
-        window.addEventListener('storage', function(e) {
-            if (e.key === STORAGE_KEYS.CONTENT_VERSION) {
-                if (callback) callback();
-            }
-        });
+    // Setup real-time sync listeners - COMPLETELY REMOVED
+    // setupRealTimeSync: function(callback) {
+    //     // Listen for localStorage changes (cross-tab sync)
+    //     window.addEventListener('storage', function(e) {
+    //         if (e.key === STORAGE_KEYS.CONTENT_VERSION) {
+    //             if (callback) callback();
+    //         }
+    //     });
 
-        // Listen for custom events (same-tab sync)
-        window.addEventListener('contentDataChanged', function(e) {
-            if (callback) callback(e.detail);
-        });
-    },
+    //     // Listen for custom events (same-tab sync)
+    //     window.addEventListener('contentDataChanged', function(e) {
+    //         if (callback) callback(e.detail);
+    //     });
+    // },
 
-    // Force refresh data (useful for manual refresh)
-    refreshData: function() {
-        window.dispatchEvent(new CustomEvent('contentDataChanged', {
-            detail: { data: getContentData(), version: Date.now() }
-        }));
-    },
+    // Force refresh data (useful for manual refresh) - REMOVED
+    // refreshData: function() {
+    //     window.dispatchEvent(new CustomEvent('contentDataChanged', {
+    //         detail: { data: getContentData(), version: Date.now() }
+    //     }));
+    // },
 
     // Get content statistics
     getContentStats: function() {
@@ -291,16 +271,16 @@ const DataManager = {
 // Initialize data on script load
 let contentData = initializeContentData();
 
-// Auto-save data periodically (backup mechanism)
-setInterval(() => {
-    const currentData = getContentData();
-    if (currentData.length > 0) {
-        localStorage.setItem('telusDigitalContentBackup', JSON.stringify({
-            data: currentData,
-            timestamp: new Date().toISOString()
-        }));
-    }
-}, 30000); // Every 30 seconds
+// Auto-save data periodically (backup mechanism) - DISABLED for manual refresh only
+// setInterval(() => {
+//     const currentData = getContentData();
+//     if (currentData.length > 0) {
+//         localStorage.setItem('telusDigitalContentBackup', JSON.stringify({
+//             data: currentData,
+//             timestamp: new Date().toISOString()
+//         }));
+//     }
+// }, 30000); // Every 30 seconds - DISABLED
 
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {

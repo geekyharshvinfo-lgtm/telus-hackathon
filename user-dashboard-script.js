@@ -9,19 +9,7 @@ let userStats = {
 
 // Initialize the user dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if DataManager is already available
-    if (typeof DataManager !== 'undefined') {
-        initializeUserDashboard();
-    } else {
-        // Load data script first
-        const script = document.createElement('script');
-        script.src = 'data.js';
-        document.head.appendChild(script);
-        
-        script.onload = function() {
-            initializeUserDashboard();
-        };
-    }
+    initializeUserDashboard();
 });
 
 function initializeUserDashboard() {
@@ -30,7 +18,14 @@ function initializeUserDashboard() {
     loadContent();
     loadUserStats();
     setupEventListeners();
-    setupRealTimeSync();
+    
+    // Update last visit time - consolidated here to avoid duplicate listeners
+    userStats.lastVisit = new Date().toLocaleDateString();
+    setTimeout(() => {
+        localStorage.setItem('userStats', JSON.stringify(userStats));
+    }, 1000);
+    
+    // setupRealTimeSync(); // Removed automatic sync - manual refresh only
 }
 
 function checkUserAuth() {
@@ -54,55 +49,39 @@ function loadUserInfo() {
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
         const user = JSON.parse(currentUser);
-        
-        // Update profile dropdown elements
-        const profileName = document.getElementById('profileName');
-        const dropdownName = document.getElementById('dropdownName');
-        const dropdownEmail = document.getElementById('dropdownEmail');
-        
-        if (profileName) {
-            profileName.textContent = user.name;
-        }
-        if (dropdownName) {
-            dropdownName.textContent = user.name;
-        }
-        if (dropdownEmail) {
-            dropdownEmail.textContent = user.email;
-        }
-        
-        // Update role if admin
-        const profileRole = document.querySelector('.profile-role');
-        if (profileRole && user.role === 'admin') {
-            profileRole.textContent = 'Administrator';
+        const userName = document.getElementById('userName');
+        if (userName) {
+            userName.textContent = user.name;
         }
     }
 }
 
 function setupEventListeners() {
-    // Auto-refresh content every 30 seconds with smooth loading
-    setInterval(() => loadContent(true), 30000);
-    
     // Load user stats from localStorage if available
     const savedStats = localStorage.getItem('userStats');
     if (savedStats) {
         userStats = { ...userStats, ...JSON.parse(savedStats) };
     }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('profileDropdown');
+        const trigger = document.querySelector('.profile-trigger');
+        
+        if (dropdown && !trigger.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
 }
 
-function loadContent(isAutoRefresh = false) {
+function loadContent() {
     const contentGrid = document.getElementById('contentGrid');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const emptyState = document.getElementById('emptyState');
     
     if (!contentGrid) return;
     
-    // For auto-refresh, use smooth transition instead of showing loading spinner
-    if (isAutoRefresh) {
-        loadContentSmoothly();
-        return;
-    }
-    
-    // Show loading for manual refresh
+    // Show loading for manual refresh only
     showLoading();
     
     setTimeout(() => {
@@ -130,95 +109,7 @@ function loadContent(isAutoRefresh = false) {
     }, 500); // Simulate loading delay
 }
 
-function loadContentSmoothly() {
-    const contentGrid = document.getElementById('contentGrid');
-    
-    try {
-        let content = DataManager.getAllContent();
-        
-        // Apply filters
-        content = applyContentFilter(content, currentFilter);
-        
-        if (content.length === 0) {
-            // Only show empty state if currently showing content
-            if (contentGrid.children.length > 0) {
-                showEmptyState();
-            }
-            return;
-        }
-        
-        // Create new content in completely hidden background
-        const tempContainer = document.createElement('div');
-        tempContainer.className = 'content-grid';
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.top = '-9999px';
-        tempContainer.style.left = '-9999px';
-        tempContainer.style.visibility = 'hidden';
-        tempContainer.style.opacity = '0';
-        tempContainer.style.pointerEvents = 'none';
-        
-        content.forEach(item => {
-            const contentCard = createContentCard(item);
-            tempContainer.appendChild(contentCard);
-        });
-        
-        // Add temp container to DOM (completely hidden)
-        document.body.appendChild(tempContainer);
-        
-        // Check if content has actually changed
-        if (hasContentChanged(contentGrid, tempContainer)) {
-            // Silently replace content without any visual effects
-            const currentDisplay = contentGrid.style.display;
-            const currentTransition = contentGrid.style.transition;
-            
-            // Temporarily disable transitions
-            contentGrid.style.transition = 'none';
-            
-            // Replace content instantly
-            contentGrid.innerHTML = tempContainer.innerHTML;
-            
-            // Restore original styles
-            contentGrid.style.display = currentDisplay;
-            
-            // Re-enable transitions after a brief delay
-            setTimeout(() => {
-                contentGrid.style.transition = currentTransition;
-            }, 10);
-            
-            // Ensure empty state is hidden
-            hideEmptyState();
-        }
-        
-        // Clean up temp container
-        tempContainer.remove();
-        
-    } catch (error) {
-        console.error('Error loading content smoothly:', error);
-        // Fallback to regular loading only for manual refresh
-        // Don't show errors during auto-refresh
-    }
-}
-
-function hasContentChanged(currentGrid, newGrid) {
-    const currentCards = currentGrid.querySelectorAll('.content-card');
-    const newCards = newGrid.querySelectorAll('.content-card');
-    
-    if (currentCards.length !== newCards.length) {
-        return true;
-    }
-    
-    // Compare content by checking titles (simple comparison)
-    for (let i = 0; i < currentCards.length; i++) {
-        const currentTitle = currentCards[i].querySelector('h3')?.textContent;
-        const newTitle = newCards[i].querySelector('h3')?.textContent;
-        
-        if (currentTitle !== newTitle) {
-            return true;
-        }
-    }
-    
-    return false;
-}
+// Auto-refresh functions removed - manual refresh only
 
 function applyContentFilter(content, filter) {
     const now = new Date();
@@ -463,62 +354,112 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Setup real-time synchronization
-function setupRealTimeSync() {
-    if (typeof DataManager !== 'undefined' && DataManager.setupRealTimeSync) {
-        DataManager.setupRealTimeSync(function(detail) {
-            console.log('Content data changed, refreshing user dashboard...');
-            loadContent();
-            showMessage('Content updated!', 'info');
-        });
-    }
-}
+// Setup real-time synchronization - COMPLETELY DISABLED
+// function setupRealTimeSync() {
+//     if (typeof DataManager !== 'undefined' && DataManager.setupRealTimeSync) {
+//         DataManager.setupRealTimeSync(function(detail) {
+//             console.log('Content data changed, refreshing user dashboard...');
+//             loadContent();
+//             showMessage('Content updated!', 'info');
+//         });
+//     }
+// }
+
+// Update last visit on page load - CONSOLIDATED INTO MAIN INITIALIZATION
+// document.addEventListener('DOMContentLoaded', function() {
+//     userStats.lastVisit = new Date().toLocaleDateString();
+//     setTimeout(() => {
+//         localStorage.setItem('userStats', JSON.stringify(userStats));
+//     }, 1000);
+// });
 
 // Profile dropdown functionality
 function toggleProfileDropdown() {
     const dropdown = document.getElementById('profileDropdown');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    
-    if (dropdown && dropdownMenu) {
-        dropdown.classList.toggle('active');
-        
-        // Close dropdown when clicking outside
-        if (dropdown.classList.contains('active')) {
-            setTimeout(() => {
-                document.addEventListener('click', closeDropdownOnOutsideClick);
-            }, 0);
-        } else {
-            document.removeEventListener('click', closeDropdownOnOutsideClick);
-        }
+    if (dropdown) {
+        dropdown.classList.toggle('show');
     }
 }
 
-function closeDropdownOnOutsideClick(event) {
-    const dropdown = document.getElementById('profileDropdown');
-    if (dropdown && !dropdown.contains(event.target)) {
-        dropdown.classList.remove('active');
-        document.removeEventListener('click', closeDropdownOnOutsideClick);
-    }
-}
-
+// Go to profile function (placeholder)
 function goToProfile() {
     // Close dropdown first
     const dropdown = document.getElementById('profileDropdown');
     if (dropdown) {
-        dropdown.classList.remove('active');
+        dropdown.classList.remove('show');
     }
     
-    // For now, show a message that profile page is coming soon
-    showMessage('Profile page coming soon!', 'info');
-    
-    // In a real application, you would navigate to the profile page:
-    // window.location.href = 'profile.html';
+    // Placeholder for profile navigation
+    showMessage('Profile section coming soon!', 'info');
 }
 
-// Update last visit on page load
-document.addEventListener('DOMContentLoaded', function() {
-    userStats.lastVisit = new Date().toLocaleDateString();
-    setTimeout(() => {
-        localStorage.setItem('userStats', JSON.stringify(userStats));
-    }, 1000);
-});
+// Manual refresh function with debounce to prevent multiple refreshes
+let isRefreshing = false;
+
+function manualRefresh() {
+    // Prevent multiple refreshes if already refreshing
+    if (isRefreshing) {
+        return;
+    }
+    
+    isRefreshing = true;
+    showMessage('Refreshing content...', 'info');
+    
+    // Disable the refresh button temporarily
+    const refreshBtn = document.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshBtn.style.opacity = '0.6';
+    }
+    
+    // Load content and re-enable after completion
+    loadContentOnce().then(() => {
+        isRefreshing = false;
+        if (refreshBtn) {
+            refreshBtn.disabled = false;
+            refreshBtn.style.opacity = '1';
+        }
+    });
+}
+
+// Single refresh function that returns a promise
+function loadContentOnce() {
+    return new Promise((resolve) => {
+        const contentGrid = document.getElementById('contentGrid');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (!contentGrid) {
+            resolve();
+            return;
+        }
+        
+        // Show loading for manual refresh only
+        showLoading();
+        
+        setTimeout(() => {
+            try {
+                let content = DataManager.getAllContent();
+                
+                // Apply filters
+                content = applyContentFilter(content, currentFilter);
+                
+                hideLoading();
+                
+                if (content.length === 0) {
+                    showEmptyState();
+                } else {
+                    hideEmptyState();
+                    renderContentGrid(content);
+                }
+                
+            } catch (error) {
+                console.error('Error loading content:', error);
+                hideLoading();
+                showEmptyState();
+            }
+            
+            resolve();
+        }, 500); // Simulate loading delay
+    });
+}

@@ -5,19 +5,7 @@ let confirmCallback = null;
 
 // Initialize the admin dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if DataManager is already available
-    if (typeof DataManager !== 'undefined') {
-        initializeAdminDashboard();
-    } else {
-        // Load data script first
-        const script = document.createElement('script');
-        script.src = 'data.js';
-        document.head.appendChild(script);
-        
-        script.onload = function() {
-            initializeAdminDashboard();
-        };
-    }
+    initializeAdminDashboard();
 });
 
 function initializeAdminDashboard() {
@@ -27,7 +15,7 @@ function initializeAdminDashboard() {
     loadContentTable();
     loadRecentActivity();
     setupEventListeners();
-    setupRealTimeSync();
+    // setupRealTimeSync(); // Removed automatic sync - manual refresh only
 }
 
 function checkAdminAuth() {
@@ -74,11 +62,11 @@ function setupEventListeners() {
         statusFilter.addEventListener('change', filterTable);
     }
     
-    // Auto-refresh every 30 seconds
-    setInterval(() => {
-        loadAdminStats();
-        loadRecentActivity();
-    }, 30000);
+    // Auto-refresh every 30 seconds - DISABLED for manual refresh only
+    // setInterval(() => {
+    //     loadAdminStats();
+    //     loadRecentActivity();
+    // }, 30000);
 }
 
 function loadAdminStats() {

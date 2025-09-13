@@ -4,14 +4,7 @@ let selectedLoginType = null;
 
 // Initialize the landing page
 document.addEventListener('DOMContentLoaded', function() {
-    // Load data script first
-    const script = document.createElement('script');
-    script.src = 'data.js';
-    document.head.appendChild(script);
-    
-    script.onload = function() {
-        initializeLandingPage();
-    };
+    initializeLandingPage();
 });
 
 function initializeLandingPage() {
