@@ -1836,45 +1836,52 @@ body.dashboard .main-content {
     transform: translateX(2px);
 }
 
-/* Special styling for the first card (My Growth Modules) */
+/* Special styling for the first card (Documents Under Review) */
 .task-overview-card:first-child .task-card-icon {
-    background: linear-gradient(135deg, rgba(102, 204, 0, 0.1) 0%, rgba(76, 175, 80, 0.1) 100%);
-    color: var(--telus-green);
-    border-color: rgba(102, 204, 0, 0.1);
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+    color: #FFC107;
+    border-color: rgba(255, 193, 7, 0.1);
 }
 
 .task-overview-card:first-child:hover .task-card-icon {
-    background: linear-gradient(135deg, var(--telus-green) 0%, #4CAF50 100%);
+    background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
     color: var(--telus-white);
-    box-shadow: 0 8px 24px rgba(102, 204, 0, 0.3);
+    box-shadow: 0 8px 24px rgba(255, 193, 7, 0.3);
+}
+
+.task-overview-card:first-child .task-number-heading .task-count {
+    background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .task-overview-card:first-child:hover .task-card-content h3 {
-    color: var(--telus-green);
+    color: #FFC107;
 }
 
-/* Special styling for the second card (Task Due) */
+/* Special styling for the second card (Documents Due) */
 .task-overview-card:nth-child(2) .task-card-icon {
-    background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 193, 7, 0.1) 100%);
-    color: #FF9800;
-    border-color: rgba(255, 152, 0, 0.1);
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.1) 100%);
+    color: #F44336;
+    border-color: rgba(244, 67, 54, 0.1);
 }
 
 .task-overview-card:nth-child(2):hover .task-card-icon {
-    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
     color: var(--telus-white);
-    box-shadow: 0 8px 24px rgba(255, 152, 0, 0.3);
+    box-shadow: 0 8px 24px rgba(244, 67, 54, 0.3);
 }
 
 .task-overview-card:nth-child(2) .task-number-heading .task-count {
-    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .task-overview-card:nth-child(2):hover .task-card-content h3 {
-    color: #FF9800;
+    color: #F44336;
 }
 
 /* Special styling for the third card (Task Completed) */
@@ -2669,6 +2676,157 @@ body.dashboard .main-content {
     font-size: var(--font-size-base);
 }
 
+/* Document Upload and View Buttons */
+.upload-document-btn {
+    background: var(--telus-blue);
+    color: var(--telus-white);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.upload-document-btn:hover {
+    background: #1976D2;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.upload-document-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.upload-document-btn i {
+    font-size: var(--font-size-base);
+}
+
+.view-document-btn {
+    background: var(--telus-gray-600);
+    color: var(--telus-white);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.view-document-btn:hover {
+    background: var(--telus-gray-700);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.view-document-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.view-document-btn i {
+    font-size: var(--font-size-base);
+}
+
+.edit-document-btn {
+    background: var(--telus-purple);
+    color: var(--telus-white);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+    margin-left: var(--spacing-sm);
+}
+
+.edit-document-btn:hover {
+    background: var(--telus-purple-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.edit-document-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.edit-document-btn i {
+    font-size: var(--font-size-base);
+}
+
+.remove-document-btn {
+    background: #F44336;
+    color: var(--telus-white);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+    margin-left: var(--spacing-sm);
+}
+
+.remove-document-btn:hover {
+    background: #D32F2F;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.remove-document-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.remove-document-btn i {
+    font-size: var(--font-size-base);
+}
+
+/* Under Review Priority Badge */
+.priority-under-review {
+    background: rgba(255, 152, 0, 0.1);
+    color: #FF9800;
+}
+
+/* Task Actions Layout for Multiple Buttons */
+.task-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Task Card Status Styles for Under Review */
+.task-card[data-status="under-review"] {
+    border-left: 4px solid #FF9800;
+    opacity: 0.9;
+}
+
+.task-card[data-status="under-review"] .task-card-header {
+    background: rgba(255, 152, 0, 0.05);
+}
+
 /* Task Completion Message */
 .task-completion-message {
     position: fixed;
@@ -2855,4 +3013,375 @@ body.dashboard .main-content {
     background: var(--telus-gray-200);
     border-color: var(--telus-gray-400);
     color: var(--telus-gray-800);
+}
+
+/* Support Cards Styles */
+.support-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.support-card {
+    background: var(--telus-white);
+    border: 1px solid var(--telus-gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.support-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--telus-purple-light);
+}
+
+.support-card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: var(--telus-white);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.support-card-icon.it-support {
+    background: linear-gradient(135deg, var(--telus-blue) 0%, #1976D2 100%);
+}
+
+.support-card-icon.hr-support {
+    background: linear-gradient(135deg, var(--telus-purple) 0%, var(--telus-purple-dark) 100%);
+}
+
+.support-card-icon.facilities-support {
+    background: linear-gradient(135deg, var(--telus-green) 0%, #4CAF50 100%);
+}
+
+.support-card:hover .support-card-icon {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.support-card-content {
+    flex: 1;
+}
+
+.support-card-content h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--telus-gray-900);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.support-card-content p {
+    font-size: var(--font-size-base);
+    color: var(--telus-gray-600);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.support-card-arrow {
+    color: var(--telus-gray-400);
+    font-size: var(--font-size-lg);
+    transition: all 0.3s ease;
+}
+
+.support-card:hover .support-card-arrow {
+    color: var(--telus-purple);
+    transform: translateX(4px);
+}
+
+/* Support Modal Styles */
+.support-contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.contact-person {
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: flex-start;
+}
+
+.contact-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--telus-purple) 0%, var(--telus-purple-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: var(--telus-white);
+    flex-shrink: 0;
+    box-shadow: var(--shadow-md);
+}
+
+.contact-details {
+    flex: 1;
+}
+
+.contact-details h4 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--telus-gray-900);
+    margin: 0 0 var(--spacing-xs) 0;
+}
+
+.contact-details > p {
+    font-size: var(--font-size-base);
+    color: var(--telus-gray-600);
+    margin: 0 0 var(--spacing-lg) 0;
+}
+
+.contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.contact-method {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--telus-gray-700);
+}
+
+.contact-method i {
+    width: 20px;
+    color: var(--telus-purple);
+}
+
+.support-links h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--telus-gray-900);
+    margin: 0 0 var(--spacing-md) 0;
+}
+
+.link-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.support-link-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--telus-white);
+    border: 2px solid var(--telus-purple);
+    border-radius: var(--radius-md);
+    color: var(--telus-purple);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.support-link-btn:hover {
+    background: var(--telus-purple);
+    color: var(--telus-white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.support-link-btn i {
+    font-size: var(--font-size-base);
+}
+
+/* FAQ Styles */
+.faq-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.faq-category {
+    background: var(--telus-white);
+    border: 1px solid var(--telus-gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.faq-category-title {
+    background: linear-gradient(135deg, var(--telus-purple) 0%, var(--telus-purple-dark) 100%);
+    color: var(--telus-white);
+    padding: var(--spacing-lg);
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.faq-category-title i {
+    font-size: var(--font-size-xl);
+}
+
+.faq-items {
+    padding: 0;
+}
+
+.faq-item {
+    border-bottom: 1px solid var(--telus-gray-200);
+    transition: all 0.3s ease;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-question {
+    padding: var(--spacing-lg);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--telus-gray-900);
+    transition: all 0.3s ease;
+}
+
+.faq-question:hover {
+    background: var(--telus-gray-50);
+    color: var(--telus-purple);
+}
+
+.faq-question i {
+    color: var(--telus-gray-500);
+    transition: all 0.3s ease;
+}
+
+.faq-item.active .faq-question {
+    background: var(--telus-gray-50);
+    color: var(--telus-purple);
+}
+
+.faq-item.active .faq-question i {
+    color: var(--telus-purple);
+}
+
+.faq-answer {
+    display: none;
+    padding: 0 var(--spacing-lg) var(--spacing-lg);
+    background: var(--telus-gray-50);
+    border-top: 1px solid var(--telus-gray-200);
+    animation: fadeInDown 0.3s ease;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.faq-answer p {
+    font-size: var(--font-size-base);
+    color: var(--telus-gray-700);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Responsive Support Cards */
+@media (max-width: 768px) {
+    .support-cards-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .support-card {
+        padding: var(--spacing-lg);
+        gap: var(--spacing-md);
+    }
+    
+    .support-card-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 24px;
+    }
+    
+    .contact-person {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: var(--spacing-md);
+    }
+    
+    .contact-avatar {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+    }
+    
+    .link-buttons {
+        gap: var(--spacing-xs);
+    }
+    
+    .support-link-btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .support-card {
+        padding: var(--spacing-md);
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .support-card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+    
+    .support-card-content h3 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .support-card-content p {
+        font-size: var(--font-size-sm);
+    }
+    
+    .faq-question {
+        padding: var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+    
+    .faq-answer {
+        padding: 0 var(--spacing-md) var(--spacing-md);
+    }
+    
+    .faq-answer p {
+        font-size: var(--font-size-sm);
+    }
+    
+    .faq-category-title {
+        padding: var(--spacing-md);
+        font-size: var(--font-size-base);
+    }
 }

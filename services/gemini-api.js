@@ -164,8 +164,7 @@ class GeminiAPIService {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload),
-                mode: 'cors'
+                body: JSON.stringify(payload)
             });
             
             console.log('Response status:', response.status);
@@ -260,6 +259,12 @@ class GeminiAPIService {
     // Health check
     async healthCheck() {
         try {
+            // Check if API key is properly configured
+            if (!this.config.getApiKey() || this.config.getApiKey() === 'YOUR_GEMINI_API_KEY_HERE') {
+                console.warn('Gemini API key not configured. Please set a valid API key in config/gemini-config.js');
+                return false;
+            }
+            
             const testResponse = await this.generateResponse('Hello');
             return testResponse.success;
         } catch (error) {

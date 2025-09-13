@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="dashboard">
     <!-- Left Navigation Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-header">
@@ -86,17 +86,243 @@
                 <p class="page-subtitle">Access and manage your documents, files, and resources.</p>
             </div>
 
-            <!-- Documents Content -->
+            <!-- Document Overview Section -->
             <div class="content-section">
-                <div class="empty-state">
-                    <div class="empty-icon"><i class="fas fa-file-alt"></i></div>
-                    <h3>No documents available</h3>
-                    <p>Your documents and files will be displayed here when they become available.</p>
+                <div class="section-header">
+                    <h2>Document Overview</h2>
+                </div>
+                <div class="task-cards-grid">
+                    <div class="task-overview-card">
+                        <div class="task-card-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="task-card-content">
+                            <div class="task-number-heading">
+                                <div class="task-count">0</div>
+                                <h3>Documents Under Review</h3>
+                            </div>
+                            <p>documents uploaded and under review</p>
+                        </div>
+                    </div>
+                    
+                    <div class="task-overview-card">
+                        <div class="task-card-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="task-card-content">
+                            <div class="task-number-heading">
+                                <div class="task-count">0</div>
+                                <h3>Documents Due</h3>
+                            </div>
+                            <p>documents requiring attention</p>
+                        </div>
+                    </div>
+                    
+                    <div class="task-overview-card">
+                        <div class="task-card-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="task-card-content">
+                            <div class="task-number-heading">
+                                <div class="task-count">0</div>
+                                <h3>Documents Approved</h3>
+                            </div>
+                            <p>documents reviewed and approved</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Management -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Document Management</h2>
+                    <div class="task-filters">
+                        <button class="filter-btn" onclick="filterByType()">
+                            <i class="fas fa-filter"></i>
+                            Filter by Type
+                        </button>
+                        <button class="filter-btn" onclick="filterByStatus()">
+                            <i class="fas fa-list"></i>
+                            Filter by Status
+                        </button>
+                    </div>
+                </div>
+                <div class="assigned-tasks-container">
+                    <!-- Document Collection Card 1 -->
+                    <div class="task-card" data-priority="high" data-status="pending" onclick="toggleTaskDetails(this)">
+                        <div class="task-card-header">
+                            <div class="task-info">
+                                <h3 class="task-name">Employee Handbook Acknowledgment</h3>
+                                <div class="task-meta">
+                                    <span class="task-assigned">Assigned: Dec 10, 2024</span>
+                                    <span class="task-due">Due: Dec 20, 2024</span>
+                                </div>
+                            </div>
+                            <div class="task-details">
+                                <div class="task-assigned-by">Assigned by: HR Department</div>
+                                <div class="priority-badge priority-high">
+                                    <i class="fas fa-circle"></i>
+                                    High Priority
+                                </div>
+                            </div>
+                            <div class="task-expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="task-card-content" style="display: none;">
+                            <div class="task-description">
+                                <p>Please review and sign the employee handbook acknowledgment form to confirm your understanding of company policies.</p>
+                            </div>
+                            <div class="task-resources">
+                                <h4>Resources:</h4>
+                                <div class="resource-links">
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-file-pdf"></i>
+                                        Employee Handbook.pdf
+                                    </a>
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-file-word"></i>
+                                        Acknowledgment Form.docx
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="upload-document-btn" onclick="uploadDocument(this)">
+                                    <i class="fas fa-upload"></i>
+                                    Upload Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Collection Card 2 -->
+                    <div class="task-card" data-priority="low" data-status="pending" onclick="toggleTaskDetails(this)">
+                        <div class="task-card-header">
+                            <div class="task-info">
+                                <h3 class="task-name">Tax Information Form (W-4)</h3>
+                                <div class="task-meta">
+                                    <span class="task-assigned">Assigned: Dec 8, 2024</span>
+                                    <span class="task-due">Due: Dec 15, 2024</span>
+                                </div>
+                            </div>
+                            <div class="task-details">
+                                <div class="task-assigned-by">Assigned by: Payroll Team</div>
+                                <div class="priority-badge priority-low">
+                                    <i class="fas fa-circle"></i>
+                                    Low Priority
+                                </div>
+                            </div>
+                            <div class="task-expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="task-card-content" style="display: none;">
+                            <div class="task-description">
+                                <p>Complete and submit your W-4 tax withholding form for payroll processing.</p>
+                            </div>
+                            <div class="task-resources">
+                                <h4>Resources:</h4>
+                                <div class="resource-links">
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-file-pdf"></i>
+                                        W-4 Form Instructions.pdf
+                                    </a>
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        IRS W-4 Calculator
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="upload-document-btn" onclick="uploadDocument(this)">
+                                    <i class="fas fa-upload"></i>
+                                    Upload Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Collection Card 3 - Already Uploaded -->
+                    <div class="task-card" data-priority="low" data-status="completed" onclick="toggleTaskDetails(this)">
+                        <div class="task-card-header">
+                            <div class="task-info">
+                                <h3 class="task-name">Emergency Contact Information</h3>
+                                <div class="task-meta">
+                                    <span class="task-assigned">Assigned: Dec 1, 2024</span>
+                                    <span class="task-due">Completed: Dec 7, 2024</span>
+                                </div>
+                            </div>
+                            <div class="task-details">
+                                <div class="task-assigned-by">Assigned by: HR Department</div>
+                                <div class="priority-badge priority-completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    Completed
+                                </div>
+                            </div>
+                            <div class="task-expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="task-card-content" style="display: none;">
+                            <div class="task-description">
+                                <p>Provide emergency contact information for company records and safety purposes.</p>
+                            </div>
+                            <div class="task-resources">
+                                <h4>Resources:</h4>
+                                <div class="resource-links">
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-file-word"></i>
+                                        Emergency Contact Form.docx
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="view-document-btn" onclick="viewDocument(this)">
+                                    <i class="fas fa-eye"></i>
+                                    View Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-button" onclick="toggleChatbot()">
+            <i class="fas fa-comments chatbot-button-icon"></i>
+        </button>
+        <div class="chatbot-popup" id="chatbotPopup">
+            <div class="chatbot-header">
+                <h3>TELUS Assistant</h3>
+                <button class="chatbot-close" onclick="toggleChatbot()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chatbot-welcome">
+                    <h4>👋 Hello! I'm your TELUS Assistant</h4>
+                    <p>How can I help you today?</p>
+                    <div class="chatbot-suggestions">
+                        <button class="suggestion-btn" onclick="sendMessage('How do I access my benefits?')">How do I access my benefits?</button>
+                        <button class="suggestion-btn" onclick="sendMessage('What are the office hours?')">What are the office hours?</button>
+                        <button class="suggestion-btn" onclick="sendMessage('How do I contact IT support?')">How do I contact IT support?</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type your message..." onkeypress="handleChatbotKeypress(event)">
+                <button class="chatbot-send" onclick="sendChatbotMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
     <script>
         function toggleProfileMenu() {
             const menu = document.getElementById('profileMenu');
@@ -109,6 +335,404 @@
             window.location.href = 'index.html';
         }
 
+        // Document Storage Management
+        const DOCUMENT_STORAGE_KEY = 'telus_document_status';
+
+        // Default document data
+        const defaultDocumentData = {
+            'Employee Handbook Acknowledgment': {
+                status: 'pending',
+                priority: 'high',
+                assignedDate: 'Dec 10, 2024',
+                dueDate: 'Dec 20, 2024',
+                assignedBy: 'HR Department'
+            },
+            'Tax Information Form (W-4)': {
+                status: 'pending',
+                priority: 'medium',
+                assignedDate: 'Dec 8, 2024',
+                dueDate: 'Dec 15, 2024',
+                assignedBy: 'Payroll Team'
+            },
+            'Emergency Contact Information': {
+                status: 'completed',
+                priority: 'low',
+                assignedDate: 'Dec 1, 2024',
+                dueDate: 'Dec 7, 2024',
+                assignedBy: 'HR Department'
+            }
+        };
+
+        function saveDocumentData() {
+            const documentCards = document.querySelectorAll('.task-card');
+            const documentData = {};
+
+            documentCards.forEach(card => {
+                const documentName = card.querySelector('.task-name').textContent;
+                const status = card.getAttribute('data-status');
+                const priority = card.getAttribute('data-priority');
+                const assignedDate = card.querySelector('.task-assigned').textContent.replace('Assigned: ', '');
+                const dueDate = card.querySelector('.task-due').textContent.replace(/^(Due: |Completed: )/, '');
+                const assignedBy = card.querySelector('.task-assigned-by').textContent.replace('Assigned by: ', '');
+
+                documentData[documentName] = {
+                    status,
+                    priority,
+                    assignedDate,
+                    dueDate,
+                    assignedBy
+                };
+            });
+
+            localStorage.setItem(DOCUMENT_STORAGE_KEY, JSON.stringify(documentData));
+        }
+
+        function loadDocumentData() {
+            const savedData = localStorage.getItem(DOCUMENT_STORAGE_KEY);
+            return savedData ? JSON.parse(savedData) : defaultDocumentData;
+        }
+
+        function initializeDocuments() {
+            const documentData = loadDocumentData();
+            const documentCards = document.querySelectorAll('.task-card');
+
+            documentCards.forEach(card => {
+                const documentName = card.querySelector('.task-name').textContent;
+                const data = documentData[documentName];
+
+                if (data) {
+                    // Update document attributes
+                    card.setAttribute('data-status', data.status);
+                    card.setAttribute('data-priority', data.priority);
+
+                    // Update document meta information
+                    card.querySelector('.task-assigned').textContent = `Assigned: ${data.assignedDate}`;
+                    card.querySelector('.task-assigned-by').textContent = `Assigned by: ${data.assignedBy}`;
+
+                    // Update priority badge and due date based on status
+                    const priorityBadge = card.querySelector('.priority-badge');
+                    const taskDue = card.querySelector('.task-due');
+
+                    if (data.status === 'completed') {
+                        priorityBadge.className = 'priority-badge priority-completed';
+                        priorityBadge.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
+                        taskDue.textContent = `Completed: ${data.dueDate}`;
+
+                        // Add view document button if not present
+                        addViewDocumentButton(card);
+                    } else {
+                        // Set priority badge based on original priority
+                        priorityBadge.className = `priority-badge priority-${data.priority}`;
+                        if (data.priority === 'low') {
+                            priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
+                        } else if (data.priority === 'high') {
+                            priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
+                        } else if (data.priority === 'medium') {
+                            priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Medium Priority';
+                        }
+                        taskDue.textContent = `Due: ${data.dueDate}`;
+
+                        // Add upload document button if not present
+                        addUploadDocumentButton(card);
+                    }
+                }
+            });
+
+            updateDocumentCounts();
+        }
+
+        function addUploadDocumentButton(documentCard) {
+            const taskContent = documentCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            // Remove existing actions
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            // Create new task actions with upload document button
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="upload-document-btn" onclick="uploadDocument(this)">
+                    <i class="fas fa-upload"></i>
+                    Upload Document
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+
+        function addViewDocumentButton(documentCard) {
+            const taskContent = documentCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            // Remove existing actions
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            // Create new task actions with view document button
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="view-document-btn" onclick="viewDocument(this)">
+                    <i class="fas fa-eye"></i>
+                    View Document
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+
+        function addViewAndRemoveDocumentButtons(documentCard) {
+            const taskContent = documentCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            // Remove existing actions
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            // Create new task actions with view and remove document buttons
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="view-document-btn" onclick="viewDocument(this)">
+                    <i class="fas fa-eye"></i>
+                    View Document
+                </button>
+                <button class="remove-document-btn" onclick="removeDocument(this)">
+                    <i class="fas fa-trash"></i>
+                    Remove
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+
+        function removeDocument(button) {
+            // Prevent event bubbling to avoid triggering card toggle
+            event.stopPropagation();
+            
+            // Find the parent document card
+            const documentCard = button.closest('.task-card');
+            const documentName = documentCard.querySelector('.task-name').textContent;
+            
+            // Get original document data to restore
+            const documentData = loadDocumentData();
+            const originalData = defaultDocumentData[documentName];
+            
+            if (originalData) {
+                // Revert document status to pending
+                documentCard.setAttribute('data-status', 'pending');
+                
+                // Restore original priority badge
+                const priorityBadge = documentCard.querySelector('.priority-badge');
+                priorityBadge.className = `priority-badge priority-${originalData.priority}`;
+                
+                if (originalData.priority === 'high') {
+                    priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
+                } else if (originalData.priority === 'medium') {
+                    priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Medium Priority';
+                } else if (originalData.priority === 'low') {
+                    priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
+                }
+                
+                // Restore original due date
+                const taskDue = documentCard.querySelector('.task-due');
+                taskDue.textContent = `Due: ${originalData.dueDate}`;
+                
+                // Replace view and remove buttons with upload button
+                addUploadDocumentButton(documentCard);
+                
+                // Save to localStorage
+                saveDocumentData();
+                
+                // Update document counts
+                updateDocumentCounts();
+                
+                // Show removal message
+                showDocumentRemovalMessage(documentName);
+            }
+        }
+
+        function showDocumentRemovalMessage(documentName) {
+            // Create a temporary removal message
+            const message = document.createElement('div');
+            message.className = 'task-completion-message';
+            message.style.background = '#F44336';
+            message.innerHTML = `
+                <i class="fas fa-trash"></i>
+                Document "${documentName}" removed successfully!
+            `;
+            
+            // Add to page
+            document.body.appendChild(message);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 3000);
+        }
+
+        function toggleTaskDetails(documentCard) {
+            const content = documentCard.querySelector('.task-card-content');
+            const isExpanded = documentCard.classList.contains('expanded');
+            
+            if (isExpanded) {
+                // Collapse
+                content.style.display = 'none';
+                documentCard.classList.remove('expanded');
+            } else {
+                // Expand
+                content.style.display = 'block';
+                documentCard.classList.add('expanded');
+            }
+        }
+
+        function uploadDocument(button) {
+            // Prevent event bubbling to avoid triggering card toggle
+            event.stopPropagation();
+            
+            // Find the parent document card
+            const documentCard = button.closest('.task-card');
+            const documentName = documentCard.querySelector('.task-name').textContent;
+            
+            // Update document status to under review
+            documentCard.setAttribute('data-status', 'under-review');
+            
+            // Update priority badge
+            const priorityBadge = documentCard.querySelector('.priority-badge');
+            priorityBadge.className = 'priority-badge priority-under-review';
+            priorityBadge.innerHTML = '<i class="fas fa-clock"></i> Under Review';
+            
+            // Update document meta to show upload date
+            const taskDue = documentCard.querySelector('.task-due');
+            const today = new Date();
+            const uploadDate = today.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            taskDue.textContent = `Uploaded: ${uploadDate}`;
+            
+            // Replace upload document button with view and remove buttons
+            addViewAndRemoveDocumentButtons(documentCard);
+            
+            // Save to localStorage
+            saveDocumentData();
+            
+            // Update document counts
+            updateDocumentCounts();
+            
+            // Show success message
+            showDocumentUploadMessage(documentName);
+        }
+
+        function viewDocument(button) {
+            // Prevent event bubbling to avoid triggering card toggle
+            event.stopPropagation();
+            
+            // Find the parent document card
+            const documentCard = button.closest('.task-card');
+            const documentName = documentCard.querySelector('.task-name').textContent;
+            
+            // Show view document message
+            showDocumentViewMessage(documentName);
+        }
+
+        function showDocumentUploadMessage(documentName) {
+            // Create a temporary success message
+            const message = document.createElement('div');
+            message.className = 'task-completion-message';
+            message.style.background = 'var(--telus-blue)';
+            message.innerHTML = `
+                <i class="fas fa-upload"></i>
+                Document "${documentName}" uploaded successfully!
+            `;
+            
+            // Add to page
+            document.body.appendChild(message);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 3000);
+        }
+
+        function showDocumentViewMessage(documentName) {
+            // Create a temporary view message
+            const message = document.createElement('div');
+            message.className = 'task-completion-message';
+            message.style.background = 'var(--telus-gray-600)';
+            message.innerHTML = `
+                <i class="fas fa-eye"></i>
+                Viewing document: "${documentName}"
+            `;
+            
+            // Add to page
+            document.body.appendChild(message);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 3000);
+        }
+
+        function updateDocumentCounts() {
+            const documentCards = document.querySelectorAll('.task-card');
+            let pendingCount = 0;
+            let underReviewCount = 0;
+            let completedCount = 0;
+
+            documentCards.forEach(card => {
+                const status = card.getAttribute('data-status');
+                if (status === 'pending') {
+                    pendingCount++;
+                } else if (status === 'under-review') {
+                    underReviewCount++;
+                } else if (status === 'completed') {
+                    completedCount++;
+                }
+            });
+
+            // Update documents under review count (first card)
+            const documentsUnderReviewElement = document.querySelector('.task-overview-card:nth-child(1) .task-count');
+            if (documentsUnderReviewElement) {
+                documentsUnderReviewElement.textContent = underReviewCount;
+            }
+
+            // Update documents due count (pending documents)
+            const documentsDueElement = document.querySelector('.task-overview-card:nth-child(2) .task-count');
+            if (documentsDueElement) {
+                documentsDueElement.textContent = pendingCount;
+            }
+
+            // Update documents approved count (completed documents)
+            const documentsApprovedElement = document.querySelector('.task-overview-card:nth-child(3) .task-count');
+            if (documentsApprovedElement) {
+                documentsApprovedElement.textContent = completedCount;
+            }
+        }
+
+        // Document Filter Functions (placeholder - no actual functionality)
+        function filterByType() {
+            console.log('Filter by Type clicked');
+            // Placeholder function - would implement document type filtering logic here
+        }
+
+        function filterByStatus() {
+            console.log('Filter by Status clicked');
+            // Placeholder function - would implement document status filtering logic here
+        }
+
         // Close profile menu when clicking outside
         document.addEventListener('click', function(event) {
             const profileSection = document.querySelector('.profile-section');
@@ -118,6 +742,11 @@
                 menu.classList.remove('show');
                 profileSection.classList.remove('open');
             }
+        });
+
+        // Initialize documents when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDocuments();
         });
     </script>
 </body>

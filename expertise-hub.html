@@ -97,6 +97,39 @@
         </div>
     </main>
 
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-button" onclick="toggleChatbot()">
+            <i class="fas fa-comments chatbot-button-icon"></i>
+        </button>
+        <div class="chatbot-popup" id="chatbotPopup">
+            <div class="chatbot-header">
+                <h3>TELUS Assistant</h3>
+                <button class="chatbot-close" onclick="toggleChatbot()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chatbot-welcome">
+                    <h4>👋 Hello! I'm your TELUS Assistant</h4>
+                    <p>How can I help you today?</p>
+                    <div class="chatbot-suggestions">
+                        <button class="suggestion-btn" onclick="sendMessage('How do I access my benefits?')">How do I access my benefits?</button>
+                        <button class="suggestion-btn" onclick="sendMessage('What are the office hours?')">What are the office hours?</button>
+                        <button class="suggestion-btn" onclick="sendMessage('How do I contact IT support?')">How do I contact IT support?</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type your message..." onkeypress="handleChatbotKeypress(event)">
+                <button class="chatbot-send" onclick="sendChatbotMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
     <script>
         function toggleProfileMenu() {
             const menu = document.getElementById('profileMenu');

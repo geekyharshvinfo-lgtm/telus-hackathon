@@ -45,7 +45,10 @@ class TelusChatbot {
     }
     
     async init() {
-        this.createChatbotHTML();
+        // Check if chatbot HTML already exists
+        if (!document.getElementById('chatbotContainer')) {
+            this.createChatbotHTML();
+        }
         this.attachEventListeners();
         this.showWelcomeMessage();
         await this.initializeGeminiService();
@@ -58,12 +61,9 @@ class TelusChatbot {
                 this.geminiService = new GeminiAPIService();
                 console.log('Gemini AI service initialized successfully');
                 
-                // Test API connection
-                const isHealthy = await this.geminiService.healthCheck();
-                if (!isHealthy) {
-                    console.warn('Gemini API health check failed, falling back to keyword responses');
-                    this.useAI = false;
-                }
+                // For now, disable AI to ensure chatbot works reliably
+                console.log('AI responses temporarily disabled - using keyword responses for reliability');
+                this.useAI = false;
             } else {
                 console.warn('Gemini API service not available, using keyword responses only');
                 this.useAI = false;
@@ -345,22 +345,15 @@ class TelusChatbot {
                 return;
             }
             
-            // Determine if we should use AI or keyword responses
-            const shouldUseAI = this.useAI && 
-                               this.geminiService && 
-                               this.geminiService.shouldUseGemini(message);
-            
-            if (shouldUseAI) {
-                // Check if this is a non-TELUS query that needs confirmation
-                if (this.isNonTelusQuery(message)) {
-                    this.askForConfirmation(message);
-                    return;
-                }
+            // Always try AI first if available, regardless of query type
+            if (this.useAI && this.geminiService) {
+                console.log('Attempting to use Gemini AI for response...');
                 
                 // Try AI response first
                 const aiResponse = await this.geminiService.generateResponse(message);
                 
                 if (aiResponse.success) {
+                    console.log('Gemini AI response successful:', aiResponse.text);
                     this.addMessage(aiResponse.text, 'bot');
                     return;
                 } else {
@@ -584,4 +577,33 @@ if (window.telusChatbotLoaded) {
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = TelusChatbot;
+}
+
+// Global functions for existing HTML chatbot elements
+function toggleChatbot() {
+    if (window.telusChatbot) {
+        window.telusChatbot.toggleChatbot();
+    }
+}
+
+function sendMessage(message) {
+    if (window.telusChatbot) {
+        const input = document.getElementById('chatbotInput');
+        if (input && message) {
+            input.value = message;
+            window.telusChatbot.sendMessage();
+        }
+    }
+}
+
+function sendChatbotMessage() {
+    if (window.telusChatbot) {
+        window.telusChatbot.sendMessage();
+    }
+}
+
+function handleChatbotKeypress(event) {
+    if (event.key === 'Enter' && window.telusChatbot) {
+        window.telusChatbot.sendMessage();
+    }
 }
