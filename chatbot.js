@@ -276,15 +276,43 @@ class TelusChatbot {
         typingDiv.className = 'chatbot-typing';
         typingDiv.id = 'typingIndicator';
         typingDiv.innerHTML = `
-            <div class="typing-dots">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
+            <div class="typing-content">
+                <div class="typing-avatar">🤖</div>
+                <div class="typing-bubble">
+                    <div class="typing-text">TELUS Assistant is thinking</div>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
             </div>
         `;
         
         messagesContainer.appendChild(typingDiv);
         this.scrollToBottom();
+        
+        // Add dynamic text changes for thinking animation
+        this.startThinkingAnimation();
+    }
+    
+    startThinkingAnimation() {
+        const thinkingTexts = [
+            "TELUS Assistant is thinking",
+            "Processing your request",
+            "Analyzing your question",
+            "Searching for information",
+            "Generating response"
+        ];
+        
+        let currentIndex = 0;
+        this.thinkingInterval = setInterval(() => {
+            const typingText = document.querySelector('.typing-text');
+            if (typingText) {
+                typingText.textContent = thinkingTexts[currentIndex];
+                currentIndex = (currentIndex + 1) % thinkingTexts.length;
+            }
+        }, 1500); // Change text every 1.5 seconds
     }
     
     hideTyping() {
@@ -292,6 +320,13 @@ class TelusChatbot {
         if (typingIndicator) {
             typingIndicator.remove();
         }
+        
+        // Clear thinking animation interval
+        if (this.thinkingInterval) {
+            clearInterval(this.thinkingInterval);
+            this.thinkingInterval = null;
+        }
+        
         this.isTyping = false;
     }
     

@@ -123,52 +123,62 @@ function loadContentSmoothly() {
         content = applyContentFilter(content, currentFilter);
         
         if (content.length === 0) {
-            showEmptyState();
+            // Only show empty state if currently showing content
+            if (contentGrid.children.length > 0) {
+                showEmptyState();
+            }
             return;
         }
         
-        hideEmptyState();
-        
-        // Create new content in background
+        // Create new content in completely hidden background
         const tempContainer = document.createElement('div');
         tempContainer.className = 'content-grid';
-        tempContainer.style.opacity = '0';
         tempContainer.style.position = 'absolute';
+        tempContainer.style.top = '-9999px';
+        tempContainer.style.left = '-9999px';
         tempContainer.style.visibility = 'hidden';
+        tempContainer.style.opacity = '0';
+        tempContainer.style.pointerEvents = 'none';
         
         content.forEach(item => {
             const contentCard = createContentCard(item);
             tempContainer.appendChild(contentCard);
         });
         
-        // Add temp container to DOM
-        contentGrid.parentNode.appendChild(tempContainer);
+        // Add temp container to DOM (completely hidden)
+        document.body.appendChild(tempContainer);
         
         // Check if content has actually changed
         if (hasContentChanged(contentGrid, tempContainer)) {
-            // Fade out current content
-            contentGrid.style.transition = 'opacity 0.3s ease';
-            contentGrid.style.opacity = '0.5';
+            // Silently replace content without any visual effects
+            const currentDisplay = contentGrid.style.display;
+            const currentTransition = contentGrid.style.transition;
             
+            // Temporarily disable transitions
+            contentGrid.style.transition = 'none';
+            
+            // Replace content instantly
+            contentGrid.innerHTML = tempContainer.innerHTML;
+            
+            // Restore original styles
+            contentGrid.style.display = currentDisplay;
+            
+            // Re-enable transitions after a brief delay
             setTimeout(() => {
-                // Replace content
-                contentGrid.innerHTML = tempContainer.innerHTML;
-                
-                // Fade in new content
-                contentGrid.style.opacity = '1';
-                
-                // Clean up
-                tempContainer.remove();
-            }, 150);
-        } else {
-            // No changes, just clean up
-            tempContainer.remove();
+                contentGrid.style.transition = currentTransition;
+            }, 10);
+            
+            // Ensure empty state is hidden
+            hideEmptyState();
         }
+        
+        // Clean up temp container
+        tempContainer.remove();
         
     } catch (error) {
         console.error('Error loading content smoothly:', error);
-        // Fallback to regular loading
-        loadContent(false);
+        // Fallback to regular loading only for manual refresh
+        // Don't show errors during auto-refresh
     }
 }
 
