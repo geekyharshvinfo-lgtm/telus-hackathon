@@ -65,6 +65,10 @@ body {
     color: var(--telus-gray-900);
     background-color: var(--telus-gray-50);
     min-height: 100vh;
+}
+
+/* Body layout for dashboard pages with sidebar */
+body.dashboard {
     display: flex;
 }
 
@@ -298,13 +302,7 @@ body {
     justify-content: center;
 }
 
-/* Main Content Layout */
-.main-content {
-    flex: 1;
-    margin-left: 280px;
-    min-height: 100vh;
-    background: var(--telus-gray-50);
-}
+/* Main Content Layout - Dashboard specific styling moved below */
 
 .content-container {
     padding: var(--spacing-xl);
@@ -408,14 +406,24 @@ body {
     opacity: 0.9;
 }
 
-/* Main Content */
+/* Login Page Main Content */
 .main-content {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-3xl) 0;
-    background: linear-gradient(135deg, var(--telus-gray-50) 0%, var(--telus-gray-100) 100%);
+    min-height: 100vh;
+    padding: 0;
+    background: var(--telus-gray-50);
+    width: 100%;
+}
+
+/* Dashboard Main Content */
+body.dashboard .main-content {
+    flex: 1;
+    margin-left: 280px;
+    min-height: 100vh;
+    background: var(--telus-gray-50);
+    padding: 0;
 }
 
 .login-container {
@@ -430,6 +438,17 @@ body {
     padding: var(--spacing-2xl);
     box-shadow: var(--shadow-xl);
     border: 1px solid var(--telus-gray-200);
+}
+
+.login-logo-container {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.login-logo {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
 }
 
 .welcome-title {
