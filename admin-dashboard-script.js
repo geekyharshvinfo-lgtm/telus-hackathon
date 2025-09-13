@@ -5,14 +5,19 @@ let confirmCallback = null;
 
 // Initialize the admin dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    // Load data script first
-    const script = document.createElement('script');
-    script.src = 'data.js';
-    document.head.appendChild(script);
-    
-    script.onload = function() {
+    // Check if DataManager is already available
+    if (typeof DataManager !== 'undefined') {
         initializeAdminDashboard();
-    };
+    } else {
+        // Load data script first
+        const script = document.createElement('script');
+        script.src = 'data.js';
+        document.head.appendChild(script);
+        
+        script.onload = function() {
+            initializeAdminDashboard();
+        };
+    }
 });
 
 function initializeAdminDashboard() {
@@ -22,6 +27,7 @@ function initializeAdminDashboard() {
     loadContentTable();
     loadRecentActivity();
     setupEventListeners();
+    setupRealTimeSync();
 }
 
 function checkAdminAuth() {
@@ -579,6 +585,17 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// Setup real-time synchronization
+function setupRealTimeSync() {
+    if (typeof DataManager !== 'undefined' && DataManager.setupRealTimeSync) {
+        DataManager.setupRealTimeSync(function(detail) {
+            console.log('Content data changed, refreshing admin dashboard...');
+            loadContentTable();
+            loadAdminStats();
+        });
+    }
+}
 
 // Log admin login on page load
 document.addEventListener('DOMContentLoaded', function() {

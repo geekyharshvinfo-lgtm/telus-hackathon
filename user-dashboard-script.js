@@ -9,14 +9,19 @@ let userStats = {
 
 // Initialize the user dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    // Load data script first
-    const script = document.createElement('script');
-    script.src = 'data.js';
-    document.head.appendChild(script);
-    
-    script.onload = function() {
+    // Check if DataManager is already available
+    if (typeof DataManager !== 'undefined') {
         initializeUserDashboard();
-    };
+    } else {
+        // Load data script first
+        const script = document.createElement('script');
+        script.src = 'data.js';
+        document.head.appendChild(script);
+        
+        script.onload = function() {
+            initializeUserDashboard();
+        };
+    }
 });
 
 function initializeUserDashboard() {
@@ -25,6 +30,7 @@ function initializeUserDashboard() {
     loadContent();
     loadUserStats();
     setupEventListeners();
+    setupRealTimeSync();
 }
 
 function checkUserAuth() {
@@ -343,6 +349,17 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// Setup real-time synchronization
+function setupRealTimeSync() {
+    if (typeof DataManager !== 'undefined' && DataManager.setupRealTimeSync) {
+        DataManager.setupRealTimeSync(function(detail) {
+            console.log('Content data changed, refreshing user dashboard...');
+            loadContent();
+            showMessage('Content updated!', 'info');
+        });
+    }
+}
 
 // Update last visit on page load
 document.addEventListener('DOMContentLoaded', function() {
