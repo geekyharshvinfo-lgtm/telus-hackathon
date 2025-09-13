@@ -62,8 +62,8 @@ function loadUserInfo() {
 }
 
 function setupEventListeners() {
-    // Auto-refresh content every 30 seconds
-    setInterval(loadContent, 30000);
+    // Auto-refresh content every 30 seconds with smooth loading
+    setInterval(() => loadContent(true), 30000);
     
     // Load user stats from localStorage if available
     const savedStats = localStorage.getItem('userStats');
@@ -72,14 +72,20 @@ function setupEventListeners() {
     }
 }
 
-function loadContent() {
+function loadContent(isAutoRefresh = false) {
     const contentGrid = document.getElementById('contentGrid');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const emptyState = document.getElementById('emptyState');
     
     if (!contentGrid) return;
     
-    // Show loading
+    // For auto-refresh, use smooth transition instead of showing loading spinner
+    if (isAutoRefresh) {
+        loadContentSmoothly();
+        return;
+    }
+    
+    // Show loading for manual refresh
     showLoading();
     
     setTimeout(() => {
@@ -105,6 +111,86 @@ function loadContent() {
             showEmptyState();
         }
     }, 500); // Simulate loading delay
+}
+
+function loadContentSmoothly() {
+    const contentGrid = document.getElementById('contentGrid');
+    
+    try {
+        let content = DataManager.getAllContent();
+        
+        // Apply filters
+        content = applyContentFilter(content, currentFilter);
+        
+        if (content.length === 0) {
+            showEmptyState();
+            return;
+        }
+        
+        hideEmptyState();
+        
+        // Create new content in background
+        const tempContainer = document.createElement('div');
+        tempContainer.className = 'content-grid';
+        tempContainer.style.opacity = '0';
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.visibility = 'hidden';
+        
+        content.forEach(item => {
+            const contentCard = createContentCard(item);
+            tempContainer.appendChild(contentCard);
+        });
+        
+        // Add temp container to DOM
+        contentGrid.parentNode.appendChild(tempContainer);
+        
+        // Check if content has actually changed
+        if (hasContentChanged(contentGrid, tempContainer)) {
+            // Fade out current content
+            contentGrid.style.transition = 'opacity 0.3s ease';
+            contentGrid.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                // Replace content
+                contentGrid.innerHTML = tempContainer.innerHTML;
+                
+                // Fade in new content
+                contentGrid.style.opacity = '1';
+                
+                // Clean up
+                tempContainer.remove();
+            }, 150);
+        } else {
+            // No changes, just clean up
+            tempContainer.remove();
+        }
+        
+    } catch (error) {
+        console.error('Error loading content smoothly:', error);
+        // Fallback to regular loading
+        loadContent(false);
+    }
+}
+
+function hasContentChanged(currentGrid, newGrid) {
+    const currentCards = currentGrid.querySelectorAll('.content-card');
+    const newCards = newGrid.querySelectorAll('.content-card');
+    
+    if (currentCards.length !== newCards.length) {
+        return true;
+    }
+    
+    // Compare content by checking titles (simple comparison)
+    for (let i = 0; i < currentCards.length; i++) {
+        const currentTitle = currentCards[i].querySelector('h3')?.textContent;
+        const newTitle = newCards[i].querySelector('h3')?.textContent;
+        
+        if (currentTitle !== newTitle) {
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 function applyContentFilter(content, filter) {
