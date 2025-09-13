@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="dashboard">
     <!-- Left Navigation Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-header">
@@ -86,18 +86,360 @@
                 <p class="page-subtitle">Manage and track your assigned tasks and projects.</p>
             </div>
 
-            <!-- Tasks Content -->
+            <!-- Task Overview Section -->
             <div class="content-section">
-                <div class="empty-state">
-                    <div class="empty-icon"><i class="fas fa-tasks"></i></div>
-                    <h3>No tasks assigned yet</h3>
-                    <p>Your tasks and assignments will appear here once they are created.</p>
+                <div class="section-header">
+                    <h2>Task Overview</h2>
+                </div>
+                <div class="task-cards-grid">
+                    <div class="task-overview-card">
+                        <div class="task-card-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="task-card-content">
+                            <h3>My Growth Modules</h3>
+                            <p>Track your learning progress</p>
+                        </div>
+                    </div>
+                    
+                    <div class="task-overview-card">
+                        <div class="task-card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="task-card-content">
+                            <div class="task-number-heading">
+                                <div class="task-count">0</div>
+                                <h3>Task Due</h3>
+                            </div>
+                            <p>tasks pending</p>
+                        </div>
+                    </div>
+                    
+                    <div class="task-overview-card">
+                        <div class="task-card-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="task-card-content">
+                            <div class="task-number-heading">
+                                <div class="task-count">0 / 0</div>
+                                <h3>Task Completed</h3>
+                            </div>
+                            <p>tasks completed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assigned Tasks -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Assigned Tasks</h2>
+                    <div class="task-filters">
+                        <button class="filter-btn" onclick="filterByStatus()">
+                            <i class="fas fa-filter"></i>
+                            Filter by Status
+                        </button>
+                        <button class="filter-btn" onclick="filterByDate()">
+                            <i class="fas fa-calendar-alt"></i>
+                            Filter by Date
+                        </button>
+                    </div>
+                </div>
+                <div class="assigned-tasks-container">
+                    <!-- Low Priority Task -->
+                    <div class="task-card" data-priority="low" data-status="pending" onclick="toggleTaskDetails(this)">
+                        <div class="task-card-header">
+                            <div class="task-info">
+                                <h3 class="task-name">UI/UX Design Review</h3>
+                                <div class="task-meta">
+                                    <span class="task-assigned">Assigned: Dec 10, 2024</span>
+                                    <span class="task-due">Due: Dec 20, 2024</span>
+                                </div>
+                            </div>
+                            <div class="task-details">
+                                <div class="task-assigned-by">Assigned by: Sarah Johnson</div>
+                                <div class="priority-badge priority-low">
+                                    <i class="fas fa-circle"></i>
+                                    Low Priority
+                                </div>
+                            </div>
+                            <div class="task-expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="task-card-content" style="display: none;">
+                            <div class="task-description">
+                                <p>Review the new dashboard design mockups and provide feedback on user experience improvements.</p>
+                            </div>
+                            <div class="task-resources">
+                                <h4>Resources:</h4>
+                                <div class="resource-links">
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-file-pdf"></i>
+                                        Design Guidelines.pdf
+                                    </a>
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-video"></i>
+                                        Design Review Tutorial
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="mark-complete-btn" onclick="markTaskComplete(this)">
+                                    <i class="fas fa-check"></i>
+                                    Mark as Complete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- High Priority Task -->
+                    <div class="task-card" data-priority="high" data-status="pending" onclick="toggleTaskDetails(this)">
+                        <div class="task-card-header">
+                            <div class="task-info">
+                                <h3 class="task-name">Customer Research Analysis</h3>
+                                <div class="task-meta">
+                                    <span class="task-assigned">Assigned: Dec 8, 2024</span>
+                                    <span class="task-due">Due: Dec 15, 2024</span>
+                                </div>
+                            </div>
+                            <div class="task-details">
+                                <div class="task-assigned-by">Assigned by: Michael Chen</div>
+                                <div class="priority-badge priority-high">
+                                    <i class="fas fa-circle"></i>
+                                    High Priority
+                                </div>
+                            </div>
+                            <div class="task-expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="task-card-content" style="display: none;">
+                            <div class="task-description">
+                                <p>Analyze customer feedback data and create actionable insights for product improvement.</p>
+                            </div>
+                            <div class="task-resources">
+                                <h4>Resources:</h4>
+                                <div class="resource-links">
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-file-excel"></i>
+                                        Customer Data.xlsx
+                                    </a>
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-video"></i>
+                                        Research Methods Training
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="mark-complete-btn" onclick="markTaskComplete(this)">
+                                    <i class="fas fa-check"></i>
+                                    Mark as Complete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Task -->
+                    <div class="task-card" data-priority="medium" data-status="completed" onclick="toggleTaskDetails(this)">
+                        <div class="task-card-header">
+                            <div class="task-info">
+                                <h3 class="task-name">Onboarding Process Documentation</h3>
+                                <div class="task-meta">
+                                    <span class="task-assigned">Assigned: Dec 1, 2024</span>
+                                    <span class="task-due">Completed: Dec 7, 2024</span>
+                                </div>
+                            </div>
+                            <div class="task-details">
+                                <div class="task-assigned-by">Assigned by: Lisa Rodriguez</div>
+                                <div class="priority-badge priority-completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    Completed
+                                </div>
+                            </div>
+                            <div class="task-expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="task-card-content" style="display: none;">
+                            <div class="task-description">
+                                <p>Create comprehensive documentation for the new employee onboarding process.</p>
+                            </div>
+                            <div class="task-resources">
+                                <h4>Resources:</h4>
+                                <div class="resource-links">
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-file-word"></i>
+                                        Onboarding Template.docx
+                                    </a>
+                                    <a href="#" class="resource-link">
+                                        <i class="fas fa-video"></i>
+                                        Documentation Best Practices
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="review-again-btn" onclick="reviewTaskAgain(this)">
+                                    <i class="fas fa-undo"></i>
+                                    Review Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
+        // Task Storage Management
+        const STORAGE_KEY = 'telus_task_status';
+
+        // Default task data with original information
+        const defaultTaskData = {
+            'UI/UX Design Review': {
+                status: 'pending',
+                priority: 'low',
+                assignedDate: 'Dec 10, 2024',
+                dueDate: 'Dec 20, 2024',
+                assignedBy: 'Sarah Johnson'
+            },
+            'Customer Research Analysis': {
+                status: 'pending',
+                priority: 'high',
+                assignedDate: 'Dec 8, 2024',
+                dueDate: 'Dec 15, 2024',
+                assignedBy: 'Michael Chen'
+            },
+            'Onboarding Process Documentation': {
+                status: 'completed',
+                priority: 'medium',
+                assignedDate: 'Dec 1, 2024',
+                dueDate: 'Dec 7, 2024',
+                assignedBy: 'Lisa Rodriguez'
+            }
+        };
+
+        function saveTaskData() {
+            const taskCards = document.querySelectorAll('.task-card');
+            const taskData = {};
+
+            taskCards.forEach(card => {
+                const taskName = card.querySelector('.task-name').textContent;
+                const status = card.getAttribute('data-status');
+                const priority = card.getAttribute('data-priority');
+                const assignedDate = card.querySelector('.task-assigned').textContent.replace('Assigned: ', '');
+                const dueDate = card.querySelector('.task-due').textContent.replace(/^(Due: |Completed: )/, '');
+                const assignedBy = card.querySelector('.task-assigned-by').textContent.replace('Assigned by: ', '');
+
+                taskData[taskName] = {
+                    status,
+                    priority,
+                    assignedDate,
+                    dueDate,
+                    assignedBy
+                };
+            });
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(taskData));
+        }
+
+        function loadTaskData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            return savedData ? JSON.parse(savedData) : defaultTaskData;
+        }
+
+        function initializeTasks() {
+            const taskData = loadTaskData();
+            const taskCards = document.querySelectorAll('.task-card');
+
+            taskCards.forEach(card => {
+                const taskName = card.querySelector('.task-name').textContent;
+                const data = taskData[taskName];
+
+                if (data) {
+                    // Update task attributes
+                    card.setAttribute('data-status', data.status);
+                    card.setAttribute('data-priority', data.priority);
+
+                    // Update task meta information
+                    card.querySelector('.task-assigned').textContent = `Assigned: ${data.assignedDate}`;
+                    card.querySelector('.task-assigned-by').textContent = `Assigned by: ${data.assignedBy}`;
+
+                    // Update priority badge and due date based on status
+                    const priorityBadge = card.querySelector('.priority-badge');
+                    const taskDue = card.querySelector('.task-due');
+
+                    if (data.status === 'completed') {
+                        priorityBadge.className = 'priority-badge priority-completed';
+                        priorityBadge.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
+                        taskDue.textContent = `Completed: ${data.dueDate}`;
+
+                        // Add review again button if not present
+                        addReviewAgainButton(card);
+                    } else {
+                        // Set priority badge based on original priority
+                        priorityBadge.className = `priority-badge priority-${data.priority}`;
+                        if (data.priority === 'low') {
+                            priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
+                        } else if (data.priority === 'high') {
+                            priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
+                        }
+                        taskDue.textContent = `Due: ${data.dueDate}`;
+
+                        // Add mark complete button if not present
+                        addMarkCompleteButton(card);
+                    }
+                }
+            });
+
+            updateTaskCounts();
+        }
+
+        function addMarkCompleteButton(taskCard) {
+            const taskContent = taskCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            // Remove existing actions
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            // Create new task actions with mark complete button
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="mark-complete-btn" onclick="markTaskComplete(this)">
+                    <i class="fas fa-check"></i>
+                    Mark as Complete
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+
+        function addReviewAgainButton(taskCard) {
+            const taskContent = taskCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            // Remove existing actions
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            // Create new task actions with review again button
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="review-again-btn" onclick="reviewTaskAgain(this)">
+                    <i class="fas fa-undo"></i>
+                    Review Again
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+
         function toggleProfileMenu() {
             const menu = document.getElementById('profileMenu');
             const profileSection = document.querySelector('.profile-section');
@@ -109,6 +451,173 @@
             window.location.href = 'index.html';
         }
 
+        function toggleTaskDetails(taskCard) {
+            const content = taskCard.querySelector('.task-card-content');
+            const isExpanded = taskCard.classList.contains('expanded');
+            
+            if (isExpanded) {
+                // Collapse
+                content.style.display = 'none';
+                taskCard.classList.remove('expanded');
+            } else {
+                // Expand
+                content.style.display = 'block';
+                taskCard.classList.add('expanded');
+            }
+        }
+
+        function markTaskComplete(button) {
+            // Prevent event bubbling to avoid triggering card toggle
+            event.stopPropagation();
+            
+            // Find the parent task card
+            const taskCard = button.closest('.task-card');
+            const taskName = taskCard.querySelector('.task-name').textContent;
+            
+            // Update task status
+            taskCard.setAttribute('data-status', 'completed');
+            
+            // Update priority badge
+            const priorityBadge = taskCard.querySelector('.priority-badge');
+            priorityBadge.className = 'priority-badge priority-completed';
+            priorityBadge.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
+            
+            // Update task meta to show completion date
+            const taskDue = taskCard.querySelector('.task-due');
+            const today = new Date();
+            const completionDate = today.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            taskDue.textContent = `Completed: ${completionDate}`;
+            
+            // Replace mark complete button with review again button
+            addReviewAgainButton(taskCard);
+            
+            // Save to localStorage
+            saveTaskData();
+            
+            // Update task counts
+            updateTaskCounts();
+            
+            // Show success message
+            showTaskCompletionMessage(taskName);
+        }
+
+        function reviewTaskAgain(button) {
+            // Prevent event bubbling to avoid triggering card toggle
+            event.stopPropagation();
+            
+            // Find the parent task card
+            const taskCard = button.closest('.task-card');
+            const taskName = taskCard.querySelector('.task-name').textContent;
+            
+            // Get original task data
+            const originalData = defaultTaskData[taskName];
+            if (!originalData) return;
+            
+            // Revert task status to original
+            taskCard.setAttribute('data-status', originalData.status);
+            taskCard.setAttribute('data-priority', originalData.priority);
+            
+            // Update priority badge to original
+            const priorityBadge = taskCard.querySelector('.priority-badge');
+            priorityBadge.className = `priority-badge priority-${originalData.priority}`;
+            if (originalData.priority === 'low') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
+            } else if (originalData.priority === 'high') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
+            } else if (originalData.priority === 'medium') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Medium Priority';
+            }
+            
+            // Update task meta to show original due date
+            const taskDue = taskCard.querySelector('.task-due');
+            taskDue.textContent = `Due: ${originalData.dueDate}`;
+            
+            // Replace review again button with mark complete button
+            addMarkCompleteButton(taskCard);
+            
+            // Save to localStorage
+            saveTaskData();
+            
+            // Update task counts
+            updateTaskCounts();
+            
+            // Show revert message
+            showTaskRevertMessage(taskName);
+        }
+
+        function showTaskCompletionMessage(taskName) {
+            // Create a temporary success message
+            const message = document.createElement('div');
+            message.className = 'task-completion-message';
+            message.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                Task "${taskName}" marked as completed!
+            `;
+            
+            // Add to page
+            document.body.appendChild(message);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 3000);
+        }
+
+        function showTaskRevertMessage(taskName) {
+            // Create a temporary revert message
+            const message = document.createElement('div');
+            message.className = 'task-completion-message';
+            message.style.background = 'var(--telus-purple)';
+            message.innerHTML = `
+                <i class="fas fa-undo"></i>
+                Task "${taskName}" reverted for review!
+            `;
+            
+            // Add to page
+            document.body.appendChild(message);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 3000);
+        }
+
+        function updateTaskCounts() {
+            const taskCards = document.querySelectorAll('.task-card');
+            let pendingCount = 0;
+            let completedCount = 0;
+            let totalCount = taskCards.length;
+
+            taskCards.forEach(card => {
+                const status = card.getAttribute('data-status');
+                if (status === 'pending') {
+                    pendingCount++;
+                } else if (status === 'completed') {
+                    completedCount++;
+                }
+            });
+
+            // Update task due count
+            const taskDueElement = document.querySelector('.task-overview-card:nth-child(2) .task-count');
+            if (taskDueElement) {
+                taskDueElement.textContent = pendingCount;
+            }
+
+            // Update task completed count
+            const taskCompletedElement = document.querySelector('.task-overview-card:nth-child(3) .task-count');
+            if (taskCompletedElement) {
+                taskCompletedElement.textContent = `${completedCount} / ${totalCount}`;
+            }
+        }
+
         // Close profile menu when clicking outside
         document.addEventListener('click', function(event) {
             const profileSection = document.querySelector('.profile-section');
@@ -118,6 +627,22 @@
                 menu.classList.remove('show');
                 profileSection.classList.remove('open');
             }
+        });
+
+        // Filter Functions (placeholder - no actual functionality)
+        function filterByStatus() {
+            console.log('Filter by Status clicked');
+            // Placeholder function - would implement status filtering logic here
+        }
+
+        function filterByDate() {
+            console.log('Filter by Date clicked');
+            // Placeholder function - would implement date filtering logic here
+        }
+
+        // Initialize tasks when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTasks();
         });
     </script>
 </body>
