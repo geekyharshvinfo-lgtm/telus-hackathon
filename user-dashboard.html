@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELUS Digital - User Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="telus-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="telus-logo">
+                    <span class="telus-brand">TELUS</span>
+                    <span class="telus-digital">Digital</span>
+                </div>
+                <nav class="header-nav">
+                    <div class="user-info">
+                        <span class="welcome-text">Welcome, <span id="userName">User</span>!</span>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <div class="container">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Your Dashboard</h1>
+                <p class="dashboard-subtitle">Discover and explore content curated just for you</p>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Latest Content</h2>
+                    <div class="content-filters">
+                        <button class="filter-btn active" onclick="filterContent('all')">All</button>
+                        <button class="filter-btn" onclick="filterContent('recent')">Recent</button>
+                        <button class="filter-btn" onclick="filterContent('popular')">Popular</button>
+                    </div>
+                </div>
+                
+                <div class="content-grid" id="contentGrid">
+                    <!-- Content will be loaded here by JavaScript -->
+                </div>
+                
+                <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Loading content...</p>
+                </div>
+                
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">📭</div>
+                    <h3>No content available</h3>
+                    <p>Check back later for new content updates!</p>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <h2>Your Activity</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-info">
+                            <h3 id="viewCount">0</h3>
+                            <p>Content Viewed</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3 id="lastVisit">Today</h3>
+                            <p>Last Visit</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-info">
+                            <h3 id="favoriteCount">0</h3>
+                            <p>Favorites</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="telus-footer">
+        <div class="container">
+            <p>2025 TELUS Digital</p>
+            <div class="footer-links">
+                <a href="#">All rights reserved</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Content Detail Modal -->
+    <div class="modal" id="contentModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Content Title</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" src="" alt="" style="display: none;">
+                <p id="modalDescription">Content description</p>
+                <div class="modal-meta">
+                    <span id="modalDate">Date</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn-primary" onclick="addToFavorites()">Add to Favorites</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="user-dashboard-script.js"></script>
+</body>
+</html>

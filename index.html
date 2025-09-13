@@ -3,19 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic HTML Page</title>
+    <title>TELUS Digital - Login</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is a basic HTML page with some body text content.</p>
-    <p>HTML (HyperText Markup Language) is the standard markup language for creating web pages. It describes the structure of a web page using markup elements.</p>
-    <h2>About This Page</h2>
-    <p>This page demonstrates basic HTML structure including:</p>
-    <ul>
-        <li>Headings (h1, h2)</li>
-        <li>Paragraphs (p)</li>
-        <li>Lists (ul, li)</li>
-    </ul>
-    <p>You can modify this content to suit your needs.</p>
+    <!-- Header -->
+    <header class="telus-header">
+        <div class="container">
+            <div class="telus-logo">
+                <span class="telus-brand">TELUS</span>
+                <span class="telus-digital">Digital</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="login-container">
+                <div class="welcome-card">
+                    <h1 class="welcome-title">Welcome!</h1>
+                    <p class="welcome-subtitle">Choose your login type to continue</p>
+                    
+                    <!-- Login Options -->
+                    <div class="login-options">
+                        <div class="login-option" onclick="selectLoginType('user')">
+                            <div class="option-icon user-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="currentColor"/>
+                                    <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <h3>Login as User</h3>
+                            <p>Access your personal dashboard and content</p>
+                        </div>
+                        
+                        <div class="login-option" onclick="selectLoginType('admin')">
+                            <div class="option-icon admin-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 7C13.1 7 14 7.9 14 9S13.1 11 12 11 10 10.1 10 9 10.9 7 12 7ZM18 17H6V15.5C6 13.83 9.33 13 12 13S18 13.83 18 15.5V17Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <h3>Login as Admin</h3>
+                            <p>Manage content and system administration</p>
+                        </div>
+                    </div>
+
+                    <!-- Login Form (Hidden initially) -->
+                    <div class="login-form-container" id="loginFormContainer" style="display: none;">
+                        <div class="divider">
+                            <span>Or continue with email</span>
+                        </div>
+                        
+                        <form id="loginForm" class="login-form">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" required>
+                            </div>
+                            
+                            <button type="submit" class="continue-btn" id="continueBtn">
+                                Continue
+                            </button>
+                        </form>
+                        
+                        <div class="demo-credentials">
+                            <p><strong>Demo Credentials:</strong></p>
+                            <p>User: user@demo.com / password123</p>
+                            <p>Admin: admin@demo.com / admin123</p>
+                        </div>
+                        
+                        <div class="terms">
+                            <p>By continuing, you agree to our 
+                                <a href="#" class="terms-link">Terms of Service</a> and 
+                                <a href="#" class="terms-link">Privacy Policy</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="telus-footer">
+        <div class="container">
+            <p>2025 TELUS Digital</p>
+            <div class="footer-links">
+                <a href="#">All rights reserved</a>
+                <a href="#">Terms of Use</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="landing-script.js"></script>
 </body>
 </html>
