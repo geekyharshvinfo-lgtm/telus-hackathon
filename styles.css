@@ -1550,3 +1550,57 @@ body {
         font-size: 20px;
     }
 }
+
+/* Chatbot Confirmation Buttons */
+.chatbot-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    justify-content: flex-start;
+}
+
+.chatbot-confirmation-btn {
+    background: var(--telus-white);
+    border: 2px solid var(--telus-purple);
+    color: var(--telus-purple);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 60px;
+    text-align: center;
+}
+
+.chatbot-confirmation-btn:hover {
+    background: var(--telus-purple);
+    color: var(--telus-white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.chatbot-confirmation-btn:active {
+    transform: translateY(0);
+}
+
+.chatbot-confirmation-btn:first-child {
+    background: var(--telus-purple);
+    color: var(--telus-white);
+}
+
+.chatbot-confirmation-btn:first-child:hover {
+    background: var(--telus-purple-dark);
+}
+
+.chatbot-confirmation-btn:last-child {
+    background: var(--telus-gray-100);
+    border-color: var(--telus-gray-300);
+    color: var(--telus-gray-700);
+}
+
+.chatbot-confirmation-btn:last-child:hover {
+    background: var(--telus-gray-200);
+    border-color: var(--telus-gray-400);
+    color: var(--telus-gray-800);
+}

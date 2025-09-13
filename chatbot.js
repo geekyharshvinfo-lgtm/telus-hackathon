@@ -136,7 +136,9 @@ class TelusChatbot {
         // Close chatbot when clicking outside
         document.addEventListener('click', (e) => {
             const container = document.getElementById('chatbotContainer');
-            if (this.isOpen && !container.contains(e.target)) {
+            // Don't close if clicking on confirmation buttons
+            const isConfirmationButton = e.target.classList.contains('chatbot-confirmation-btn');
+            if (this.isOpen && !container.contains(e.target) && !isConfirmationButton) {
                 this.closeChatbot();
             }
         });
@@ -214,6 +216,55 @@ class TelusChatbot {
         this.scrollToBottom();
         
         this.messages.push({ text, sender, timestamp: new Date() });
+    }
+    
+    addMessageWithButtons(text, sender, buttons) {
+        const messagesContainer = document.getElementById('chatbotMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chatbot-message ${sender}`;
+        
+        // Add the text content
+        const textDiv = document.createElement('div');
+        textDiv.textContent = text;
+        messageDiv.appendChild(textDiv);
+        
+        // Add buttons container
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'chatbot-buttons';
+        
+        buttons.forEach(button => {
+            const buttonElement = document.createElement('button');
+            buttonElement.className = 'chatbot-confirmation-btn';
+            buttonElement.textContent = button.text;
+            buttonElement.onclick = (event) => this.handleButtonClick(button.action, event);
+            buttonsDiv.appendChild(buttonElement);
+        });
+        
+        messageDiv.appendChild(buttonsDiv);
+        messagesContainer.appendChild(messageDiv);
+        this.scrollToBottom();
+        
+        this.messages.push({ text, sender, timestamp: new Date(), hasButtons: true });
+    }
+    
+    handleButtonClick(action, event) {
+        // Prevent event bubbling to avoid triggering the "click outside" listener
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // Remove all confirmation buttons to prevent multiple clicks
+        const buttons = document.querySelectorAll('.chatbot-confirmation-btn');
+        buttons.forEach(btn => btn.remove());
+        
+        if (action === 'confirmYes') {
+            this.addMessage('Yes', 'user');
+            this.handleConfirmationResponse('yes');
+        } else if (action === 'confirmNo') {
+            this.addMessage('No', 'user');
+            this.handleConfirmationResponse('no');
+        }
     }
     
     showTyping() {
@@ -334,11 +385,12 @@ class TelusChatbot {
         
         const confirmationMessage = `I notice you're asking about something outside the TELUS Digital ecosystem. I can help you with general knowledge questions too! 
 
-Would you like me to search for information about "${query}" outside of TELUS services?
-
-Please reply with "yes" to proceed or "no" to ask about TELUS Digital services instead.`;
+Would you like me to search for information about "${query}" outside of TELUS services?`;
         
-        this.addMessage(confirmationMessage, 'bot');
+        this.addMessageWithButtons(confirmationMessage, 'bot', [
+            { text: 'Yes', action: 'confirmYes' },
+            { text: 'No', action: 'confirmNo' }
+        ]);
     }
     
     // Handle user's confirmation response
@@ -481,11 +533,18 @@ Please reply with "yes" to proceed or "no" to ask about TELUS Digital services i
 
 // Initialize chatbot when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Only initialize if not already initialized
-    if (!window.telusChatbot) {
+    // Only initialize if not already initialized and if chatbot container doesn't exist
+    if (!window.telusChatbot && !document.getElementById('chatbotContainer')) {
         window.telusChatbot = new TelusChatbot();
     }
 });
+
+// Prevent multiple script executions
+if (window.telusChatbotLoaded) {
+    // Script already loaded, don't execute again
+} else {
+    window.telusChatbotLoaded = true;
+}
 
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
