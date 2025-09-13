@@ -171,26 +171,34 @@ body {
 .option-icon {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto var(--spacing-md);
     transition: all 0.2s ease;
+    background: none;
+    border: none;
+    box-shadow: none;
 }
 
 .user-icon {
-    background: rgba(66, 133, 244, 0.1);
-    color: var(--telus-blue);
+    background: none;
+    color: var(--telus-purple);
 }
 
 .admin-icon {
-    background: rgba(75, 40, 109, 0.1);
+    background: none;
     color: var(--telus-purple);
 }
 
 .login-option:hover .option-icon {
-    transform: scale(1.1);
+    transform: none;
+    color: var(--telus-purple);
+}
+
+.login-option.selected .option-icon {
+    color: var(--telus-purple);
 }
 
 .login-option h3 {
@@ -634,8 +642,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--telus-gray-100);
-    border-radius: 50%;
+    background: none;
+    border-radius: 0;
+    color: var(--telus-purple);
+    border: none;
+    box-shadow: none;
 }
 
 .stat-info h3 {
@@ -781,6 +792,9 @@ body {
 .empty-icon {
     font-size: 48px;
     margin-bottom: var(--spacing-lg);
+    color: var(--telus-purple);
+    border: none;
+    box-shadow: none;
 }
 
 .empty-state h3,
@@ -916,6 +930,9 @@ body {
 
 .btn-icon {
     font-size: var(--font-size-lg);
+    color: inherit;
+    border: none;
+    box-shadow: none;
 }
 
 /* Table Styles */
@@ -1131,12 +1148,15 @@ body {
 .activity-icon {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
-    background: var(--telus-gray-100);
+    border-radius: 0;
+    background: none;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: var(--font-size-sm);
+    color: var(--telus-purple);
+    border: none;
+    box-shadow: none;
 }
 
 .activity-content {
@@ -1269,9 +1289,11 @@ body {
 }
 
 .chatbot-button-icon {
-    color: var(--telus-white);
+    color: var(--telus-purple);
     font-size: 24px;
     transition: transform 0.3s ease;
+    border: none;
+    box-shadow: none;
 }
 
 .chatbot-button.active .chatbot-button-icon {
@@ -1465,14 +1487,16 @@ body {
 .typing-avatar {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--telus-purple) 0%, var(--telus-purple-dark) 100%);
+    border-radius: 0;
+    background: none;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: none;
     animation: avatarPulse 2s infinite ease-in-out;
+    color: var(--telus-purple);
+    border: none;
 }
 
 @keyframes avatarPulse {
@@ -1726,4 +1750,232 @@ body {
     background: var(--telus-gray-200);
     border-color: var(--telus-gray-400);
     color: var(--telus-gray-800);
+}
+
+/* Compact Profile Dropdown Styles */
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-btn-compact {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    color: var(--telus-white);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: all 0.2s ease;
+    font-family: inherit;
+    font-size: var(--font-size-xs);
+    min-width: auto;
+}
+
+.profile-btn-compact:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.profile-dropdown.active .profile-btn-compact {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.profile-icon-compact {
+    width: 24px;
+    height: 24px;
+    border-radius: 0;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    color: var(--telus-purple);
+    border: none;
+    box-shadow: none;
+}
+
+.profile-name-compact {
+    font-weight: 500;
+    font-size: var(--font-size-xs);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.dropdown-arrow-compact {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
+.profile-dropdown.active .dropdown-arrow-compact {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu-compact {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--spacing-xs);
+    background: var(--telus-white);
+    border: 1px solid var(--telus-gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 160px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.profile-dropdown.active .dropdown-menu-compact {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.dropdown-item-compact {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--telus-gray-700);
+    text-decoration: none;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dropdown-item-compact:hover {
+    background: var(--telus-gray-50);
+    color: var(--telus-purple);
+}
+
+.dropdown-item-compact:last-child:hover {
+    background: rgba(244, 67, 54, 0.05);
+    color: #C62828;
+}
+
+.dropdown-item-icon {
+    font-size: 12px;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+    color: var(--telus-purple);
+    border: none;
+    box-shadow: none;
+}
+
+/* Responsive Profile Dropdown */
+@media (max-width: 768px) {
+    .profile-btn {
+        min-width: 150px;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .profile-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+    
+    .profile-name {
+        font-size: var(--font-size-xs);
+    }
+    
+    .profile-role {
+        font-size: 10px;
+    }
+    
+    .dropdown-menu {
+        min-width: 250px;
+        right: -20px;
+    }
+    
+    .dropdown-header {
+        padding: var(--spacing-md);
+    }
+    
+    .dropdown-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-btn {
+        min-width: 120px;
+        gap: var(--spacing-xs);
+    }
+    
+    .profile-info {
+        display: none;
+    }
+    
+    .dropdown-menu {
+        min-width: 220px;
+        right: -40px;
+    }
+    
+    .dropdown-item {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+}
+
+/* Animation for dropdown appearance */
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.profile-dropdown.active .dropdown-menu {
+    animation: dropdownSlideIn 0.2s ease;
+}
+
+/* Focus states for accessibility */
+.profile-btn:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+.dropdown-item:focus {
+    background: var(--telus-gray-50);
+    color: var(--telus-purple);
+    outline: 2px solid var(--telus-purple-light);
+    outline-offset: -2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .profile-btn {
+        border-width: 2px;
+    }
+    
+    .dropdown-menu {
+        border-width: 2px;
+    }
+    
+    .dropdown-item:hover {
+        background: var(--telus-gray-100);
+    }
 }

@@ -16,9 +16,22 @@
                     <span class="telus-digital">Digital</span>
                 </div>
                 <nav class="header-nav">
-                    <div class="user-info">
-                        <span class="welcome-text">Welcome, <span id="userName">User</span>!</span>
-                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <button class="profile-btn-compact" onclick="toggleProfileDropdown()">
+                            <div class="profile-icon-compact">👤</div>
+                            <span class="profile-name-compact" id="profileName">Demo User</span>
+                            <div class="dropdown-arrow-compact">▼</div>
+                        </button>
+                        <div class="dropdown-menu-compact" id="dropdownMenu">
+                            <a href="#" class="dropdown-item-compact" onclick="goToProfile()">
+                                <span class="dropdown-item-icon">👤</span>
+                                My Profile
+                            </a>
+                            <a href="#" class="dropdown-item-compact" onclick="logout()">
+                                <span class="dropdown-item-icon">🚪</span>
+                                Logout
+                            </a>
+                        </div>
                     </div>
                 </nav>
             </div>

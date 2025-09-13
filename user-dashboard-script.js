@@ -54,9 +54,26 @@ function loadUserInfo() {
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
         const user = JSON.parse(currentUser);
-        const userName = document.getElementById('userName');
-        if (userName) {
-            userName.textContent = user.name;
+        
+        // Update profile dropdown elements
+        const profileName = document.getElementById('profileName');
+        const dropdownName = document.getElementById('dropdownName');
+        const dropdownEmail = document.getElementById('dropdownEmail');
+        
+        if (profileName) {
+            profileName.textContent = user.name;
+        }
+        if (dropdownName) {
+            dropdownName.textContent = user.name;
+        }
+        if (dropdownEmail) {
+            dropdownEmail.textContent = user.email;
+        }
+        
+        // Update role if admin
+        const profileRole = document.querySelector('.profile-role');
+        if (profileRole && user.role === 'admin') {
+            profileRole.textContent = 'Administrator';
         }
     }
 }
@@ -455,6 +472,47 @@ function setupRealTimeSync() {
             showMessage('Content updated!', 'info');
         });
     }
+}
+
+// Profile dropdown functionality
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    
+    if (dropdown && dropdownMenu) {
+        dropdown.classList.toggle('active');
+        
+        // Close dropdown when clicking outside
+        if (dropdown.classList.contains('active')) {
+            setTimeout(() => {
+                document.addEventListener('click', closeDropdownOnOutsideClick);
+            }, 0);
+        } else {
+            document.removeEventListener('click', closeDropdownOnOutsideClick);
+        }
+    }
+}
+
+function closeDropdownOnOutsideClick(event) {
+    const dropdown = document.getElementById('profileDropdown');
+    if (dropdown && !dropdown.contains(event.target)) {
+        dropdown.classList.remove('active');
+        document.removeEventListener('click', closeDropdownOnOutsideClick);
+    }
+}
+
+function goToProfile() {
+    // Close dropdown first
+    const dropdown = document.getElementById('profileDropdown');
+    if (dropdown) {
+        dropdown.classList.remove('active');
+    }
+    
+    // For now, show a message that profile page is coming soon
+    showMessage('Profile page coming soon!', 'info');
+    
+    // In a real application, you would navigate to the profile page:
+    // window.location.href = 'profile.html';
 }
 
 // Update last visit on page load
