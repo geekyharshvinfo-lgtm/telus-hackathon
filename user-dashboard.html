@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TELUS Digital - Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="user-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="dashboard">
@@ -31,15 +31,15 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="expertise-hub.html" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-bullseye"></i></span>
-                        <span class="nav-text">Expertise Hub</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="documents.html" class="nav-link">
                         <span class="nav-icon"><i class="fas fa-file-alt"></i></span>
                         <span class="nav-text">Documents</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="expertise-hub.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        <span class="nav-text">Expertise Hub</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -124,19 +124,15 @@
                         <div class="stat-content">
                             <div class="stat-numbers">
                                 <div class="stat-item">
-                                    <span class="stat-value" id="tasksPending">2</span>
+                                    <span class="stat-value" id="tasksPending">0</span>
                                     <span class="stat-label">Pending</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-value" id="tasksCompleted">1</span>
+                                    <span class="stat-value" id="tasksCompleted">0</span>
                                     <span class="stat-label">Completed</span>
                                 </div>
                             </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="tasksProgress" style="width: 33%"></div>
-                            </div>
                             <div class="stat-footer">
-                                <span class="progress-text" id="tasksProgressText">33% Complete</span>
                                 <a href="my-tasks.html" class="quick-action">View Tasks <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
@@ -155,19 +151,15 @@
                         <div class="stat-content">
                             <div class="stat-numbers">
                                 <div class="stat-item">
-                                    <span class="stat-value" id="docsPending">2</span>
+                                    <span class="stat-value" id="docsPending">0</span>
                                     <span class="stat-label">Pending</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-value" id="docsCompleted">1</span>
+                                    <span class="stat-value" id="docsCompleted">0</span>
                                     <span class="stat-label">Approved</span>
                                 </div>
                             </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="docsProgress" style="width: 33%"></div>
-                            </div>
                             <div class="stat-footer">
-                                <span class="progress-text" id="docsProgressText">33% Complete</span>
                                 <a href="documents.html" class="quick-action">View Documents <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
@@ -194,24 +186,8 @@
                                     <span class="stat-label">Active Projects</span>
                                 </div>
                             </div>
-                            <div class="team-status">
-                                <div class="status-indicators">
-                                    <div class="status-item">
-                                        <span class="status-dot online"></span>
-                                        <span>8 Online</span>
-                                    </div>
-                                    <div class="status-item">
-                                        <span class="status-dot away"></span>
-                                        <span>2 Away</span>
-                                    </div>
-                                    <div class="status-item">
-                                        <span class="status-dot offline"></span>
-                                        <span>2 Offline</span>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="stat-footer">
-                                <a href="expertise-hub.html" class="quick-action">View Team <i class="fas fa-arrow-right"></i></a>
+                                <a href="help-support.html" class="quick-action">Contact Support <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -304,13 +280,13 @@
                         </div>
                     </a>
                     
-                    <a href="expertise-hub.html" class="quick-action-card">
+                    <a href="help-support.html" class="quick-action-card">
                         <div class="action-icon">
-                            <i class="fas fa-search"></i>
+                            <i class="fas fa-question-circle"></i>
                         </div>
                         <div class="action-content">
-                            <h4>Find Team Member</h4>
-                            <p>Browse team directory</p>
+                            <h4>Get Help & Support</h4>
+                            <p>Access help resources and support</p>
                         </div>
                     </a>
                     
@@ -340,6 +316,7 @@
         </div>
     </div>
 
+    <script src="sync-manager.js"></script>
     <script src="data.js"></script>
     <script src="user-dashboard-script.js"></script>
     <script src="config/gemini-config.js"></script>

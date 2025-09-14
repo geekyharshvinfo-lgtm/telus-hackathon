@@ -34,7 +34,33 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
     setupEventListeners();
     loadUserStats();
+    
+    // Force immediate data load and update
+    console.log('Forcing immediate data load on page initialization...');
+    loadTaskData();
+    loadDocumentData();
     updateOverviewStats();
+    
+    // Log current localStorage data for debugging
+    const currentDocData = localStorage.getItem('telus_document_status');
+    console.log('Current document data on page load:', currentDocData);
+    
+    // Setup sync listeners after a short delay to ensure SyncManager is loaded
+    setTimeout(() => {
+        setupSyncListeners();
+    }, 100);
+    
+    // Additional forced refresh after a short delay to catch any timing issues
+    setTimeout(() => {
+        console.log('Secondary data refresh after initialization...');
+        loadTaskData();
+        loadDocumentData();
+        updateOverviewStats();
+        
+        // Log again to see if data changed
+        const updatedDocData = localStorage.getItem('telus_document_status');
+        console.log('Document data after secondary refresh:', updatedDocData);
+    }, 500);
 });
 
 // Initialize dashboard components
@@ -108,7 +134,6 @@ function updateOverviewStats() {
     updateTaskStats();
     updateDocumentStats();
     updateTeamStats();
-    updateProgressBars();
     updateOverallProgress();
 }
 
@@ -139,23 +164,47 @@ function loadTaskData() {
 // Load document data from localStorage
 function loadDocumentData() {
     const docData = localStorage.getItem('telus_document_status');
+    
     if (docData) {
-        const documents = JSON.parse(docData);
-        let pending = 0;
-        let completed = 0;
-        
-        Object.values(documents).forEach(doc => {
-            if (doc.status === 'pending') {
-                pending++;
-            } else if (doc.status === 'completed') {
-                completed++;
-            }
-        });
-        
+        try {
+            const documents = JSON.parse(docData);
+            
+            let pending = 0;
+            let completed = 0;
+            let underReview = 0;
+            let approved = 0;
+            
+            Object.values(documents).forEach(doc => {
+                if (doc.status === 'pending') {
+                    pending++;
+                } else if (doc.status === 'completed' || doc.status === 'approved') {
+                    completed++;
+                    if (doc.status === 'approved') {
+                        approved++;
+                    }
+                } else if (doc.status === 'under-review') {
+                    underReview++;
+                }
+            });
+            
+            dashboardData.documents = {
+                pending: pending,
+                completed: completed,
+                underReview: underReview,
+                approved: approved,
+                total: pending + completed + underReview
+            };
+        } catch (error) {
+            console.error('Error parsing document data:', error);
+        }
+    } else {
+        // Reset to default values when no data
         dashboardData.documents = {
-            pending: pending,
-            completed: completed,
-            total: pending + completed
+            pending: 0,
+            completed: 0,
+            underReview: 0,
+            approved: 0,
+            total: 0
         };
     }
 }
@@ -164,38 +213,20 @@ function loadDocumentData() {
 function updateTaskStats() {
     const tasksPending = document.getElementById('tasksPending');
     const tasksCompleted = document.getElementById('tasksCompleted');
-    const tasksProgress = document.getElementById('tasksProgress');
-    const tasksProgressText = document.getElementById('tasksProgressText');
     
     if (tasksPending) tasksPending.textContent = dashboardData.tasks.pending;
     if (tasksCompleted) tasksCompleted.textContent = dashboardData.tasks.completed;
-    
-    // Calculate progress percentage
-    const progressPercentage = dashboardData.tasks.total > 0 
-        ? Math.round((dashboardData.tasks.completed / dashboardData.tasks.total) * 100)
-        : 0;
-    
-    if (tasksProgress) tasksProgress.style.width = progressPercentage + '%';
-    if (tasksProgressText) tasksProgressText.textContent = progressPercentage + '% Complete';
 }
 
 // Update document statistics in UI
 function updateDocumentStats() {
     const docsPending = document.getElementById('docsPending');
     const docsCompleted = document.getElementById('docsCompleted');
-    const docsProgress = document.getElementById('docsProgress');
-    const docsProgressText = document.getElementById('docsProgressText');
+    const docsUnderReview = document.getElementById('docsUnderReview');
     
     if (docsPending) docsPending.textContent = dashboardData.documents.pending;
     if (docsCompleted) docsCompleted.textContent = dashboardData.documents.completed;
-    
-    // Calculate progress percentage
-    const progressPercentage = dashboardData.documents.total > 0 
-        ? Math.round((dashboardData.documents.completed / dashboardData.documents.total) * 100)
-        : 0;
-    
-    if (docsProgress) docsProgress.style.width = progressPercentage + '%';
-    if (docsProgressText) docsProgressText.textContent = progressPercentage + '% Complete';
+    if (docsUnderReview) docsUnderReview.textContent = dashboardData.documents.underReview || 0;
 }
 
 // Update team statistics in UI
@@ -204,12 +235,6 @@ function updateTeamStats() {
     // In a real application, these would come from an API
 }
 
-// Update progress bars
-function updateProgressBars() {
-    // Don't reset progress bars - they should maintain their values
-    // The progress bars are already set with correct values in updateTaskStats() and updateDocumentStats()
-    // No animation needed as it causes the bars to reset to zero
-}
 
 // Update overall progress circular indicator
 function updateOverallProgress() {
@@ -254,7 +279,15 @@ function refreshActivity() {
     
     // Simulate refresh delay
     setTimeout(() => {
+        // Force reload data from localStorage
+        loadTaskData();
+        loadDocumentData();
         updateOverviewStats();
+        
+        // Trigger sync manager refresh if available
+        if (window.SyncManager) {
+            window.SyncManager.refreshAllData();
+        }
         
         if (refreshBtn) {
             refreshBtn.classList.remove('loading');
@@ -435,12 +468,142 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-// Listen for storage changes to update dashboard when data changes
-window.addEventListener('storage', function(e) {
-    if (e.key === 'telus_task_status' || e.key === 'telus_document_status') {
-        updateOverviewStats();
+// Setup SyncManager listeners for real-time updates
+function setupSyncListeners() {
+    if (window.SyncManager) {
+        // Listen for task changes
+        window.SyncManager.addListener('tasks', (data, source) => {
+            console.log('Tasks updated from:', source);
+            loadTaskData();
+            updateTaskStats();
+            updateOverallProgress();
+            updateOverviewStats();
+            if (source === 'admin') {
+                showMessage('Tasks updated by administrator', 'info');
+            }
+        });
+        
+        // Listen for document changes
+        window.SyncManager.addListener('documents', (data, source) => {
+            console.log('Documents updated from:', source);
+            loadDocumentData();
+            updateDocumentStats();
+            updateOverallProgress();
+            updateOverviewStats();
+            if (source === 'admin') {
+                showMessage('Documents updated by administrator', 'info');
+            }
+        });
+        
+        
+        // Listen for activity changes
+        window.SyncManager.addListener('activities', (data, source) => {
+            console.log('Activities updated from:', source);
+        });
+        
+        console.log('SyncManager listeners setup complete');
+    } else {
+        console.warn('SyncManager not available, retrying in 500ms...');
+        setTimeout(setupSyncListeners, 500);
     }
-});
+}
+
+// Enhanced localStorage event listeners for real-time synchronization
+function setupEnhancedStorageListeners() {
+    console.log('Setting up enhanced localStorage event listeners...');
+    
+    // Listen for storage changes to update dashboard when data changes (cross-tab sync)
+    window.addEventListener('storage', function(e) {
+        console.log('Storage event detected:', e.key, e.newValue);
+        
+        if (e.key === 'telus_document_status') {
+            console.log('Document data changed, updating dashboard...');
+            loadDocumentData();
+            updateDocumentStats();
+            updateOverallProgress();
+            showMessage('Documents updated by administrator', 'info');
+            
+            // Log the current document data for debugging
+            const currentData = localStorage.getItem('telus_document_status');
+            console.log('Current document data after storage event:', currentData);
+        } else if (e.key === 'telus_task_status') {
+            console.log('Task data changed, updating dashboard...');
+            loadTaskData();
+            updateTaskStats();
+            updateOverallProgress();
+            showMessage('Tasks updated by administrator', 'info');
+        }
+    });
+
+    // Listen for custom events for same-tab synchronization
+    window.addEventListener('dataUpdated', function(e) {
+        console.log('Custom data update event:', e.detail);
+        const { type } = e.detail || {};
+        
+        if (type === 'documents' || !type) {
+            loadDocumentData();
+            updateDocumentStats();
+        }
+        if (type === 'tasks' || !type) {
+            loadTaskData();
+            updateTaskStats();
+        }
+        updateOverallProgress();
+        showMessage('Data updated by administrator', 'info');
+    });
+
+    // Listen for TELUS data sync events
+    window.addEventListener('telusDataSync', function(e) {
+        console.log('TELUS data sync event:', e.detail);
+        const { type, source } = e.detail || {};
+        
+        if (type === 'documents') {
+            console.log('Documents synced, refreshing document overview...');
+            loadDocumentData();
+            updateDocumentStats();
+            updateOverallProgress();
+            
+            if (source === 'admin') {
+                showMessage('Documents updated by administrator', 'info');
+            }
+        } else if (type === 'tasks') {
+            console.log('Tasks synced, refreshing task overview...');
+            loadTaskData();
+            updateTaskStats();
+            updateOverallProgress();
+            
+            if (source === 'admin') {
+                showMessage('Tasks updated by administrator', 'info');
+            }
+        }
+    });
+    
+    // Add periodic refresh to catch any missed updates
+    setInterval(function() {
+        const currentDocData = localStorage.getItem('telus_document_status');
+        if (currentDocData) {
+            try {
+                const docs = JSON.parse(currentDocData);
+                const docCount = Object.keys(docs).length;
+                
+                // Only update if we detect a change in document count
+                if (docCount !== dashboardData.documents.total) {
+                    console.log('Periodic check detected document changes, refreshing...');
+                    loadDocumentData();
+                    updateDocumentStats();
+                    updateOverallProgress();
+                }
+            } catch (error) {
+                console.error('Error in periodic document check:', error);
+            }
+        }
+    }, 5000); // Check every 5 seconds
+    
+    console.log('Enhanced localStorage event listeners setup complete');
+}
+
+// Call the enhanced setup function
+setupEnhancedStorageListeners();
 
 // Export functions for global access
 window.refreshActivity = refreshActivity;

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TELUS Digital - Documents</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="user-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="dashboard">
@@ -31,15 +31,15 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="expertise-hub.html" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-bullseye"></i></span>
-                        <span class="nav-text">Expertise Hub</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="documents.html" class="nav-link active">
                         <span class="nav-icon"><i class="fas fa-file-alt"></i></span>
                         <span class="nav-text">Documents</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="expertise-hub.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        <span class="nav-text">Expertise Hub</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -91,41 +91,41 @@
                 <div class="section-header">
                     <h2>Document Overview</h2>
                 </div>
-                <div class="task-cards-grid">
-                    <div class="task-overview-card">
-                        <div class="task-card-icon">
+                <div class="expertise-nav-grid">
+                    <div class="expertise-nav-card">
+                        <div class="nav-card-icon">
                             <i class="fas fa-hourglass-half"></i>
                         </div>
-                        <div class="task-card-content">
+                        <div class="nav-card-content">
                             <div class="task-number-heading">
-                                <div class="task-count">0</div>
-                                <h3>Documents Under Review</h3>
+                                <div class="task-count" id="docsUnderReview">0</div>
+                                <h3>Docs Under Review</h3>
                             </div>
                             <p>documents uploaded and under review</p>
                         </div>
                     </div>
                     
-                    <div class="task-overview-card">
-                        <div class="task-card-icon">
+                    <div class="expertise-nav-card">
+                        <div class="nav-card-icon">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
-                        <div class="task-card-content">
+                        <div class="nav-card-content">
                             <div class="task-number-heading">
-                                <div class="task-count">0</div>
-                                <h3>Documents Due</h3>
+                                <div class="task-count" id="docsPending">0</div>
+                                <h3>Docs Due</h3>
                             </div>
                             <p>documents requiring attention</p>
                         </div>
                     </div>
                     
-                    <div class="task-overview-card">
-                        <div class="task-card-icon">
+                    <div class="expertise-nav-card">
+                        <div class="nav-card-icon">
                             <i class="fas fa-check-circle"></i>
                         </div>
-                        <div class="task-card-content">
+                        <div class="nav-card-content">
                             <div class="task-number-heading">
-                                <div class="task-count">0</div>
-                                <h3>Documents Approved</h3>
+                                <div class="task-count" id="docsCompleted">0</div>
+                                <h3>Docs Approved</h3>
                             </div>
                             <p>documents reviewed and approved</p>
                         </div>
@@ -146,144 +146,18 @@
                             <i class="fas fa-list"></i>
                             Filter by Status
                         </button>
+                        <button class="filter-btn refresh-documents-btn" onclick="refreshDocumentsFromAdmin()" id="refreshDocumentsBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Documents
+                        </button>
                     </div>
                 </div>
                 <div class="assigned-tasks-container">
-                    <!-- Document Collection Card 1 -->
-                    <div class="task-card" data-priority="high" data-status="pending" onclick="toggleTaskDetails(this)">
-                        <div class="task-card-header">
-                            <div class="task-info">
-                                <h3 class="task-name">Employee Handbook Acknowledgment</h3>
-                                <div class="task-meta">
-                                    <span class="task-assigned">Assigned: Dec 10, 2024</span>
-                                    <span class="task-due">Due: Dec 20, 2024</span>
-                                </div>
-                            </div>
-                            <div class="task-details">
-                                <div class="task-assigned-by">Assigned by: HR Department</div>
-                                <div class="priority-badge priority-high">
-                                    <i class="fas fa-circle"></i>
-                                    High Priority
-                                </div>
-                            </div>
-                            <div class="task-expand-icon">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="task-card-content" style="display: none;">
-                            <div class="task-description">
-                                <p>Please review and sign the employee handbook acknowledgment form to confirm your understanding of company policies.</p>
-                            </div>
-                            <div class="task-resources">
-                                <h4>Resources:</h4>
-                                <div class="resource-links">
-                                    <a href="#" class="resource-link">
-                                        <i class="fas fa-file-pdf"></i>
-                                        Employee Handbook.pdf
-                                    </a>
-                                    <a href="#" class="resource-link">
-                                        <i class="fas fa-file-word"></i>
-                                        Acknowledgment Form.docx
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="task-actions">
-                                <button class="upload-document-btn" onclick="uploadDocument(this)">
-                                    <i class="fas fa-upload"></i>
-                                    Upload Document
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Document Collection Card 2 -->
-                    <div class="task-card" data-priority="low" data-status="pending" onclick="toggleTaskDetails(this)">
-                        <div class="task-card-header">
-                            <div class="task-info">
-                                <h3 class="task-name">Tax Information Form (W-4)</h3>
-                                <div class="task-meta">
-                                    <span class="task-assigned">Assigned: Dec 8, 2024</span>
-                                    <span class="task-due">Due: Dec 15, 2024</span>
-                                </div>
-                            </div>
-                            <div class="task-details">
-                                <div class="task-assigned-by">Assigned by: Payroll Team</div>
-                                <div class="priority-badge priority-low">
-                                    <i class="fas fa-circle"></i>
-                                    Low Priority
-                                </div>
-                            </div>
-                            <div class="task-expand-icon">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="task-card-content" style="display: none;">
-                            <div class="task-description">
-                                <p>Complete and submit your W-4 tax withholding form for payroll processing.</p>
-                            </div>
-                            <div class="task-resources">
-                                <h4>Resources:</h4>
-                                <div class="resource-links">
-                                    <a href="#" class="resource-link">
-                                        <i class="fas fa-file-pdf"></i>
-                                        W-4 Form Instructions.pdf
-                                    </a>
-                                    <a href="#" class="resource-link">
-                                        <i class="fas fa-external-link-alt"></i>
-                                        IRS W-4 Calculator
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="task-actions">
-                                <button class="upload-document-btn" onclick="uploadDocument(this)">
-                                    <i class="fas fa-upload"></i>
-                                    Upload Document
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Document Collection Card 3 - Already Uploaded -->
-                    <div class="task-card" data-priority="low" data-status="completed" onclick="toggleTaskDetails(this)">
-                        <div class="task-card-header">
-                            <div class="task-info">
-                                <h3 class="task-name">Emergency Contact Information</h3>
-                                <div class="task-meta">
-                                    <span class="task-assigned">Assigned: Dec 1, 2024</span>
-                                    <span class="task-due">Completed: Dec 7, 2024</span>
-                                </div>
-                            </div>
-                            <div class="task-details">
-                                <div class="task-assigned-by">Assigned by: HR Department</div>
-                                <div class="priority-badge priority-completed">
-                                    <i class="fas fa-check-circle"></i>
-                                    Completed
-                                </div>
-                            </div>
-                            <div class="task-expand-icon">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        <div class="task-card-content" style="display: none;">
-                            <div class="task-description">
-                                <p>Provide emergency contact information for company records and safety purposes.</p>
-                            </div>
-                            <div class="task-resources">
-                                <h4>Resources:</h4>
-                                <div class="resource-links">
-                                    <a href="#" class="resource-link">
-                                        <i class="fas fa-file-word"></i>
-                                        Emergency Contact Form.docx
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="task-actions">
-                                <button class="view-document-btn" onclick="viewDocument(this)">
-                                    <i class="fas fa-eye"></i>
-                                    View Document
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Documents will be loaded dynamically from admin side -->
+                    <div class="no-documents-message" style="text-align: center; padding: 40px; color: #6c757d;">
+                        <i class="fas fa-folder-open" style="font-size: 3em; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <h3>No Documents Available</h3>
+                        <p>Documents will appear here when assigned by administrators.</p>
                     </div>
                 </div>
             </div>
@@ -335,108 +209,91 @@
             window.location.href = 'index.html';
         }
 
-        // Document Storage Management
+        // Document Storage Management - Use same key as admin side
         const DOCUMENT_STORAGE_KEY = 'telus_document_status';
+        const USER_DOCUMENT_STATUS_KEY = 'telus_user_document_status';
 
-        // Default document data
-        const defaultDocumentData = {
-            'Employee Handbook Acknowledgment': {
-                status: 'pending',
-                priority: 'high',
-                assignedDate: 'Dec 10, 2024',
-                dueDate: 'Dec 20, 2024',
-                assignedBy: 'HR Department'
-            },
-            'Tax Information Form (W-4)': {
-                status: 'pending',
-                priority: 'medium',
-                assignedDate: 'Dec 8, 2024',
-                dueDate: 'Dec 15, 2024',
-                assignedBy: 'Payroll Team'
-            },
-            'Emergency Contact Information': {
-                status: 'completed',
-                priority: 'low',
-                assignedDate: 'Dec 1, 2024',
-                dueDate: 'Dec 7, 2024',
-                assignedBy: 'HR Department'
-            }
-        };
+        // Clear storage function for clean state
+        function clearAllDocumentStorage() {
+            localStorage.removeItem(DOCUMENT_STORAGE_KEY);
+            localStorage.removeItem(USER_DOCUMENT_STATUS_KEY);
+            console.log('All document storage cleared for clean state');
+        }
 
         function saveDocumentData() {
             const documentCards = document.querySelectorAll('.task-card');
-            const documentData = {};
+            
+            // Get existing admin document data to preserve it
+            const existingAdminData = localStorage.getItem(DOCUMENT_STORAGE_KEY);
+            let adminDocuments = existingAdminData ? JSON.parse(existingAdminData) : {};
+            
+            // Save user document status separately to preserve user actions
+            const userDocumentStatus = {};
 
             documentCards.forEach(card => {
                 const documentName = card.querySelector('.task-name').textContent;
                 const status = card.getAttribute('data-status');
                 const priority = card.getAttribute('data-priority');
                 const assignedDate = card.querySelector('.task-assigned').textContent.replace('Assigned: ', '');
-                const dueDate = card.querySelector('.task-due').textContent.replace(/^(Due: |Completed: )/, '');
+                const dueDate = card.querySelector('.task-due').textContent.replace(/^(Due: |Completed: |Uploaded: |Approved: |Rejected: )/, '');
                 const assignedBy = card.querySelector('.task-assigned-by').textContent.replace('Assigned by: ', '');
 
-                documentData[documentName] = {
+                // Save user status
+                userDocumentStatus[documentName] = {
                     status,
                     priority,
                     assignedDate,
                     dueDate,
-                    assignedBy
+                    assignedBy,
+                    visible: true,
+                    isUserModified: status === 'under-review' || status === 'approved' || status === 'rejected'
                 };
+
+                // Update admin documents if this document exists there
+                Object.keys(adminDocuments).forEach(docId => {
+                    const adminDoc = adminDocuments[docId];
+                    if (adminDoc && adminDoc.title === documentName) {
+                        // Preserve admin data but update status if user modified
+                        adminDocuments[docId] = {
+                            ...adminDoc,
+                            status: status,
+                            lastModified: new Date().toISOString(),
+                            userModified: status === 'under-review' || status === 'approved' || status === 'rejected'
+                        };
+                    }
+                });
             });
 
-            localStorage.setItem(DOCUMENT_STORAGE_KEY, JSON.stringify(documentData));
+            // Save both user status and updated admin data
+            localStorage.setItem(USER_DOCUMENT_STATUS_KEY, JSON.stringify(userDocumentStatus));
+            localStorage.setItem(DOCUMENT_STORAGE_KEY, JSON.stringify(adminDocuments));
+            
+            console.log('Document data saved:', userDocumentStatus);
+            console.log('Admin document data updated:', adminDocuments);
         }
 
         function loadDocumentData() {
             const savedData = localStorage.getItem(DOCUMENT_STORAGE_KEY);
-            return savedData ? JSON.parse(savedData) : defaultDocumentData;
+            return savedData ? JSON.parse(savedData) : {};
         }
 
         function initializeDocuments() {
-            const documentData = loadDocumentData();
+            // Check if there are any documents to display
+            const documentsContainer = document.querySelector('.assigned-tasks-container');
             const documentCards = document.querySelectorAll('.task-card');
-
-            documentCards.forEach(card => {
-                const documentName = card.querySelector('.task-name').textContent;
-                const data = documentData[documentName];
-
-                if (data) {
-                    // Update document attributes
-                    card.setAttribute('data-status', data.status);
-                    card.setAttribute('data-priority', data.priority);
-
-                    // Update document meta information
-                    card.querySelector('.task-assigned').textContent = `Assigned: ${data.assignedDate}`;
-                    card.querySelector('.task-assigned-by').textContent = `Assigned by: ${data.assignedBy}`;
-
-                    // Update priority badge and due date based on status
-                    const priorityBadge = card.querySelector('.priority-badge');
-                    const taskDue = card.querySelector('.task-due');
-
-                    if (data.status === 'completed') {
-                        priorityBadge.className = 'priority-badge priority-completed';
-                        priorityBadge.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
-                        taskDue.textContent = `Completed: ${data.dueDate}`;
-
-                        // Add view document button if not present
-                        addViewDocumentButton(card);
-                    } else {
-                        // Set priority badge based on original priority
-                        priorityBadge.className = `priority-badge priority-${data.priority}`;
-                        if (data.priority === 'low') {
-                            priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
-                        } else if (data.priority === 'high') {
-                            priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
-                        } else if (data.priority === 'medium') {
-                            priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Medium Priority';
-                        }
-                        taskDue.textContent = `Due: ${data.dueDate}`;
-
-                        // Add upload document button if not present
-                        addUploadDocumentButton(card);
-                    }
+            const noDocumentsMessage = document.querySelector('.no-documents-message');
+            
+            if (documentCards.length === 0) {
+                // Show no documents message
+                if (noDocumentsMessage) {
+                    noDocumentsMessage.style.display = 'block';
                 }
-            });
+            } else {
+                // Hide no documents message
+                if (noDocumentsMessage) {
+                    noDocumentsMessage.style.display = 'none';
+                }
+            }
 
             updateDocumentCounts();
         }
@@ -519,42 +376,59 @@
             const documentCard = button.closest('.task-card');
             const documentName = documentCard.querySelector('.task-name').textContent;
             
-            // Get original document data to restore
-            const documentData = loadDocumentData();
-            const originalData = defaultDocumentData[documentName];
+            // Reset document status to pending
+            documentCard.setAttribute('data-status', 'pending');
             
-            if (originalData) {
-                // Revert document status to pending
-                documentCard.setAttribute('data-status', 'pending');
-                
-                // Restore original priority badge
-                const priorityBadge = documentCard.querySelector('.priority-badge');
-                priorityBadge.className = `priority-badge priority-${originalData.priority}`;
-                
-                if (originalData.priority === 'high') {
-                    priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
-                } else if (originalData.priority === 'medium') {
-                    priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Medium Priority';
-                } else if (originalData.priority === 'low') {
-                    priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
-                }
-                
-                // Restore original due date
-                const taskDue = documentCard.querySelector('.task-due');
-                taskDue.textContent = `Due: ${originalData.dueDate}`;
-                
-                // Replace view and remove buttons with upload button
-                addUploadDocumentButton(documentCard);
-                
-                // Save to localStorage
-                saveDocumentData();
-                
-                // Update document counts
-                updateDocumentCounts();
-                
-                // Show removal message
-                showDocumentRemovalMessage(documentName);
+            // Get original priority from data attribute or default to medium
+            const originalPriority = documentCard.getAttribute('data-priority') || 'medium';
+            
+            // Restore original priority badge
+            const priorityBadge = documentCard.querySelector('.priority-badge');
+            priorityBadge.className = `priority-badge priority-${originalPriority}`;
+            
+            if (originalPriority === 'high') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
+            } else if (originalPriority === 'medium') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Medium Priority';
+            } else if (originalPriority === 'low') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
             }
+            
+            // Reset due date to original from admin data
+            const adminDocumentData = localStorage.getItem('telus_document_status');
+            if (adminDocumentData) {
+                try {
+                    const adminDocuments = JSON.parse(adminDocumentData);
+                    Object.values(adminDocuments).forEach(adminDoc => {
+                        if (adminDoc.title === documentName && adminDoc.dueDate) {
+                            const taskDue = documentCard.querySelector('.task-due');
+                            const dueDate = new Date(adminDoc.dueDate).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric' 
+                            });
+                            taskDue.textContent = `Due: ${dueDate}`;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error restoring due date:', error);
+                }
+            }
+            
+            // Replace view and remove buttons with upload button
+            addUploadDocumentButton(documentCard);
+            
+            // Update admin side to reset status
+            updateAdminDocumentStatus(documentName, 'pending');
+            
+            // Save to localStorage
+            saveDocumentData();
+            
+            // Update document counts
+            updateDocumentCounts();
+            
+            // Show removal message
+            showDocumentRemovalMessage(documentName);
         }
 
         function showDocumentRemovalMessage(documentName) {
@@ -587,7 +461,17 @@
                 content.style.display = 'none';
                 documentCard.classList.remove('expanded');
             } else {
-                // Expand
+                // Auto-collapse other open tiles first
+                const allDocumentCards = document.querySelectorAll('.task-card');
+                allDocumentCards.forEach(card => {
+                    if (card !== documentCard && card.classList.contains('expanded')) {
+                        const otherContent = card.querySelector('.task-card-content');
+                        otherContent.style.display = 'none';
+                        card.classList.remove('expanded');
+                    }
+                });
+                
+                // Expand current tile
                 content.style.display = 'block';
                 documentCard.classList.add('expanded');
             }
@@ -625,11 +509,57 @@
             // Save to localStorage
             saveDocumentData();
             
+            // Update admin-side document status if this is an admin-created document
+            updateAdminDocumentStatus(documentName, 'under-review', uploadDate);
+            
             // Update document counts
             updateDocumentCounts();
             
             // Show success message
             showDocumentUploadMessage(documentName);
+        }
+        
+        // Update admin-side document status
+        function updateAdminDocumentStatus(documentName, status, uploadDate = null) {
+            const adminDocumentData = localStorage.getItem('telus_document_status');
+            if (adminDocumentData) {
+                try {
+                    const adminDocuments = JSON.parse(adminDocumentData);
+                    
+                    // Find the document by title and update its status
+                    Object.keys(adminDocuments).forEach(docId => {
+                        const doc = adminDocuments[docId];
+                        if (doc && doc.title === documentName) {
+                            adminDocuments[docId] = {
+                                ...doc,
+                                status: status,
+                                lastModified: new Date().toISOString(),
+                                uploadDate: uploadDate || doc.uploadDate,
+                                userResponse: uploadDate ? `Document uploaded on ${uploadDate}` : doc.userResponse
+                            };
+                        }
+                    });
+                    
+                    // Save back to localStorage
+                    localStorage.setItem('telus_document_status', JSON.stringify(adminDocuments));
+                    
+                    // Trigger storage event for admin side sync
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: 'telus_document_status',
+                        newValue: JSON.stringify(adminDocuments),
+                        storageArea: localStorage
+                    }));
+                    
+                    // Also trigger custom event for same-tab sync
+                    window.dispatchEvent(new CustomEvent('telusDataSync', {
+                        detail: { type: 'documents', source: 'user', data: adminDocuments }
+                    }));
+                    
+                    console.log('Admin document status updated:', documentName, status);
+                } catch (error) {
+                    console.error('Error updating admin document status:', error);
+                }
+            }
         }
 
         function viewDocument(button) {
@@ -687,38 +617,74 @@
         }
 
         function updateDocumentCounts() {
+            // First try to count from DOM elements (existing document cards)
             const documentCards = document.querySelectorAll('.task-card');
             let pendingCount = 0;
             let underReviewCount = 0;
             let completedCount = 0;
+            let approvedCount = 0;
 
-            documentCards.forEach(card => {
-                const status = card.getAttribute('data-status');
-                if (status === 'pending') {
-                    pendingCount++;
-                } else if (status === 'under-review') {
-                    underReviewCount++;
-                } else if (status === 'completed') {
-                    completedCount++;
+            if (documentCards.length > 0) {
+                // Count from existing DOM elements
+                documentCards.forEach(card => {
+                    const status = card.getAttribute('data-status');
+                    if (status === 'pending') {
+                        pendingCount++;
+                    } else if (status === 'under-review') {
+                        underReviewCount++;
+                    } else if (status === 'completed') {
+                        completedCount++;
+                    } else if (status === 'approved') {
+                        approvedCount++;
+                    }
+                });
+            } else {
+                // If no DOM elements, count directly from localStorage
+                const adminDocumentData = localStorage.getItem('telus_document_status');
+                if (adminDocumentData) {
+                    try {
+                        const adminDocuments = JSON.parse(adminDocumentData);
+                        Object.values(adminDocuments).forEach(doc => {
+                            if (doc && doc.status) {
+                                if (doc.status === 'pending') {
+                                    pendingCount++;
+                                } else if (doc.status === 'under-review') {
+                                    underReviewCount++;
+                                } else if (doc.status === 'completed') {
+                                    completedCount++;
+                                } else if (doc.status === 'approved') {
+                                    approvedCount++;
+                                }
+                            }
+                        });
+                        console.log('Document counts from localStorage:', {
+                            pending: pendingCount,
+                            underReview: underReviewCount,
+                            completed: completedCount,
+                            approved: approvedCount
+                        });
+                    } catch (error) {
+                        console.error('Error parsing localStorage document data:', error);
+                    }
                 }
-            });
+            }
 
-            // Update documents under review count (first card)
-            const documentsUnderReviewElement = document.querySelector('.task-overview-card:nth-child(1) .task-count');
+            // Update documents under review count using correct ID
+            const documentsUnderReviewElement = document.getElementById('docsUnderReview');
             if (documentsUnderReviewElement) {
                 documentsUnderReviewElement.textContent = underReviewCount;
             }
 
-            // Update documents due count (pending documents)
-            const documentsDueElement = document.querySelector('.task-overview-card:nth-child(2) .task-count');
+            // Update documents due count (pending documents) using correct ID
+            const documentsDueElement = document.getElementById('docsPending');
             if (documentsDueElement) {
                 documentsDueElement.textContent = pendingCount;
             }
 
-            // Update documents approved count (completed documents)
-            const documentsApprovedElement = document.querySelector('.task-overview-card:nth-child(3) .task-count');
+            // Update documents approved count using correct ID
+            const documentsApprovedElement = document.getElementById('docsCompleted');
             if (documentsApprovedElement) {
-                documentsApprovedElement.textContent = completedCount;
+                documentsApprovedElement.textContent = approvedCount + completedCount;
             }
         }
 
@@ -744,10 +710,546 @@
             }
         });
 
+        // Load documents from admin (new function to handle admin-created documents)
+        function loadDocumentsFromAdmin() {
+            const adminDocumentData = localStorage.getItem('telus_document_status');
+            const userDocumentStatus = localStorage.getItem(USER_DOCUMENT_STATUS_KEY);
+            
+            if (!adminDocumentData) {
+                console.log('No admin document data found');
+                return;
+            }
+            
+            try {
+                const adminDocuments = JSON.parse(adminDocumentData);
+                const userStatus = userDocumentStatus ? JSON.parse(userDocumentStatus) : {};
+                const documentsContainer = document.querySelector('.assigned-tasks-container');
+                const noDocumentsMessage = document.querySelector('.no-documents-message');
+                
+                console.log('Loading admin documents:', Object.keys(adminDocuments).length, 'documents found');
+                
+                // Get existing document cards to preserve user status
+                const existingCards = document.querySelectorAll('.task-card');
+                const existingDocuments = {};
+                
+                existingCards.forEach(card => {
+                    const documentName = card.querySelector('.task-name').textContent;
+                    const status = card.getAttribute('data-status');
+                    existingDocuments[documentName] = {
+                        element: card,
+                        status: status,
+                        isUserModified: status === 'under-review' || status === 'approved' || status === 'rejected'
+                    };
+                });
+                
+                // Clear only admin-created documents that don't exist in admin data anymore
+                const existingAdminCards = document.querySelectorAll('.task-card[data-admin-created="true"]');
+                existingAdminCards.forEach(card => {
+                    const documentName = card.querySelector('.task-name').textContent;
+                    const stillExists = Object.values(adminDocuments).some(doc => doc.title === documentName);
+                    if (!stillExists) {
+                        card.remove();
+                    }
+                });
+                
+                // Add or update admin-created documents
+                let documentsAdded = 0;
+                Object.entries(adminDocuments).forEach(([docId, docInfo]) => {
+                    if (docInfo && docInfo.title) {
+                        const documentName = docInfo.title;
+                        const existingDoc = existingDocuments[documentName];
+                        
+                        if (existingDoc && existingDoc.element) {
+                            // Update existing document with admin data but preserve user status
+                            const card = existingDoc.element;
+                            
+                            // Only update if user hasn't modified it or if admin has made changes
+                            if (!existingDoc.isUserModified || docInfo.status !== existingDoc.status) {
+                                updateDocumentCardFromAdmin(card, docInfo);
+                            }
+                            
+                            // Mark as admin-created if not already marked
+                            if (!card.hasAttribute('data-admin-created')) {
+                                card.setAttribute('data-admin-created', 'true');
+                            }
+                            documentsAdded++;
+                        } else {
+                            // Create new document card for admin-created documents
+                            const newDocumentCard = createDocumentCard(documentName, {
+                                ...docInfo,
+                                assignedDate: docInfo.dateCreated ? new Date(docInfo.dateCreated).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                }) : 'Today',
+                                dueDate: docInfo.dueDate ? new Date(docInfo.dueDate).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                }) : 'No due date',
+                                assignedBy: 'Administrator'
+                            });
+                            
+                            // Mark as admin-created
+                            newDocumentCard.setAttribute('data-admin-created', 'true');
+                            documentsContainer.appendChild(newDocumentCard);
+                            documentsAdded++;
+                        }
+                    }
+                });
+                
+                // Hide/show no documents message based on whether we have documents
+                if (documentsAdded > 0 || document.querySelectorAll('.task-card').length > 0) {
+                    if (noDocumentsMessage) {
+                        noDocumentsMessage.style.display = 'none';
+                    }
+                } else {
+                    if (noDocumentsMessage) {
+                        noDocumentsMessage.style.display = 'block';
+                    }
+                }
+                
+                console.log('Documents loaded successfully:', documentsAdded, 'new documents added');
+                updateDocumentCounts();
+            } catch (error) {
+                console.error('Error loading admin documents:', error);
+            }
+        }
+        
+        // Update document card from admin data while preserving user modifications
+        function updateDocumentCardFromAdmin(documentCard, adminDoc) {
+            const currentStatus = documentCard.getAttribute('data-status');
+            
+            // Only update if admin status is different and more recent
+            if (adminDoc.status && adminDoc.status !== currentStatus) {
+                // Check if this is an admin decision (approved/rejected) that should override user status
+                if (adminDoc.status === 'approved' || adminDoc.status === 'rejected') {
+                    updateDocumentCardStatus(documentCard, adminDoc);
+                }
+            }
+            
+            // Update other metadata if needed
+            const assignedDate = adminDoc.dateCreated ? new Date(adminDoc.dateCreated).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            }) : 'Today';
+            
+            const assignedElement = documentCard.querySelector('.task-assigned');
+            if (assignedElement && !assignedElement.textContent.includes('Assigned:')) {
+                assignedElement.textContent = `Assigned: ${assignedDate}`;
+            }
+        }
+        
+        // Create a new document card element
+        function createDocumentCard(documentName, docInfo) {
+            const documentCard = document.createElement('div');
+            documentCard.className = 'task-card';
+            documentCard.setAttribute('data-priority', docInfo.priority || 'medium');
+            documentCard.setAttribute('data-status', docInfo.status || 'pending');
+            documentCard.onclick = function() { toggleTaskDetails(this); };
+            
+            const priorityClass = `priority-${docInfo.priority || 'medium'}`;
+            const priorityText = docInfo.priority === 'high' ? 'High Priority' : 
+                               docInfo.priority === 'low' ? 'Low Priority' : 'Medium Priority';
+            const priorityIcon = docInfo.status === 'completed' ? 'fa-check-circle' : 'fa-circle';
+            
+            const statusText = docInfo.status === 'completed' ? 'Completed' : priorityText;
+            const statusClass = docInfo.status === 'completed' ? 'priority-completed' : priorityClass;
+            
+            const dueDateText = docInfo.status === 'completed' ? 
+                `Completed: ${docInfo.dueDate}` : `Due: ${docInfo.dueDate}`;
+            
+            documentCard.innerHTML = `
+                <div class="task-card-header">
+                    <div class="task-info">
+                        <h3 class="task-name">${documentName}</h3>
+                        <div class="task-meta">
+                            <span class="task-assigned">Assigned: ${docInfo.assignedDate || 'Today'}</span>
+                            <span class="task-due">${dueDateText}</span>
+                        </div>
+                    </div>
+                    <div class="task-details">
+                        <div class="task-assigned-by">Assigned by: ${docInfo.assignedBy || 'Admin'}</div>
+                        <div class="priority-badge ${statusClass}">
+                            <i class="fas ${priorityIcon}"></i>
+                            ${statusText}
+                        </div>
+                    </div>
+                    <div class="task-expand-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="task-card-content" style="display: none;">
+                    <div class="task-description">
+                        <p><strong>Description:</strong> ${docInfo.description || 'Document details will be provided by the administrator.'}</p>
+                    </div>
+                    <div class="task-resources">
+                        <h4>Resources:</h4>
+                        <div class="resource-links">
+                            <a href="#" class="resource-link">
+                                <i class="fas fa-info-circle"></i>
+                                Resources will be provided by admin
+                            </a>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        ${docInfo.status === 'completed' ? 
+                            `<button class="view-document-btn" onclick="viewDocument(this)">
+                                <i class="fas fa-eye"></i>
+                                View Document
+                            </button>` :
+                            `<button class="upload-document-btn" onclick="uploadDocument(this)">
+                                <i class="fas fa-upload"></i>
+                                Upload Document
+                            </button>`
+                        }
+                    </div>
+                </div>
+            `;
+            
+            return documentCard;
+        }
+        
+        // Refresh documents from admin side
+        function refreshDocumentsFromAdmin() {
+            const refreshBtn = document.getElementById('refreshDocumentsBtn');
+            if (!refreshBtn) return;
+            
+            const originalText = refreshBtn.innerHTML;
+            
+            // Show loading state
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            refreshBtn.disabled = true;
+            
+            // Simulate refresh delay and then reload document data
+            setTimeout(() => {
+                try {
+                    // Load documents from admin system
+                    loadDocumentsFromAdmin();
+                    
+                    // Also refresh default documents
+                    initializeDocuments();
+                    
+                    showRefreshMessage('Documents refreshed successfully!', 'success');
+                    console.log('Documents refreshed from admin side');
+                    
+                } catch (error) {
+                    console.error('Error refreshing documents:', error);
+                    showRefreshMessage('Error refreshing documents', 'error');
+                } finally {
+                    // Reset button
+                    refreshBtn.innerHTML = originalText;
+                    refreshBtn.disabled = false;
+                }
+            }, 1000);
+        }
+        
+        // Show refresh message
+        function showRefreshMessage(message, type) {
+            // Remove existing messages
+            const existingMessages = document.querySelectorAll('.refresh-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type} refresh-message`;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--telus-green)' : 
+                            type === 'error' ? '#dc3545' : 'var(--telus-purple)'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-weight: 500;
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+            messageDiv.textContent = message;
+            
+            // Add to page
+            document.body.appendChild(messageDiv);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 4000);
+        }
+
         // Initialize documents when page loads
         document.addEventListener('DOMContentLoaded', function() {
             initializeDocuments();
+            loadDocumentsFromAdmin(); // Load admin-created documents
+            
+            // Auto-refresh documents from admin on page load (CRITICAL: This was missing!)
+            refreshDocumentsFromAdmin();
+            
+            // Listen for storage changes to update documents in real-time
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'telus_document_status') {
+                    console.log('Admin documents updated, refreshing...');
+                    loadDocumentsFromAdmin();
+                    updateDocumentStatusFromAdmin();
+                    showRefreshMessage('Documents updated by administrator', 'info');
+                }
+            });
+            
+            // Listen for custom sync events
+            window.addEventListener('telusDataSync', function(e) {
+                if (e.detail.type === 'documents' && e.detail.source === 'admin') {
+                    console.log('Admin documents synced, refreshing...');
+                    loadDocumentsFromAdmin();
+                    updateDocumentStatusFromAdmin();
+                    showRefreshMessage('Documents updated by administrator', 'info');
+                }
+            });
         });
+        
+        // Update document status from admin decisions
+        function updateDocumentStatusFromAdmin() {
+            const adminDocumentData = localStorage.getItem('telus_document_status');
+            if (!adminDocumentData) return;
+            
+            try {
+                const adminDocuments = JSON.parse(adminDocumentData);
+                const documentCards = document.querySelectorAll('.task-card');
+                
+                documentCards.forEach(card => {
+                    const documentName = card.querySelector('.task-name').textContent;
+                    
+                    // Find matching admin document
+                    Object.values(adminDocuments).forEach(adminDoc => {
+                        if (adminDoc.title === documentName) {
+                            const currentStatus = card.getAttribute('data-status');
+                            
+                            // Update if status changed from admin side
+                            if (adminDoc.status !== currentStatus) {
+                                updateDocumentCardStatus(card, adminDoc);
+                            }
+                        }
+                    });
+                });
+                
+                updateDocumentCounts();
+            } catch (error) {
+                console.error('Error updating document status from admin:', error);
+            }
+        }
+        
+        // Update individual document card status
+        function updateDocumentCardStatus(documentCard, adminDoc) {
+            const priorityBadge = documentCard.querySelector('.priority-badge');
+            const taskDue = documentCard.querySelector('.task-due');
+            
+            // Update card status attribute
+            documentCard.setAttribute('data-status', adminDoc.status);
+            
+            switch (adminDoc.status) {
+                case 'approved':
+                    priorityBadge.className = 'priority-badge priority-approved';
+                    priorityBadge.innerHTML = '<i class="fas fa-check-circle"></i> Approved';
+                    taskDue.textContent = `Approved: ${adminDoc.reviewDate || 'Today'}`;
+                    addApprovedDocumentButton(documentCard);
+                    
+                    // Show approval notification
+                    showDocumentStatusMessage(adminDoc.title, 'approved', adminDoc.adminNote);
+                    break;
+                    
+                case 'rejected':
+                    priorityBadge.className = 'priority-badge priority-rejected';
+                    priorityBadge.innerHTML = '<i class="fas fa-times-circle"></i> Rejected';
+                    taskDue.textContent = `Rejected: ${adminDoc.reviewDate || 'Today'}`;
+                    addRejectedDocumentButton(documentCard);
+                    
+                    // Show rejection notification
+                    showDocumentStatusMessage(adminDoc.title, 'rejected', adminDoc.adminNote);
+                    break;
+                    
+                case 'under-review':
+                    priorityBadge.className = 'priority-badge priority-under-review';
+                    priorityBadge.innerHTML = '<i class="fas fa-clock"></i> Under Review';
+                    taskDue.textContent = `Uploaded: ${adminDoc.uploadDate || 'Today'}`;
+                    addViewAndRemoveDocumentButtons(documentCard);
+                    break;
+            }
+        }
+        
+        // Add approved document button
+        function addApprovedDocumentButton(documentCard) {
+            const taskContent = documentCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="view-document-btn approved" onclick="viewApprovedDocument(this)">
+                    <i class="fas fa-check-circle"></i>
+                    Document Approved
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+        
+        // Add rejected document button
+        function addRejectedDocumentButton(documentCard) {
+            const taskContent = documentCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="upload-document-btn rejected" onclick="reuploadDocument(this)">
+                    <i class="fas fa-upload"></i>
+                    Re-upload Document
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+        
+        // View approved document
+        function viewApprovedDocument(button) {
+            event.stopPropagation();
+            
+            const documentCard = button.closest('.task-card');
+            const documentName = documentCard.querySelector('.task-name').textContent;
+            
+            showDocumentViewMessage(`${documentName} - Document has been approved by administrator`);
+        }
+        
+        // Re-upload rejected document
+        function reuploadDocument(button) {
+            event.stopPropagation();
+            
+            const documentCard = button.closest('.task-card');
+            const documentName = documentCard.querySelector('.task-name').textContent;
+            
+            // Reset to pending status for re-upload
+            documentCard.setAttribute('data-status', 'pending');
+            
+            // Get original priority from data attribute or default to medium
+            const originalPriority = documentCard.getAttribute('data-priority') || 'medium';
+            
+            // Reset priority badge to original
+            const priorityBadge = documentCard.querySelector('.priority-badge');
+            priorityBadge.className = `priority-badge priority-${originalPriority}`;
+            
+            if (originalPriority === 'high') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
+            } else if (originalPriority === 'medium') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Medium Priority';
+            } else if (originalPriority === 'low') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
+            }
+            
+            // Reset due date to original from admin data
+            const adminDocumentData = localStorage.getItem(DOCUMENT_STORAGE_KEY);
+            if (adminDocumentData) {
+                try {
+                    const adminDocuments = JSON.parse(adminDocumentData);
+                    Object.values(adminDocuments).forEach(adminDoc => {
+                        if (adminDoc.title === documentName && adminDoc.dueDate) {
+                            const taskDue = documentCard.querySelector('.task-due');
+                            const dueDate = new Date(adminDoc.dueDate).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric' 
+                            });
+                            taskDue.textContent = `Due: ${dueDate}`;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error restoring due date:', error);
+                }
+            }
+            
+            // Add upload button back
+            addUploadDocumentButton(documentCard);
+            
+            // Update admin side to reset status
+            updateAdminDocumentStatus(documentName, 'pending');
+            
+            // Save and update counts
+            saveDocumentData();
+            updateDocumentCounts();
+            
+            showDocumentReuploadMessage(documentName);
+        }
+        
+        // Show document status change message
+        function showDocumentStatusMessage(documentName, status, adminNote) {
+            const statusText = status === 'approved' ? 'approved' : 'rejected';
+            const statusColor = status === 'approved' ? 'var(--telus-green)' : '#dc3545';
+            const statusIcon = status === 'approved' ? 'fa-check-circle' : 'fa-times-circle';
+            
+            const message = document.createElement('div');
+            message.className = 'document-status-message';
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${statusColor};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-weight: 500;
+                max-width: 350px;
+                word-wrap: break-word;
+            `;
+            message.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <i class="fas ${statusIcon}" style="margin-right: 8px;"></i>
+                    <strong>Document ${statusText.charAt(0).toUpperCase() + statusText.slice(1)}</strong>
+                </div>
+                <div style="margin-bottom: 5px;">${documentName}</div>
+                ${adminNote ? `<div style="font-size: 0.9em; opacity: 0.9;">${adminNote}</div>` : ''}
+            `;
+            
+            document.body.appendChild(message);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.remove();
+                }
+            }, 5000);
+        }
+        
+        // Show document re-upload message
+        function showDocumentReuploadMessage(documentName) {
+            const message = document.createElement('div');
+            message.className = 'task-completion-message';
+            message.style.background = 'var(--telus-purple)';
+            message.innerHTML = `
+                <i class="fas fa-redo"></i>
+                Document "${documentName}" reset for re-upload
+            `;
+            
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 3000);
+        }
     </script>
 </body>
 </html>
