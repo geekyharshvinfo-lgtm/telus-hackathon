@@ -1,3 +1,11 @@
+// @ts-nocheck
+/**
+ * @fileoverview Enhanced Mock Data Manager for TELUS Digital Platform
+ * @description Frontend-only data simulation with localStorage persistence and authentication
+ * @author TELUS Digital Team
+ * @version 1.0.0
+ */
+
 // Enhanced Mock data with localStorage persistence and real-time sync
 // This simulates what would come from a backend database with real-time updates
 
@@ -166,9 +174,22 @@ const DataManager = {
         return false;
     },
 
-    // User authentication
+    // User authentication - Enhanced to include admin-created users
     authenticateUser: function(email, password) {
-        const user = users.find(user => user.email === email && user.password === password);
+        // First check hardcoded demo users
+        let user = users.find(user => user.email === email && user.password === password);
+        
+        // If not found in demo users, check admin-created users from localStorage
+        if (!user) {
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            user = registeredUsers.find(user => user.email === email && user.password === password);
+            
+            // If found in registered users, ensure it has the proper structure
+            if (user && !user.role) {
+                user.role = 'user'; // Default role for admin-created users
+            }
+        }
+        
         if (user) {
             // Log login activity
             this.logActivity('login', `${user.name} (${user.role}) logged in`);

@@ -98,9 +98,36 @@ function loadUserInfo() {
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
         const user = JSON.parse(currentUser);
+        
+        // Update main userName element (if exists)
         const userName = document.getElementById('userName');
         if (userName) {
             userName.textContent = user.name;
+        }
+        
+        // Update profile section in navbar
+        const profileName = document.getElementById('profileName');
+        const profileRole = document.getElementById('profileRole');
+        
+        if (profileName && profileRole) {
+            // Extract first name from full name
+            const firstName = user.name ? user.name.split(' ')[0] : 'User';
+            
+            // Get designation from admin-created users or use role as fallback
+            let designation = 'Team Member'; // Default
+            
+            if (user.designation) {
+                // Admin-created user with designation
+                designation = user.designation;
+            } else if (user.role === 'admin') {
+                designation = 'Administrator';
+            } else if (user.role === 'user') {
+                designation = 'Team Member';
+            }
+            
+            // Update profile display
+            profileName.textContent = firstName;
+            profileRole.textContent = designation;
         }
     }
 }
