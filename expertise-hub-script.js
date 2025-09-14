@@ -242,6 +242,8 @@ let filteredTeammates = [...expertiseHubData.teammates];
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
     initializeExpertiseHub();
+    loadAdminCreatedUsers();
+    setupExpertiseHubSyncListeners();
 });
 
 // Main initialization function
@@ -417,6 +419,202 @@ function setupEventListeners() {
     if (roleFilter) {
         roleFilter.addEventListener('change', filterTeammates);
     }
+}
+
+// Load admin-created users and integrate with expertise hub
+function loadAdminCreatedUsers() {
+    try {
+        // Load users from admin-created storage
+        const adminUsers = JSON.parse(localStorage.getItem('expertise_hub_users') || '[]');
+        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        
+        console.log('Loading admin-created users:', adminUsers.length, 'expertise hub users');
+        console.log('Loading registered users:', registeredUsers.length, 'registered users');
+        
+        // Combine admin-created users with registered users that have expertise hub data
+        const allAdminUsers = [...adminUsers];
+        
+        // Add registered users that have complete expertise hub data
+        registeredUsers.forEach(user => {
+            if (user.pod && user.designation && user.skills) {
+                // Check if user is not already in expertise hub users
+                const existsInExpertiseHub = adminUsers.some(existingUser => 
+                    existingUser.email === user.email || existingUser.id === user.id
+                );
+                
+                if (!existsInExpertiseHub) {
+                    allAdminUsers.push(user);
+                }
+            }
+        });
+        
+        if (allAdminUsers.length > 0) {
+            console.log('Integrating', allAdminUsers.length, 'admin-created users into expertise hub');
+            
+            // Add admin-created users to the teammates array
+            allAdminUsers.forEach(user => {
+                // Check if user already exists in teammates (avoid duplicates)
+                const existingIndex = expertiseHubData.teammates.findIndex(teammate => 
+                    teammate.email === user.email || teammate.id === user.id
+                );
+                
+                if (existingIndex === -1) {
+                    // Add new user
+                    expertiseHubData.teammates.push({
+                        id: user.id || Date.now() + Math.random(),
+                        name: user.name,
+                        designation: user.designation,
+                        role: user.role || 'Team Member',
+                        pod: user.pod,
+                        email: user.email,
+                        phone: user.phone || '+1 (555) 123-4567',
+                        location: user.location || 'Vancouver, BC',
+                        experience: user.experience || '3-5 years',
+                        skills: Array.isArray(user.skills) ? user.skills : (user.skills ? user.skills.split(',').map(s => s.trim()) : ['Product Strategy', 'Agile']),
+                        currentProject: user.currentProject || 'Digital Platform Enhancement',
+                        availability: user.availability || 'Available',
+                        avatar: user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&size=120&background=4b286d&color=ffffff&bold=true`,
+                        description: user.description || 'Experienced professional focused on delivering innovative solutions and driving team collaboration.',
+                        source: 'admin' // Mark as admin-created
+                    });
+                    console.log('Added admin-created user to expertise hub:', user.name);
+                } else {
+                    // Update existing user with latest data
+                    const updatedUser = {
+                        ...expertiseHubData.teammates[existingIndex],
+                        name: user.name,
+                        designation: user.designation,
+                        role: user.role || expertiseHubData.teammates[existingIndex].role,
+                        pod: user.pod,
+                        email: user.email,
+                        phone: user.phone || expertiseHubData.teammates[existingIndex].phone,
+                        location: user.location || expertiseHubData.teammates[existingIndex].location,
+                        experience: user.experience || expertiseHubData.teammates[existingIndex].experience,
+                        skills: Array.isArray(user.skills) ? user.skills : (user.skills ? user.skills.split(',').map(s => s.trim()) : expertiseHubData.teammates[existingIndex].skills),
+                        currentProject: user.currentProject || expertiseHubData.teammates[existingIndex].currentProject,
+                        availability: user.availability || expertiseHubData.teammates[existingIndex].availability,
+                        avatar: user.avatar || expertiseHubData.teammates[existingIndex].avatar,
+                        description: user.description || expertiseHubData.teammates[existingIndex].description,
+                        source: 'admin'
+                    };
+                    expertiseHubData.teammates[existingIndex] = updatedUser;
+                    console.log('Updated existing user in expertise hub:', user.name);
+                }
+            });
+            
+            // Update filtered teammates and re-render
+            filteredTeammates = [...expertiseHubData.teammates];
+            if (currentSection === 'teammates') {
+                renderTeammatesGrid();
+            }
+            
+            console.log('Total teammates after admin integration:', expertiseHubData.teammates.length);
+        }
+    } catch (error) {
+        console.error('Error loading admin-created users:', error);
+    }
+}
+
+// Setup sync listeners for real-time updates from admin
+function setupExpertiseHubSyncListeners() {
+    console.log('Setting up expertise hub sync listeners...');
+    
+    // Listen for admin user creation/updates
+    window.addEventListener('expertiseHubUserAdded', function(event) {
+        console.log('New user added by admin:', event.detail.user);
+        loadAdminCreatedUsers(); // Reload all users
+        showUserAddedNotification(event.detail.user.name);
+    });
+    
+    window.addEventListener('expertiseHubUserUpdated', function(event) {
+        console.log('User updated by admin:', event.detail.user);
+        loadAdminCreatedUsers(); // Reload all users
+        showUserUpdatedNotification(event.detail.user.name);
+    });
+    
+    // Listen for storage changes (cross-tab sync)
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'expertise_hub_users' || event.key === 'registeredUsers') {
+            console.log('User data updated in storage, reloading expertise hub...');
+            loadAdminCreatedUsers();
+        }
+    });
+    
+    console.log('Expertise hub sync listeners set up successfully');
+}
+
+// Show notification when new user is added
+function showUserAddedNotification(userName) {
+    showExpertiseNotification(`New team member added: ${userName}`, 'success');
+}
+
+// Show notification when user is updated
+function showUserUpdatedNotification(userName) {
+    showExpertiseNotification(`Team member updated: ${userName}`, 'info');
+}
+
+// Show expertise hub notifications
+function showExpertiseNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.expertise-notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.className = 'expertise-notification';
+    
+    const bgColor = type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8';
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 9999;
+        font-weight: 500;
+        font-size: 0.9em;
+        max-width: 300px;
+        word-wrap: break-word;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center;">
+            <i class="fas ${icon}" style="margin-right: 8px;"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add CSS animation if not already added
+    if (!document.querySelector('#expertiseNotificationStyles')) {
+        const style = document.createElement('style');
+        style.id = 'expertiseNotificationStyles';
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideInRight 0.3s ease-out reverse';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }
+    }, 4000);
 }
 
 // Chatbot integration for expertise hub

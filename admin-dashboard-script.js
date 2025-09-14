@@ -816,18 +816,29 @@ function createUserRow(userId, user) {
     
     const statusBadge = '<span class="status-badge success">Active</span>';
     
+    // POD badge with color coding
+    const podBadge = user.pod 
+        ? `<span class="pod-badge" style="background: var(--telus-purple); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em;">${user.pod}</span>`
+        : '<span style="color: #6c757d; font-style: italic;">No POD</span>';
+    
     row.innerHTML = `
         <td>${userId}</td>
-        <td>${user.name || 'Unknown'}</td>
+        <td>
+            <div style="display: flex; flex-direction: column;">
+                <strong>${user.name || 'Unknown'}</strong>
+                ${user.designation ? `<small style="color: #6c757d;">${user.designation}</small>` : ''}
+            </div>
+        </td>
         <td>${user.email}</td>
+        <td>${podBadge}</td>
         <td>${roleBadge}</td>
         <td>${statusBadge}</td>
         <td>${new Date().toLocaleDateString()}</td>
         <td>
-            <button class="action-btn edit" onclick="editUser(${userId})">
+            <button class="action-btn edit" onclick="editUser(${userId})" title="Edit User">
                 <i class="fas fa-edit"></i>
             </button>
-            ${user.role !== 'admin' ? `<button class="action-btn delete" onclick="confirmDeleteUser(${userId})">
+            ${user.role !== 'admin' ? `<button class="action-btn delete" onclick="confirmDeleteUser(${userId})" title="Delete User">
                 <i class="fas fa-trash"></i>
             </button>` : ''}
         </td>
@@ -1487,22 +1498,83 @@ function getUserFormFields() {
     return `
         <div class="form-group">
             <label for="userName">Full Name *</label>
-            <input type="text" id="userName" name="name" required>
+            <input type="text" id="userName" name="name" required placeholder="Enter full name">
         </div>
         <div class="form-group">
-            <label for="userEmail">Email *</label>
-            <input type="email" id="userEmail" name="email" required>
+            <label for="userDesignation">Designation *</label>
+            <input type="text" id="userDesignation" name="designation" required placeholder="e.g., Senior Product Manager" value="Product Manager">
         </div>
         <div class="form-group">
-            <label for="userRole">Role</label>
+            <label for="userRole">Role/Department</label>
             <select id="userRole" name="role">
-                <option value="user">User</option>
+                <option value="Product Management" selected>Product Management</option>
+                <option value="Product Designer">Product Designer</option>
+                <option value="Software Developer">Software Developer</option>
+                <option value="Solution Engineer">Solution Engineer</option>
+                <option value="Machine Learning">Machine Learning</option>
+                <option value="Quality Analyst">Quality Analyst</option>
+                <option value="Marketing">Marketing</option>
+                <option value="HR">HR</option>
+                <option value="Consultant">Consultant</option>
+                <option value="user">User (Basic)</option>
                 <option value="admin">Admin</option>
             </select>
         </div>
         <div class="form-group">
-            <label for="userPassword">Password</label>
-            <input type="password" id="userPassword" name="password" placeholder="Leave blank to keep current password">
+            <label for="userPod">POD Assignment</label>
+            <select id="userPod" name="pod">
+                <option value="Platform" selected>Platform Team</option>
+                <option value="Growth">Growth Team</option>
+                <option value="CC">Control Centre</option>
+                <option value="TS">Talent Studio</option>
+                <option value="GTS">Ground Truth Studio</option>
+                <option value="FTS">Fine Tune Studio</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="userEmail">Email</label>
+            <input type="email" id="userEmail" name="email" value="user.name@telus.com" placeholder="Auto-generated from name">
+        </div>
+        <div class="form-group">
+            <label for="userPhone">Phone</label>
+            <input type="tel" id="userPhone" name="phone" value="+1 (555) 123-4567">
+        </div>
+        <div class="form-group">
+            <label for="userLocation">Location</label>
+            <input type="text" id="userLocation" name="location" value="Vancouver, BC">
+        </div>
+        <div class="form-group">
+            <label for="userExperience">Experience Level</label>
+            <select id="userExperience" name="experience">
+                <option value="1-2 years">1-2 years</option>
+                <option value="3-5 years" selected>3-5 years</option>
+                <option value="5+ years">5+ years</option>
+                <option value="10+ years">10+ years</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="userSkills">Skills (comma-separated)</label>
+            <input type="text" id="userSkills" name="skills" value="Product Strategy, Agile, Analytics" placeholder="e.g., React, Node.js, Python">
+        </div>
+        <div class="form-group">
+            <label for="userProject">Current Project</label>
+            <input type="text" id="userProject" name="currentProject" value="Digital Platform Enhancement">
+        </div>
+        <div class="form-group">
+            <label for="userAvailability">Availability</label>
+            <select id="userAvailability" name="availability">
+                <option value="Available" selected>Available</option>
+                <option value="Busy">Busy</option>
+                <option value="Away">Away</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="userDescription">Description</label>
+            <textarea id="userDescription" name="description" rows="3" placeholder="Brief professional description">Experienced professional focused on delivering innovative solutions and driving team collaboration.</textarea>
+        </div>
+        <div class="form-group">
+            <label for="userPassword">Password (Optional)</label>
+            <input type="password" id="userPassword" name="password" placeholder="Leave blank for default password">
         </div>
     `;
 }
@@ -1534,6 +1606,11 @@ function showFormModal(title, formFields, data = null) {
         // Setup file upload handling if document form
         if (currentFormType === 'document') {
             setupFileUploadHandling();
+        }
+        
+        // Setup auto-email generation for user form
+        if (currentFormType === 'user') {
+            setupAutoEmailGeneration();
         }
         
         // Populate form with existing data if editing
@@ -1866,28 +1943,109 @@ function saveContent(data) {
 }
 
 function saveUser(data) {
-    const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    
-    if (editingItemId) {
-        // Update existing user
-        const userIndex = editingItemId - 1;
-        if (userIndex < users.length) {
-            users[userIndex] = { ...users[userIndex], ...data };
+    try {
+        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        
+        // Create comprehensive user profile for expertise hub integration
+        const expertiseUser = {
+            id: editingItemId ? editingItemId : Date.now(),
+            name: data.name,
+            designation: data.designation,
+            role: data.role,
+            pod: data.pod,
+            email: data.email,
+            phone: data.phone || '+1 (555) 123-4567',
+            location: data.location || 'Vancouver, BC',
+            experience: data.experience || '3-5 years',
+            skills: data.skills ? data.skills.split(',').map(s => s.trim()) : ['Product Strategy', 'Agile', 'Analytics'],
+            currentProject: data.currentProject || 'Digital Platform Enhancement',
+            availability: data.availability || 'Available',
+            avatar: generateDefaultAvatar(data.name),
+            description: data.description || 'Experienced professional focused on delivering innovative solutions and driving team collaboration.',
+            dateCreated: new Date().toISOString(),
+            // Keep password for admin user management
+            password: data.password || 'defaultPassword123'
+        };
+        
+        if (editingItemId) {
+            // Update existing user
+            const userIndex = editingItemId - 1;
+            if (userIndex < users.length) {
+                users[userIndex] = { ...users[userIndex], ...expertiseUser };
+                localStorage.setItem('registeredUsers', JSON.stringify(users));
+                
+                // Update expertise hub data
+                updateExpertiseHubUser(expertiseUser);
+                
+                console.log('User updated and synced to expertise hub:', expertiseUser);
+                return true;
+            }
+        } else {
+            // Add new user
+            users.push(expertiseUser);
             localStorage.setItem('registeredUsers', JSON.stringify(users));
+            
+            // Add to expertise hub
+            addToExpertiseHub(expertiseUser);
+            
+            console.log('New user created and added to expertise hub:', expertiseUser);
             return true;
         }
-    } else {
-        // Add new user
-        users.push({
-            ...data,
-            id: Date.now(),
-            dateCreated: new Date().toISOString()
-        });
-        localStorage.setItem('registeredUsers', JSON.stringify(users));
-        return true;
+        
+        return false;
+    } catch (error) {
+        console.error('Error saving user:', error);
+        return false;
     }
-    
-    return false;
+}
+
+// Add user to expertise hub
+function addToExpertiseHub(user) {
+    try {
+        // Get existing expertise hub users
+        const expertiseUsers = JSON.parse(localStorage.getItem('expertise_hub_users') || '[]');
+        
+        // Add new user to expertise hub
+        expertiseUsers.push(user);
+        localStorage.setItem('expertise_hub_users', JSON.stringify(expertiseUsers));
+        
+        // Trigger sync event for expertise hub
+        window.dispatchEvent(new CustomEvent('expertiseHubUserAdded', {
+            detail: { user: user, source: 'admin' }
+        }));
+        
+        console.log('User added to expertise hub:', user.name);
+    } catch (error) {
+        console.error('Error adding user to expertise hub:', error);
+    }
+}
+
+// Update user in expertise hub
+function updateExpertiseHubUser(user) {
+    try {
+        // Get existing expertise hub users
+        const expertiseUsers = JSON.parse(localStorage.getItem('expertise_hub_users') || '[]');
+        
+        // Find and update user
+        const userIndex = expertiseUsers.findIndex(u => u.id === user.id);
+        if (userIndex !== -1) {
+            expertiseUsers[userIndex] = user;
+        } else {
+            // If not found, add as new user
+            expertiseUsers.push(user);
+        }
+        
+        localStorage.setItem('expertise_hub_users', JSON.stringify(expertiseUsers));
+        
+        // Trigger sync event for expertise hub
+        window.dispatchEvent(new CustomEvent('expertiseHubUserUpdated', {
+            detail: { user: user, source: 'admin' }
+        }));
+        
+        console.log('User updated in expertise hub:', user.name);
+    } catch (error) {
+        console.error('Error updating user in expertise hub:', error);
+    }
 }
 
 // Activity and logging functions
@@ -2494,6 +2652,43 @@ function previewDocumentSubmission(docId) {
 function viewDocumentResponse(docId) {
     // Redirect to the new preview function
     previewDocumentSubmission(docId);
+}
+
+// Setup auto-email generation for user form
+function setupAutoEmailGeneration() {
+    const nameInput = document.getElementById('userName');
+    const emailInput = document.getElementById('userEmail');
+    
+    if (nameInput && emailInput) {
+        nameInput.addEventListener('input', function(e) {
+            const name = e.target.value.trim();
+            if (name) {
+                // Generate email from name
+                const emailName = name.toLowerCase()
+                    .replace(/[^a-z\s]/g, '') // Remove non-alphabetic characters except spaces
+                    .replace(/\s+/g, '.') // Replace spaces with dots
+                    .replace(/\.+/g, '.') // Replace multiple dots with single dot
+                    .replace(/^\.+|\.+$/g, ''); // Remove leading/trailing dots
+                
+                emailInput.value = `${emailName}@telus.com`;
+            } else {
+                emailInput.value = 'user.name@telus.com';
+            }
+        });
+    }
+}
+
+// Generate default avatar from initials
+function generateDefaultAvatar(name) {
+    if (!name) return 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face';
+    
+    const initials = name.split(' ')
+        .map(word => word.charAt(0).toUpperCase())
+        .join('')
+        .substring(0, 2);
+    
+    // Use a placeholder service for avatar generation
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=120&background=4b286d&color=ffffff&bold=true`;
 }
 
 // Export functions for global access
