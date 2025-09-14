@@ -1,16 +1,8 @@
-// Signup script for user registration (signup.html)
+// Signup script for Supabase user registration (signup.html)
 
-// Load the data script and initialize
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Load mock data script
-    const script = document.createElement('script');
-    script.src = 'data.js';
-    document.head.appendChild(script);
-    
-    // Wait for data to load then initialize
-    script.onload = function() {
-        initializeSignupPage();
-    };
+    initializeSignupPage();
 });
 
 function initializeSignupPage() {
@@ -28,10 +20,19 @@ function setupSignupForm() {
     setupRealTimeValidation();
 }
 
-function checkIfAlreadyLoggedIn() {
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-        window.location.href = 'index.html';
+async function checkIfAlreadyLoggedIn() {
+    try {
+        if (!window.SupabaseService) {
+            console.log('Supabase service not available yet');
+            return;
+        }
+        
+        const { data: { user } } = await window.SupabaseService.supabase.auth.getUser();
+        if (user) {
+            window.location.href = 'user-dashboard.html';
+        }
+    } catch (error) {
+        console.error('Error checking login status:', error);
     }
 }
 
@@ -108,7 +109,7 @@ function hideFieldError(field) {
     }
 }
 
-function handleSignup(e) {
+async function handleSignup(e) {
     e.preventDefault();
     
     const name = document.getElementById('name').value.trim();
@@ -144,29 +145,80 @@ function handleSignup(e) {
     submitBtn.textContent = 'Creating Account...';
     submitBtn.disabled = true;
     
-    // Simulate network delay
-    setTimeout(() => {
-        try {
-            const result = DataManager.registerUser(name, email, password);
-            
-            if (!result.success) {
-                showMessage(result.message, 'error');
-                resetSubmitButton(submitBtn, originalText);
-                return;
-            }
-            
-            showMessage('Account created successfully! Redirecting to login...', 'success');
-            
-            // Redirect to login page after successful registration
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 2000);
-            
-        } catch (error) {
-            showMessage('Registration error: ' + error.message, 'error');
-            resetSubmitButton(submitBtn, originalText);
+    try {
+        // Check if Supabase service is available
+        if (!window.SupabaseService) {
+            throw new Error('Supabase service not available. Please refresh the page.');
         }
-    }, 1500);
+        
+        // Create user account with Supabase Auth
+        const { data, error } = await window.SupabaseService.supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: name,
+                    role: 'user' // Default role for new signups
+                }
+            }
+        });
+        
+        if (error) {
+            throw error;
+        }
+        
+        if (!data.user) {
+            throw new Error('Account creation failed - no user data received');
+        }
+        
+        console.log('✅ User account created in Supabase Auth:', data.user.id);
+        
+        // Create user profile in the profiles table using the correct function
+        const profileResult = await window.SupabaseService.createProfile(data.user.id, {
+            email: email,
+            name: name,
+            role: 'user',
+            designation: 'Team Member',
+            pod: 'Platform',
+            location: 'Vancouver, BC',
+            experience: '1-3 years',
+            skills: ['Product Strategy', 'Agile'],
+            current_project: 'Digital Platform Enhancement',
+            availability: 'Available',
+            description: 'New team member focused on delivering innovative solutions.'
+        });
+        
+        if (profileResult) {
+            console.log('✅ User profile created successfully:', profileResult);
+        } else {
+            console.warn('⚠️ Profile creation failed, but user account was created');
+            // Don't throw error here - user account still exists in Auth
+        }
+        
+        showMessage('Account created successfully! Please check your email to confirm your account, then you can login.', 'success');
+        
+        // Redirect to login page after successful registration
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Signup error:', error);
+        let errorMessage = 'Account creation failed. Please try again.';
+        
+        if (error.message.includes('User already registered')) {
+            errorMessage = 'An account with this email already exists. Please login instead.';
+        } else if (error.message.includes('Password should be at least')) {
+            errorMessage = 'Password must be at least 6 characters long';
+        } else if (error.message.includes('Invalid email')) {
+            errorMessage = 'Please enter a valid email address';
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
+        showMessage(errorMessage, 'error');
+        resetSubmitButton(submitBtn, originalText);
+    }
 }
 
 function resetSubmitButton(button, originalText) {
