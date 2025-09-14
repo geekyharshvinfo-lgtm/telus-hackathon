@@ -66,26 +66,31 @@ class SupabaseService {
                     password: password,
                     options: {
                         data: {
-                            full_name: userData.name,
-                            role: userData.role || 'user',
-                            designation: userData.designation || 'Team Member',
-                            pod: userData.pod || 'Platform',
-                            phone: userData.phone || '',
-                            location: userData.location || 'Vancouver, BC',
-                            experience: userData.experience || '3-5 years',
-                            skills: userData.skills || ['Product Strategy', 'Agile', 'Analytics'],
-                            current_project: userData.currentProject || 'Digital Platform Enhancement',
-                            availability: userData.availability || 'Available',
-                            description: userData.description || 'Experienced professional focused on delivering innovative solutions.'
+                            name: userData.name,
+                            role: userData.role || 'user'
                         }
                     }
                 });
 
                 if (error) throw error;
 
-                // Profile will be automatically created by database trigger
-                // No manual profile creation needed
-                console.log('✅ User created successfully, profile will be auto-generated');
+                // Create profile
+                if (data.user) {
+                    await this.createProfile(data.user.id, {
+                        email: email,
+                        name: userData.name,
+                        role: userData.role || 'user',
+                        designation: userData.designation || 'Team Member',
+                        pod: userData.pod || 'Platform',
+                        phone: userData.phone || '',
+                        location: userData.location || 'Vancouver, BC',
+                        experience: userData.experience || '3-5 years',
+                        skills: userData.skills || ['Product Strategy', 'Agile', 'Analytics'],
+                        current_project: userData.currentProject || 'Digital Platform Enhancement',
+                        availability: userData.availability || 'Available',
+                        description: userData.description || 'Experienced professional focused on delivering innovative solutions.'
+                    });
+                }
 
                 return { success: true, user: data.user };
             } else {

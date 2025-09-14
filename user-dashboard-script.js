@@ -75,78 +75,34 @@ function initializeDashboard() {
     }
 }
 
-// Check user authentication with Supabase
-async function checkUserAuth() {
-    try {
-        if (!window.SupabaseService) {
-            console.log('Supabase service not available, redirecting to login');
-            window.location.href = 'login.html';
-            return;
+// Check user authentication
+function checkUserAuth() {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    const user = JSON.parse(currentUser);
+    if (user.role === 'admin') {
+        // Admin can view user dashboard but show admin badge
+        const userName = document.getElementById('userName');
+        if (userName) {
+            userName.textContent = user.name + ' (Admin)';
         }
-        
-        const { data: { user } } = await window.SupabaseService.supabase.auth.getUser();
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        // Get user profile from Supabase
-        const userProfile = await window.SupabaseService.getProfile(user.id);
-        if (!userProfile) {
-            console.error('User profile not found');
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        // Store current user data for compatibility
-        const currentUser = {
-            id: user.id,
-            email: user.email,
-            name: userProfile.full_name,
-            role: userProfile.role
-        };
-        
-        // Store in localStorage for backward compatibility with existing code
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        
-        if (userProfile.role === 'admin') {
-            // Admin can view user dashboard but show admin badge
-            const userName = document.getElementById('userName');
-            if (userName) {
-                userName.textContent = userProfile.full_name + ' (Admin)';
-            }
-        }
-        
-        return currentUser;
-    } catch (error) {
-        console.error('Authentication check failed:', error);
-        window.location.href = 'login.html';
     }
 }
 
-// Load user information from Supabase
-async function loadUserInfo() {
-    try {
-        if (!window.supabaseService) {
-            console.log('Supabase service not available yet');
-            return;
-        }
-        
-        const { data: { user } } = await window.supabaseService.supabase.auth.getUser();
-        if (!user) {
-            return;
-        }
-        
-        const userProfile = await window.supabaseService.getUserProfile(user.id);
-        if (!userProfile) {
-            console.error('User profile not found');
-            return;
-        }
+// Load user information
+function loadUserInfo() {
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+        const user = JSON.parse(currentUser);
         
         // Update main userName element (if exists)
         const userName = document.getElementById('userName');
         if (userName) {
-            userName.textContent = userProfile.full_name;
+            userName.textContent = user.name;
         }
         
         // Update profile section in navbar
@@ -155,16 +111,17 @@ async function loadUserInfo() {
         
         if (profileName && profileRole) {
             // Extract first name from full name
-            const firstName = userProfile.full_name ? userProfile.full_name.split(' ')[0] : 'User';
+            const firstName = user.name ? user.name.split(' ')[0] : 'User';
             
-            // Get designation from user profile
+            // Get designation from admin-created users or use role as fallback
             let designation = 'Team Member'; // Default
             
-            if (userProfile.designation) {
-                designation = userProfile.designation;
-            } else if (userProfile.role === 'admin') {
+            if (user.designation) {
+                // Admin-created user with designation
+                designation = user.designation;
+            } else if (user.role === 'admin') {
                 designation = 'Administrator';
-            } else if (userProfile.role === 'user') {
+            } else if (user.role === 'user') {
                 designation = 'Team Member';
             }
             
@@ -172,8 +129,6 @@ async function loadUserInfo() {
             profileName.textContent = firstName;
             profileRole.textContent = designation;
         }
-    } catch (error) {
-        console.error('Error loading user info:', error);
     }
 }
 
@@ -499,37 +454,22 @@ function addToFavorites() {
     showMessage('Added to favorites!', 'success');
 }
 
-// Logout function with Supabase
-async function logout() {
-    try {
-        // Log logout activity
-        if (window.DataManager) {
-            window.DataManager.logActivity('logout', 'User logged out from dashboard');
-        }
-        
-        // Update last visit time
-        userStats.lastVisit = new Date().toLocaleDateString();
-        saveUserStats();
-        
-        // Sign out from Supabase
-        if (window.supabaseService) {
-            const { error } = await window.supabaseService.supabase.auth.signOut();
-            if (error) {
-                console.error('Error signing out:', error);
-            }
-        }
-        
-        // Clear user session
-        localStorage.removeItem('currentUser');
-        
-        // Redirect to login page
-        window.location.href = 'login.html';
-    } catch (error) {
-        console.error('Logout error:', error);
-        // Force redirect even if logout fails
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
+// Logout function
+function logout() {
+    // Log logout activity
+    if (window.DataManager) {
+        window.DataManager.logActivity('logout', 'User logged out from dashboard');
     }
+    
+    // Update last visit time
+    userStats.lastVisit = new Date().toLocaleDateString();
+    saveUserStats();
+    
+    // Clear user session
+    localStorage.removeItem('currentUser');
+    
+    // Redirect to login page
+    window.location.href = 'index.html';
 }
 
 // Profile dropdown functionality
