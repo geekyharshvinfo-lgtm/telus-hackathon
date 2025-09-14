@@ -87,7 +87,7 @@ class TelusChatbot {
         const chatbotHTML = `
             <div class="chatbot-container" id="chatbotContainer">
                 <button class="chatbot-button" id="chatbotButton">
-                    <span class="chatbot-button-icon">💬</span>
+                    <span class="chatbot-button-icon"><i class="fas fa-comments"></i></span>
                 </button>
                 
                 <div class="chatbot-popup" id="chatbotPopup">
@@ -405,7 +405,20 @@ class TelusChatbot {
     
     async respondToMessage(message) {
         try {
-            // Always try AI first if available
+            // Check if we're waiting for confirmation response
+            if (this.waitingForConfirmation) {
+                this.handleConfirmationResponse(message);
+                return;
+            }
+            
+            // Check if this is a non-TELUS query that needs confirmation
+            if (this.isNonTelusQuery(message)) {
+                this.hideTyping();
+                this.askForConfirmation(message);
+                return;
+            }
+            
+            // For TELUS-related queries, proceed normally with AI
             if (this.useAI && this.geminiService) {
                 console.log('Attempting to use Gemini AI for response...');
                 
@@ -413,7 +426,7 @@ class TelusChatbot {
                 
                 if (aiResponse.success) {
                     console.log('Gemini AI response successful:', aiResponse.text);
-                    this.addMessageWithTypewriter(aiResponse.text, 'bot'); // Use new method
+                    this.addMessageWithTypewriter(aiResponse.text, 'bot');
                     return;
                 } else {
                     console.warn('AI response failed, falling back to keyword response:', aiResponse.error);
@@ -422,12 +435,12 @@ class TelusChatbot {
             
             // Fallback to keyword-based response
             const response = this.generateResponse(message.toLowerCase());
-            this.addMessageWithTypewriter(response, 'bot'); // Use new method
+            this.addMessageWithTypewriter(response, 'bot');
             
         } catch (error) {
             console.error('Error in respondToMessage:', error);
             // Ultimate fallback
-            this.addMessageWithTypewriter(this.getRandomResponse('default'), 'bot'); // Use new method
+            this.addMessageWithTypewriter(this.getRandomResponse('default'), 'bot');
         }
     }
     
@@ -440,7 +453,9 @@ class TelusChatbot {
             'telus', 'cloud', 'digital transformation', 'cybersecurity', 'data analytics',
             'telecommunications', 'technical support', 'billing', 'account', 'service',
             'pricing', 'contact', 'support', 'help', 'business', 'enterprise',
-            'infrastructure', 'platform', 'software', 'security', 'analytics'
+            'infrastructure', 'platform', 'software', 'security', 'analytics',
+            'digital services', 'customer service', 'subscription', 'plan', 'package',
+            'network', 'connectivity', 'internet', 'phone', 'mobile', 'wireless'
         ];
         
         // If message contains TELUS keywords, don't ask for confirmation
@@ -455,14 +470,18 @@ class TelusChatbot {
             'sports', 'cricket', 'football', 'movie', 'film', 'book', 'author',
             'country', 'city', 'place', 'weather', 'news', 'current events',
             'recipe', 'cooking', 'health', 'medical', 'science', 'technology',
-            'programming', 'coding', 'math', 'physics', 'chemistry', 'biology'
+            'programming', 'coding', 'math', 'physics', 'chemistry', 'biology',
+            'capital of', 'population of', 'when was', 'where is', 'how to cook',
+            'how to make', 'recipe for', 'meaning of', 'definition of'
         ];
         
         // Check if it's a general knowledge question
         return nonTelusIndicators.some(indicator => lowerMessage.includes(indicator)) ||
                (lowerMessage.includes('who') && !lowerMessage.includes('telus')) ||
-               (lowerMessage.includes('what') && !lowerMessage.includes('telus')) ||
-               (lowerMessage.includes('how') && !lowerMessage.includes('telus') && !lowerMessage.includes('service'));
+               (lowerMessage.includes('what') && !lowerMessage.includes('telus') && !lowerMessage.includes('service')) ||
+               (lowerMessage.includes('how') && !lowerMessage.includes('telus') && !lowerMessage.includes('service') && !lowerMessage.includes('support')) ||
+               (lowerMessage.includes('where') && !lowerMessage.includes('telus')) ||
+               (lowerMessage.includes('when') && !lowerMessage.includes('telus'));
     }
     
     // Ask user for confirmation to search outside TELUS ecosystem
