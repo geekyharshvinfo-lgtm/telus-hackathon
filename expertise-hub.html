@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELUS Digital - Expertise Hub</title>
+    <link rel="stylesheet" href="user-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard">
+    <!-- Left Navigation Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="images/telus-logo.png" alt="TELUS Logo" class="logo">
+            </div>
+        </div>
+        
+        <div class="sidebar-content">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="user-dashboard.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-home"></i></span>
+                        <span class="nav-text">Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="my-tasks.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-tasks"></i></span>
+                        <span class="nav-text">My Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="documents.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-file-alt"></i></span>
+                        <span class="nav-text">Documents</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="expertise-hub.html" class="nav-link active">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        <span class="nav-text">Expertise Hub</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="help-support.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-question-circle"></i></span>
+                        <span class="nav-text">Help & Support</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="profile-section">
+                <div class="profile-trigger" onclick="toggleProfileMenu()">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">John Doe</span>
+                        <span class="profile-role">Product Design Intern</span>
+                    </div>
+                    <span class="profile-arrow"><i class="fas fa-chevron-up"></i></span>
+                </div>
+                <div class="profile-menu" id="profileMenu">
+                    <a href="#" class="profile-menu-item">
+                        <span class="menu-icon"><i class="fas fa-user"></i></span>
+                        Profile
+                    </a>
+                    <a href="index.html" class="profile-menu-item" onclick="logout()">
+                        <span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-content">
+                    <div class="header-text">
+                        <h1 class="page-title">Expertise Hub</h1>
+                        <p class="page-subtitle">Connect with mentors, explore PODs, and find your teammates</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Your Manager and Mentor Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Your Team</h2>
+                    <p class="section-subtitle">Connect with your manager and mentor</p>
+                </div>
+                <div class="team-profiles-grid">
+                    <div class="team-profile-card">
+                        <div class="team-profile-header">
+                        <div class="team-profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                            <div class="team-profile-info">
+                                <div class="team-profile-name">Sarah Miller</div>
+                                <div class="team-profile-designation">Senior Product Manager</div>
+                                <div class="team-profile-pod">Platform POD</div>
+                            </div>
+                            <div class="team-profile-label">Your Manager</div>
+                        </div>
+                        <div class="team-profile-description">
+                            <p>Sarah has been leading product initiatives at TELUS for over 6 years. She specializes in user experience design and agile methodologies, helping teams deliver exceptional digital products.</p>
+                        </div>
+                        <div class="team-profile-actions">
+                            <button class="contact-btn email-btn" onclick="contactViaEmail('sarah.miller@telus.com')">
+                                <i class="fas fa-envelope"></i> Email
+                            </button>
+                            <button class="contact-btn slack-btn" onclick="contactViaSlack('@sarah.miller')">
+                                <i class="fab fa-slack"></i> Slack
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="team-profile-card">
+                        <div class="team-profile-header">
+                            <div class="team-profile-avatar">
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face" alt="Michael Johnson" />
+                            </div>
+                            <div class="team-profile-info">
+                                <div class="team-profile-name">Michael Johnson</div>
+                                <div class="team-profile-designation">Principal UX Designer</div>
+                                <div class="team-profile-pod">Design POD</div>
+                            </div>
+                            <div class="team-profile-label">Your Mentor</div>
+                        </div>
+                        <div class="team-profile-description">
+                            <p>Michael is a seasoned design professional with expertise in user research and design systems. He mentors junior designers and helps them grow their skills in creating user-centered solutions.</p>
+                        </div>
+                        <div class="team-profile-actions">
+                            <button class="contact-btn email-btn" onclick="contactViaEmail('michael.johnson@telus.com')">
+                                <i class="fas fa-envelope"></i> Email
+                            </button>
+                            <button class="contact-btn slack-btn" onclick="contactViaSlack('@michael.johnson')">
+                                <i class="fab fa-slack"></i> Slack
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Navigation Cards -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Explore</h2>
+                    <p class="section-subtitle">Discover our organization and connect with teammates</p>
+                </div>
+                <div class="expertise-main-grid">
+                    <div class="expertise-main-card" onclick="navigateToSection('pods')">
+                        <div class="main-card-icon">
+                            <i class="fas fa-sitemap"></i>
+                        </div>
+                        <div class="main-card-content">
+                            <h3>Explore Our PODs</h3>
+                            <p>Discover different PODs and their software solutions</p>
+                        </div>
+                        <div class="main-card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="expertise-main-card" onclick="navigateToSection('teammates')">
+                        <div class="main-card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="main-card-content">
+                            <h3>Find Teammates</h3>
+                            <p>Search and filter team members by role, POD, and expertise</p>
+                        </div>
+                        <div class="main-card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="expertise-content">
+                <!-- Landing Section (Default) -->
+                <div class="content-panel active" id="landing-panel">
+                    <div class="landing-section">
+                        <!-- Quick stats cards removed as requested -->
+                    </div>
+                </div>
+
+                <!-- Mentor Section -->
+                <div class="content-panel" id="mentor-panel">
+                    <div class="section-header">
+                        <h2>Find a Mentor</h2>
+                        <p class="section-subtitle">Connect with experienced professionals who can guide your career growth</p>
+                        <button class="back-btn" onclick="navigateToSection('landing')">
+                            <i class="fas fa-arrow-left"></i> Back to Hub
+                        </button>
+                    </div>
+                    <div class="mentor-grid" id="mentorGrid">
+                        <!-- Mentor cards will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- PODs Section -->
+                <div class="content-panel" id="pods-panel">
+                    <div class="section-header">
+                        <h2>Explore Our PODs</h2>
+                        <p class="section-subtitle">Discover different PODs and their software solutions</p>
+                        <button class="back-btn" onclick="navigateToSection('landing')">
+                            <i class="fas fa-arrow-left"></i> Back to Hub
+                        </button>
+                    </div>
+                    <div class="pods-grid" id="podsGrid">
+                        <!-- POD cards will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- POD Details Section -->
+                    <div class="pod-details-section" id="podDetailsSection" style="display: none;">
+                        <div class="pod-details-header">
+                            <button class="back-to-pods-btn" onclick="backToPods()">
+                                <i class="fas fa-arrow-left"></i> Back to PODs
+                            </button>
+                            <h3 id="podDetailsTitle">POD Details</h3>
+                        </div>
+                        <div class="pod-members-grid" id="podMembersGrid">
+                            <!-- POD members will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teammates Section -->
+                <div class="content-panel" id="teammates-panel">
+                    <div class="section-header">
+                        <h2>Find Teammates</h2>
+                        <p class="section-subtitle">Search and filter team members by role, POD, and expertise</p>
+                        <button class="back-btn" onclick="navigateToSection('landing')">
+                            <i class="fas fa-arrow-left"></i> Back to Hub
+                        </button>
+                    </div>
+                    
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-section">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="teammateSearch" placeholder="Search by name, role, or skills..." onkeyup="filterTeammates()">
+                        </div>
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label for="podFilter">Filter by POD:</label>
+                                <select id="podFilter" onchange="filterTeammates()">
+                                    <option value="">All PODs</option>
+                                    <option value="Platform">Platform</option>
+                                    <option value="Growth">Growth</option>
+                                    <option value="CC">CC</option>
+                                    <option value="TS">TS</option>
+                                    <option value="GTS">GTS</option>
+                                    <option value="FTS">FTS</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="roleFilter">Filter by Role:</label>
+                                <select id="roleFilter" onchange="filterTeammates()">
+                                    <option value="">All Roles</option>
+                                    <option value="Product Management">Product Management</option>
+                                    <option value="Product Designer">Product Designer</option>
+                                    <option value="Solution Engineer">Solution Engineer</option>
+                                    <option value="Software Developer">Software Developer</option>
+                                    <option value="Machine Learning">Machine Learning</option>
+                                    <option value="Artificial Intelligence">Artificial Intelligence</option>
+                                    <option value="HR">HR</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Quality Analyst">Quality Analyst</option>
+                                    <option value="Consultant">Consultant</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Teammates Grid -->
+                    <div class="teammates-grid" id="teammatesGrid">
+                        <!-- Teammate cards will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-button" onclick="toggleChatbot()">
+            <i class="fas fa-comments chatbot-button-icon"></i>
+        </button>
+        <div class="chatbot-popup" id="chatbotPopup">
+            <div class="chatbot-header">
+                <h3>TELUS Assistant</h3>
+                <button class="chatbot-close" onclick="toggleChatbot()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chatbot-welcome">
+                    <h4>👋 Hello! I'm your TELUS Assistant</h4>
+                    <p>How can I help you today?</p>
+                    <div class="chatbot-suggestions">
+                        <button class="suggestion-btn" onclick="sendMessage('How do I find a mentor?')">How do I find a mentor?</button>
+                        <button class="suggestion-btn" onclick="sendMessage('What PODs are available?')">What PODs are available?</button>
+                        <button class="suggestion-btn" onclick="sendMessage('How do I contact a teammate?')">How do I contact a teammate?</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type your message..." onkeypress="handleChatbotKeypress(event)">
+                <button class="chatbot-send" onclick="sendChatbotMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+    <script src="data.js"></script>
+    <script src="expertise-hub-script.js"></script>
+    <script>
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            const profileSection = document.querySelector('.profile-section');
+            menu.classList.toggle('show');
+            profileSection.classList.toggle('open');
+        }
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileSection = document.querySelector('.profile-section');
+            const menu = document.getElementById('profileMenu');
+            
+            if (!profileSection.contains(event.target)) {
+                menu.classList.remove('show');
+                profileSection.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>

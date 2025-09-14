@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELUS Digital - Admin Dashboard</title>
+    <link rel="stylesheet" href="user-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard admin-dashboard">
+    <!-- Left Navigation Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="images/telus-logo.png" alt="TELUS Logo" class="logo">
+                <span class="admin-badge">ADMIN</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-content">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="admin-dashboard.html" class="nav-link active">
+                        <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                        <span class="nav-text">Admin Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="switchToSection('tasks')">
+                        <span class="nav-icon"><i class="fas fa-tasks"></i></span>
+                        <span class="nav-text">Manage Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="switchToSection('documents')">
+                        <span class="nav-icon"><i class="fas fa-file-alt"></i></span>
+                        <span class="nav-text">Manage Documents</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="switchToSection('users')">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        <span class="nav-text">User Management</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="profile-section">
+                <div class="profile-trigger" onclick="toggleProfileMenu()">
+                    <div class="profile-avatar admin-avatar">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name" id="adminName">Administrator</span>
+                        <span class="profile-role">System Admin</span>
+                    </div>
+                    <span class="profile-arrow"><i class="fas fa-chevron-up"></i></span>
+                </div>
+                <div class="profile-menu" id="profileMenu">
+                    <a href="#" class="profile-menu-item">
+                        <span class="menu-icon"><i class="fas fa-cog"></i></span>
+                        Admin Settings
+                    </a>
+                    <a href="#" class="profile-menu-item" onclick="logout(); return false;">
+                        <span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Dashboard Header -->
+            <div class="page-header">
+                <div class="header-content">
+                    <div class="header-text">
+                        <h1 class="page-title">Admin Dashboard</h1>
+                        <p class="page-subtitle">Manage and monitor the entire TELUS Digital platform</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-secondary" onclick="refreshAllData()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Data
+                        </button>
+                        <button class="btn-primary" onclick="showQuickAddModal()">
+                            <i class="fas fa-plus"></i>
+                            Quick Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overview Dashboard Section -->
+            <div class="content-section" id="overviewSection">
+                <div class="section-header">
+                    <h2>System Overview</h2>
+                    <p class="section-subtitle">Real-time statistics and system health monitoring</p>
+                </div>
+                
+                <!-- Admin Stats Grid -->
+                <div class="overview-stats-grid admin-stats-grid">
+                    <div class="overview-stat-card tasks admin-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="stat-title">
+                                <h3>Task Management</h3>
+                                <span class="stat-subtitle">User Tasks Overview</span>
+                            </div>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-numbers">
+                                <div class="stat-item">
+                                    <span class="stat-value" id="adminTasksPending">0</span>
+                                    <span class="stat-label">Pending Tasks</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="adminTasksCompleted">0</span>
+                                    <span class="stat-label">Completed Tasks</span>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <div class="admin-actions">
+                                    <button class="quick-action-btn" onclick="addNewTask()">
+                                        <i class="fas fa-plus"></i> Add Task
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-stat-card documents admin-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-title">
+                                <h3>Document Management</h3>
+                                <span class="stat-subtitle">Document Status Overview</span>
+                            </div>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-numbers">
+                                <div class="stat-item">
+                                    <span class="stat-value" id="adminDocsPending">0</span>
+                                    <span class="stat-label">Pending Review</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="adminDocsApproved">0</span>
+                                    <span class="stat-label">Approved</span>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <div class="admin-actions">
+                                    <button class="quick-action-btn" onclick="addNewDocument()">
+                                        <i class="fas fa-plus"></i> Add Document
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-stat-card team admin-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-title">
+                                <h3>User Management</h3>
+                                <span class="stat-subtitle">Active Users & Teams</span>
+                            </div>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-numbers">
+                                <div class="stat-item">
+                                    <span class="stat-value" id="adminTotalUsers">0</span>
+                                    <span class="stat-label">Total Users</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="adminActiveUsers">0</span>
+                                    <span class="stat-label">Active Today</span>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <div class="admin-actions">
+                                    <button class="quick-action-btn" onclick="addNewUser()">
+                                        <i class="fas fa-user-plus"></i> Add User
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Management Sections (Hidden by default) -->
+            
+            <!-- Task Management Section -->
+            <div class="content-section management-section" id="tasksSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Task Management</h2>
+                    <div class="section-actions">
+                        <button class="btn-secondary" onclick="switchToSection('overview')">
+                            <i class="fas fa-arrow-left"></i> Back to Overview
+                        </button>
+                        <button class="btn-primary" onclick="addNewTask()">
+                            <i class="fas fa-plus"></i> Add New Task
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="management-content">
+                    <div class="management-filters">
+                        <input type="text" id="taskSearchInput" placeholder="Search tasks..." class="search-input">
+                        <select id="taskStatusFilter" class="status-filter">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    
+                    <div class="management-table-container">
+                        <table class="management-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>POD</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Date Added</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                            <tbody id="tasksTableBody">
+                                <!-- Tasks will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Management Section -->
+            <div class="content-section management-section" id="documentsSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Document Management</h2>
+                    <div class="section-actions">
+                        <button class="btn-secondary" onclick="switchToSection('overview')">
+                            <i class="fas fa-arrow-left"></i> Back to Overview
+                        </button>
+                        <button class="btn-primary" onclick="addNewDocument()">
+                            <i class="fas fa-plus"></i> Add New Document
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="management-content">
+                    <div class="management-filters">
+                        <input type="text" id="docSearchInput" placeholder="Search documents..." class="search-input">
+                        <select id="docStatusFilter" class="status-filter">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending Review</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    
+                    <div class="management-table-container">
+                        <table class="management-table">
+                            <thead>
+                                <tr>
+                                    <th>Document Name</th>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Upload Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="documentsTableBody">
+                                <!-- Documents will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- User Management Section -->
+            <div class="content-section management-section" id="usersSection" style="display: none;">
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <div class="section-actions">
+                        <button class="btn-secondary" onclick="switchToSection('overview')">
+                            <i class="fas fa-arrow-left"></i> Back to Overview
+                        </button>
+                        <button class="btn-primary" onclick="addNewUser()">
+                            <i class="fas fa-user-plus"></i> Add New User
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="management-content">
+                    <div class="management-filters">
+                        <input type="text" id="userSearchInput" placeholder="Search users..." class="search-input">
+                        <select id="userRoleFilter" class="status-filter">
+                            <option value="all">All Roles</option>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    
+                    <div class="management-table-container">
+                        <table class="management-table">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Recent Activity Section -->
+            <div class="content-section" id="activitySection">
+                <div class="section-header">
+                    <h2>Recent System Activity</h2>
+                    <button class="refresh-btn" onclick="refreshActivity()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+                
+                <div class="activity-feed admin-activity-feed" id="adminActivityFeed">
+                    <!-- Activity items will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    
+    <!-- Quick Add Modal -->
+    <div class="modal" id="quickAddModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Quick Add</h3>
+                <button class="modal-close" onclick="closeQuickAddModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="quick-add-options">
+                    <button class="quick-add-btn" onclick="addNewTask()">
+                        <i class="fas fa-tasks"></i>
+                        <span>Add Task</span>
+                    </button>
+                    <button class="quick-add-btn" onclick="addNewDocument()">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Add Document</span>
+                    </button>
+                    <button class="quick-add-btn" onclick="addNewUser()">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add User</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Form Modal -->
+    <div class="modal" id="formModal" style="display: none;">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="formModalTitle">Add Item</h3>
+                <button class="modal-close" onclick="closeFormModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="adminForm">
+                    <div id="formFields">
+                        <!-- Dynamic form fields will be inserted here -->
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeFormModal()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="formSubmitBtn">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Action</h3>
+                <button class="modal-close" onclick="closeConfirmModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                <button class="btn-danger" id="confirmBtn" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="sync-manager.js"></script>
+    <script src="data.js"></script>
+    <script src="admin-dashboard-script.js"></script>
+    <script>
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            const profileSection = document.querySelector('.profile-section');
+            menu.classList.toggle('show');
+            profileSection.classList.toggle('open');
+        }
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileSection = document.querySelector('.profile-section');
+            const menu = document.getElementById('profileMenu');
+            
+            if (!profileSection.contains(event.target)) {
+                menu.classList.remove('show');
+                profileSection.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>

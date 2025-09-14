@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Assignment System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #663399;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #552288;
+        }
+        .assignment-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 TELUS Assignment System Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Overview</h2>
+        <p>This test verifies that the user assignment system works correctly:</p>
+        <ul>
+            <li>✅ Admin can create tasks/documents with specific user assignments</li>
+            <li>✅ Assignment data is stored in localStorage</li>
+            <li>✅ User pages filter content based on assignments</li>
+            <li>✅ Assignment filtering functions work correctly</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Test Controls</h2>
+        <button onclick="createTestData()">Create Test Assignment Data</button>
+        <button onclick="testAssignmentFiltering()">Test Assignment Filtering</button>
+        <button onclick="simulateUserLogin()">Simulate User Login</button>
+        <button onclick="clearTestData()">Clear Test Data</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>💾 Current Assignment Data</h2>
+        <div id="assignmentData"></div>
+    </div>
+
+    <script>
+        // Test user data
+        const testUsers = [
+            { email: 'john.doe@telus.com', name: 'John Doe', designation: 'Product Designer' },
+            { email: 'jane.smith@telus.com', name: 'Jane Smith', designation: 'Developer' },
+            { email: 'admin@demo.com', name: 'Admin User', designation: 'Administrator' }
+        ];
+
+        // Assignment filtering functions (copied from fixed pages)
+        function getCurrentUserEmail() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                return currentUser ? JSON.parse(currentUser).email : null;
+            } catch (error) {
+                console.error('Error getting current user email:', error);
+                return null;
+            }
+        }
+
+        function getAssignment(itemId) {
+            try {
+                const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+                return assignments[itemId] || null;
+            } catch (error) {
+                console.error('Error getting assignment:', error);
+                return null;
+            }
+        }
+
+        function isItemAssignedToUser(itemId, userEmail) {
+            try {
+                const assignment = getAssignment(itemId);
+                if (!assignment) {
+                    return true; // Backward compatibility
+                }
+                
+                return assignment.assignedUsers.includes('all') || assignment.assignedUsers.includes(userEmail);
+            } catch (error) {
+                console.error('Error checking item assignment:', error);
+                return true;
+            }
+        }
+
+        function addTestResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function createTestData() {
+            addTestResult('Creating test assignment data...', 'info');
+            
+            // Create test tasks
+            const testTasks = {
+                'task_001': {
+                    title: 'Design Review Task',
+                    description: 'Review the new UI design mockups',
+                    priority: 'high',
+                    status: 'pending',
+                    dateCreated: new Date().toISOString(),
+                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+                },
+                'task_002': {
+                    title: 'Code Implementation',
+                    description: 'Implement the new feature based on specifications',
+                    priority: 'medium',
+                    status: 'pending',
+                    dateCreated: new Date().toISOString(),
+                    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
+                },
+                'task_003': {
+                    title: 'All Users Task',
+                    description: 'This task should be visible to all users',
+                    priority: 'low',
+                    status: 'pending',
+                    dateCreated: new Date().toISOString(),
+                    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+                }
+            };
+
+            // Create test assignments
+            const testAssignments = {
+                'task_001': {
+                    assignedUsers: ['john.doe@telus.com'],
+                    assignedBy: 'admin@demo.com',
+                    assignedDate: new Date().toISOString()
+                },
+                'task_002': {
+                    assignedUsers: ['jane.smith@telus.com'],
+                    assignedBy: 'admin@demo.com',
+                    assignedDate: new Date().toISOString()
+                },
+                'task_003': {
+                    assignedUsers: ['all'],
+                    assignedBy: 'admin@demo.com',
+                    assignedDate: new Date().toISOString()
+                }
+            };
+
+            // Store test data
+            localStorage.setItem('telus_task_status', JSON.stringify(testTasks));
+            localStorage.setItem('telus_user_assignments', JSON.stringify(testAssignments));
+            localStorage.setItem('registeredUsers', JSON.stringify(testUsers));
+
+            addTestResult('✅ Test data created successfully!', 'success');
+            addTestResult(`Created ${Object.keys(testTasks).length} test tasks`, 'info');
+            addTestResult(`Created ${Object.keys(testAssignments).length} test assignments`, 'info');
+            
+            updateAssignmentDisplay();
+        }
+
+        function testAssignmentFiltering() {
+            addTestResult('Testing assignment filtering logic...', 'info');
+            
+            const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+            if (Object.keys(assignments).length === 0) {
+                addTestResult('❌ No assignment data found. Create test data first.', 'error');
+                return;
+            }
+
+            // Test for John Doe
+            const johnEmail = 'john.doe@telus.com';
+            const johnTasks = [];
+            Object.keys(assignments).forEach(taskId => {
+                if (isItemAssignedToUser(taskId, johnEmail)) {
+                    johnTasks.push(taskId);
+                }
+            });
+
+            // Test for Jane Smith
+            const janeEmail = 'jane.smith@telus.com';
+            const janeTasks = [];
+            Object.keys(assignments).forEach(taskId => {
+                if (isItemAssignedToUser(taskId, janeEmail)) {
+                    janeTasks.push(taskId);
+                }
+            });
+
+            addTestResult(`✅ John Doe should see tasks: ${johnTasks.join(', ')}`, 'success');
+            addTestResult(`✅ Jane Smith should see tasks: ${janeTasks.join(', ')}`, 'success');
+            
+            // Verify specific assignments
+            if (johnTasks.includes('task_001') && johnTasks.includes('task_003')) {
+                addTestResult('✅ John Doe assignment filtering works correctly', 'success');
+            } else {
+                addTestResult('❌ John Doe assignment filtering failed', 'error');
+            }
+
+            if (janeTasks.includes('task_002') && janeTasks.includes('task_003')) {
+                addTestResult('✅ Jane Smith assignment filtering works correctly', 'success');
+            } else {
+                addTestResult('❌ Jane Smith assignment filtering failed', 'error');
+            }
+        }
+
+        function simulateUserLogin() {
+            const userSelect = prompt('Select user to simulate login:\n1. John Doe\n2. Jane Smith\n3. Admin\n\nEnter 1, 2, or 3:');
+            
+            let selectedUser;
+            switch(userSelect) {
+                case '1':
+                    selectedUser = testUsers[0];
+                    break;
+                case '2':
+                    selectedUser = testUsers[1];
+                    break;
+                case '3':
+                    selectedUser = testUsers[2];
+                    break;
+                default:
+                    addTestResult('❌ Invalid selection', 'error');
+                    return;
+            }
+
+            localStorage.setItem('currentUser', JSON.stringify(selectedUser));
+            addTestResult(`✅ Simulated login for: ${selectedUser.name} (${selectedUser.email})`, 'success');
+            
+            // Test what this user should see
+            const userEmail = selectedUser.email;
+            const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+            const visibleTasks = [];
+            
+            Object.keys(assignments).forEach(taskId => {
+                if (isItemAssignedToUser(taskId, userEmail)) {
+                    visibleTasks.push(taskId);
+                }
+            });
+
+            addTestResult(`📋 ${selectedUser.name} should see tasks: ${visibleTasks.join(', ')}`, 'info');
+        }
+
+        function clearTestData() {
+            localStorage.removeItem('telus_task_status');
+            localStorage.removeItem('telus_user_assignments');
+            localStorage.removeItem('currentUser');
+            addTestResult('🗑️ Test data cleared', 'info');
+            updateAssignmentDisplay();
+        }
+
+        function updateAssignmentDisplay() {
+            const assignmentDiv = document.getElementById('assignmentData');
+            const assignments = localStorage.getItem('telus_user_assignments');
+            const tasks = localStorage.getItem('telus_task_status');
+            const currentUser = localStorage.getItem('currentUser');
+
+            let html = '<div class="assignment-info">';
+            
+            if (assignments) {
+                html += '<h4>📋 Current Assignments:</h4>';
+                html += `<pre>${JSON.stringify(JSON.parse(assignments), null, 2)}</pre>`;
+            } else {
+                html += '<p>No assignment data found.</p>';
+            }
+
+            if (tasks) {
+                html += '<h4>📝 Current Tasks:</h4>';
+                html += `<pre>${JSON.stringify(JSON.parse(tasks), null, 2)}</pre>`;
+            }
+
+            if (currentUser) {
+                html += '<h4>👤 Current User:</h4>';
+                html += `<pre>${JSON.stringify(JSON.parse(currentUser), null, 2)}</pre>`;
+            }
+
+            html += '</div>';
+            assignmentDiv.innerHTML = html;
+        }
+
+        // Initialize display
+        document.addEventListener('DOMContentLoaded', function() {
+            addTestResult('🚀 Assignment System Test initialized', 'info');
+            updateAssignmentDisplay();
+        });
+    </script>
+</body>
+</html>

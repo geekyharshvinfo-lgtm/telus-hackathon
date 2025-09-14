@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELUS Digital - My Tasks</title>
+    <link rel="stylesheet" href="user-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard">
+    <!-- Left Navigation Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="images/telus-logo.png" alt="TELUS Logo" class="logo">
+            </div>
+        </div>
+        
+        <div class="sidebar-content">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="user-dashboard.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-home"></i></span>
+                        <span class="nav-text">Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="my-tasks.html" class="nav-link active">
+                        <span class="nav-icon"><i class="fas fa-tasks"></i></span>
+                        <span class="nav-text">My Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="documents.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-file-alt"></i></span>
+                        <span class="nav-text">Documents</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="expertise-hub.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        <span class="nav-text">Expertise Hub</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="help-support.html" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-question-circle"></i></span>
+                        <span class="nav-text">Help & Support</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="profile-section">
+                <div class="profile-trigger" onclick="toggleProfileMenu()">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">John Doe</span>
+                        <span class="profile-role">Product Design Intern</span>
+                    </div>
+                    <span class="profile-arrow"><i class="fas fa-chevron-up"></i></span>
+                </div>
+                <div class="profile-menu" id="profileMenu">
+                    <a href="#" class="profile-menu-item">
+                        <span class="menu-icon"><i class="fas fa-user"></i></span>
+                        Profile
+                    </a>
+                    <a href="index.html" class="profile-menu-item" onclick="logout()">
+                        <span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">My Tasks</h1>
+                <p class="page-subtitle">Manage and track your assigned tasks and projects.</p>
+            </div>
+
+            <!-- Task Overview Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Task Overview</h2>
+                </div>
+                <div class="expertise-nav-grid">
+                    <div class="expertise-nav-card">
+                        <div class="nav-card-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="nav-card-content">
+                            <h3>My Growth Modules</h3>
+                            <p>Track your learning progress</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expertise-nav-card">
+                        <div class="nav-card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="nav-card-content">
+                            <div class="task-number-heading">
+                                <div class="task-count" id="tasksDue">0</div>
+                                <h3>Task Due</h3>
+                            </div>
+                            <p>tasks pending</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expertise-nav-card">
+                        <div class="nav-card-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="nav-card-content">
+                            <div class="task-number-heading">
+                                <div class="task-count" id="tasksCompletedCount">0</div>
+                                <h3>Task Completed</h3>
+                            </div>
+                            <p>tasks completed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assigned Tasks -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Assigned Tasks</h2>
+                    <div class="task-filters">
+                        <button class="filter-btn" onclick="filterByStatus()">
+                            <i class="fas fa-filter"></i>
+                            Filter by Status
+                        </button>
+                        <button class="filter-btn" onclick="filterByDate()">
+                            <i class="fas fa-calendar-alt"></i>
+                            Filter by Date
+                        </button>
+                        <button class="filter-btn refresh-tasks-btn" onclick="refreshTasksFromAdmin()" id="refreshTasksBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Tasks
+                        </button>
+                    </div>
+                </div>
+                <div class="assigned-tasks-container">
+                    <!-- Tasks will be loaded dynamically from admin side -->
+                    <div class="no-tasks-message" style="text-align: center; padding: 40px; color: #6c757d;">
+                        <i class="fas fa-tasks" style="font-size: 3em; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <h3>No Tasks Available</h3>
+                        <p>Tasks will appear here when assigned by administrators.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-button" onclick="toggleChatbot()">
+            <i class="fas fa-comments chatbot-button-icon"></i>
+        </button>
+        <div class="chatbot-popup" id="chatbotPopup">
+            <div class="chatbot-header">
+                <h3>TELUS Assistant</h3>
+                <button class="chatbot-close" onclick="toggleChatbot()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chatbot-welcome">
+                    <h4>👋 Hello! I'm your TELUS Assistant</h4>
+                    <p>How can I help you today?</p>
+                    <div class="chatbot-suggestions">
+                        <button class="suggestion-btn" onclick="sendMessage('How do I access my benefits?')">How do I access my benefits?</button>
+                        <button class="suggestion-btn" onclick="sendMessage('What are the office hours?')">What are the office hours?</button>
+                        <button class="suggestion-btn" onclick="sendMessage('How do I contact IT support?')">How do I contact IT support?</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input-container">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type your message..." onkeypress="handleChatbotKeypress(event)">
+                <button class="chatbot-send" onclick="sendChatbotMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+    <script>
+        // Task Storage Management - Use same key as admin side
+        const STORAGE_KEY = 'telus_task_status';
+        const USER_TASK_STATUS_KEY = 'telus_user_task_status';
+
+        // Clear storage function for clean state
+        function clearAllTaskStorage() {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(USER_TASK_STATUS_KEY);
+            console.log('All task storage cleared for clean state');
+        }
+
+        // REMOVED: Problematic saveTaskData function that was overwriting admin task data
+        // User-side should never overwrite admin task data structure
+        // Status updates are now handled exclusively through updateAdminTaskStatus()
+        
+        function saveUserTaskPreferences() {
+            // Save only user-specific preferences, not task data
+            const taskCards = document.querySelectorAll('.task-card');
+            const userPreferences = {};
+
+            taskCards.forEach(card => {
+                const taskName = card.querySelector('.task-name').textContent;
+                const isExpanded = card.classList.contains('expanded');
+                
+                userPreferences[taskName] = {
+                    isExpanded: isExpanded,
+                    lastViewed: new Date().toISOString()
+                };
+            });
+
+            // Save to separate user preferences key, not admin task data
+            localStorage.setItem(USER_TASK_STATUS_KEY, JSON.stringify(userPreferences));
+            console.log('User task preferences saved (not overwriting admin data)');
+        }
+
+        function loadTaskData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            return savedData ? JSON.parse(savedData) : {};
+        }
+
+        function initializeTasks() {
+            // Check if there are any tasks to display
+            const tasksContainer = document.querySelector('.assigned-tasks-container');
+            const taskCards = document.querySelectorAll('.task-card');
+            const noTasksMessage = document.querySelector('.no-tasks-message');
+            
+            if (taskCards.length === 0) {
+                // Show no tasks message
+                if (noTasksMessage) {
+                    noTasksMessage.style.display = 'block';
+                }
+            } else {
+                // Hide no tasks message
+                if (noTasksMessage) {
+                    noTasksMessage.style.display = 'none';
+                }
+            }
+
+            updateTaskCounts();
+        }
+
+        function addMarkCompleteButton(taskCard) {
+            const taskContent = taskCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            // Remove existing actions
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            // Create new task actions with mark complete button
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="mark-complete-btn" onclick="markTaskComplete(this)">
+                    <i class="fas fa-check"></i>
+                    Mark as Complete
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+
+        function addReviewAgainButton(taskCard) {
+            const taskContent = taskCard.querySelector('.task-card-content');
+            let taskActions = taskContent.querySelector('.task-actions');
+
+            // Remove existing actions
+            if (taskActions) {
+                taskActions.remove();
+            }
+
+            // Create new task actions with review again button
+            taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+            taskActions.innerHTML = `
+                <button class="review-again-btn" onclick="reviewTaskAgain(this)">
+                    <i class="fas fa-undo"></i>
+                    Review Again
+                </button>
+            `;
+
+            taskContent.appendChild(taskActions);
+        }
+
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            const profileSection = document.querySelector('.profile-section');
+            menu.classList.toggle('show');
+            profileSection.classList.toggle('open');
+        }
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+
+        function toggleTaskDetails(taskCard) {
+            const content = taskCard.querySelector('.task-card-content');
+            const isExpanded = taskCard.classList.contains('expanded');
+            
+            if (isExpanded) {
+                // Collapse
+                content.style.display = 'none';
+                taskCard.classList.remove('expanded');
+            } else {
+                // Auto-collapse other open tiles first
+                const allTaskCards = document.querySelectorAll('.task-card');
+                allTaskCards.forEach(card => {
+                    if (card !== taskCard && card.classList.contains('expanded')) {
+                        const otherContent = card.querySelector('.task-card-content');
+                        otherContent.style.display = 'none';
+                        card.classList.remove('expanded');
+                    }
+                });
+                
+                // Expand current tile
+                content.style.display = 'block';
+                taskCard.classList.add('expanded');
+            }
+        }
+
+        function markTaskComplete(button) {
+            // Prevent event bubbling to avoid triggering card toggle
+            event.stopPropagation();
+            
+            // Find the parent task card
+            const taskCard = button.closest('.task-card');
+            const taskName = taskCard.querySelector('.task-name').textContent;
+            
+            // Update task status
+            taskCard.setAttribute('data-status', 'completed');
+            
+            // Update priority badge
+            const priorityBadge = taskCard.querySelector('.priority-badge');
+            priorityBadge.className = 'priority-badge priority-completed';
+            priorityBadge.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
+            
+            // Update task meta to show completion date
+            const taskDue = taskCard.querySelector('.task-due');
+            const today = new Date();
+            const completionDate = today.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            taskDue.textContent = `Completed: ${completionDate}`;
+            
+            // Replace mark complete button with review again button
+            addReviewAgainButton(taskCard);
+            
+            // Update admin-side task status for real-time sync
+            updateAdminTaskStatus(taskName, 'completed', completionDate);
+            
+            // Save user preferences (not task data - that's handled by updateAdminTaskStatus)
+            saveUserTaskPreferences();
+            
+            // Update task counts
+            updateTaskCounts();
+            
+            // Show success message
+            showTaskCompletionMessage(taskName);
+        }
+
+        function reviewTaskAgain(button) {
+            // Prevent event bubbling to avoid triggering card toggle
+            event.stopPropagation();
+            
+            // Find the parent task card
+            const taskCard = button.closest('.task-card');
+            const taskName = taskCard.querySelector('.task-name').textContent;
+            
+            // Reset task status to pending
+            taskCard.setAttribute('data-status', 'pending');
+            
+            // Get original priority from data attribute or default to medium
+            const originalPriority = taskCard.getAttribute('data-priority') || 'medium';
+            
+            // Update priority badge to original
+            const priorityBadge = taskCard.querySelector('.priority-badge');
+            priorityBadge.className = `priority-badge priority-${originalPriority}`;
+            
+            if (originalPriority === 'low') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Low Priority';
+            } else if (originalPriority === 'high') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> High Priority';
+            } else if (originalPriority === 'medium') {
+                priorityBadge.innerHTML = '<i class="fas fa-circle"></i> Medium Priority';
+            }
+            
+            // Reset due date to original from admin data
+            const adminTaskData = localStorage.getItem(STORAGE_KEY);
+            if (adminTaskData) {
+                try {
+                    const adminTasks = JSON.parse(adminTaskData);
+                    Object.values(adminTasks).forEach(adminTask => {
+                        if (adminTask.title === taskName && adminTask.dueDate) {
+                            const taskDue = taskCard.querySelector('.task-due');
+                            const dueDate = new Date(adminTask.dueDate).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric' 
+                            });
+                            taskDue.textContent = `Due: ${dueDate}`;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error restoring due date:', error);
+                }
+            }
+            
+            // Replace review again button with mark complete button
+            addMarkCompleteButton(taskCard);
+            
+            // Update admin-side task status for real-time sync
+            updateAdminTaskStatus(taskName, 'pending');
+            
+            // Save user preferences (not task data - that's handled by updateAdminTaskStatus)
+            saveUserTaskPreferences();
+            
+            // Update task counts
+            updateTaskCounts();
+            
+            // Show revert message
+            showTaskRevertMessage(taskName);
+        }
+
+        function showTaskCompletionMessage(taskName) {
+            // Create a temporary success message
+            const message = document.createElement('div');
+            message.className = 'task-completion-message';
+            message.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                Task "${taskName}" marked as completed!
+            `;
+            
+            // Add to page
+            document.body.appendChild(message);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 3000);
+        }
+
+        function showTaskRevertMessage(taskName) {
+            // Create a temporary revert message
+            const message = document.createElement('div');
+            message.className = 'task-completion-message';
+            message.style.background = 'var(--telus-purple)';
+            message.innerHTML = `
+                <i class="fas fa-undo"></i>
+                Task "${taskName}" reverted for review!
+            `;
+            
+            // Add to page
+            document.body.appendChild(message);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 3000);
+        }
+
+        function updateTaskCounts() {
+            const taskCards = document.querySelectorAll('.task-card');
+            let pendingCount = 0;
+            let completedCount = 0;
+            let totalCount = taskCards.length;
+
+            taskCards.forEach(card => {
+                const status = card.getAttribute('data-status');
+                if (status === 'pending') {
+                    pendingCount++;
+                } else if (status === 'completed') {
+                    completedCount++;
+                }
+            });
+
+            // Update task due count using new ID
+            const taskDueElement = document.getElementById('tasksDue');
+            if (taskDueElement) {
+                taskDueElement.textContent = pendingCount;
+            }
+
+            // Update task completed count using new ID - show only completed count
+            const taskCompletedElement = document.getElementById('tasksCompletedCount');
+            if (taskCompletedElement) {
+                taskCompletedElement.textContent = completedCount;
+            }
+        }
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileSection = document.querySelector('.profile-section');
+            const menu = document.getElementById('profileMenu');
+            
+            if (!profileSection.contains(event.target)) {
+                menu.classList.remove('show');
+                profileSection.classList.remove('open');
+            }
+        });
+
+        // Refresh tasks from admin side
+        function refreshTasksFromAdmin() {
+            const refreshBtn = document.getElementById('refreshTasksBtn');
+            const originalText = refreshBtn.innerHTML;
+            
+            // Show loading state
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            refreshBtn.disabled = true;
+            
+            // Simulate refresh delay and then reload task data
+            setTimeout(() => {
+                try {
+                    // Load tasks from admin system
+                    loadTasksFromAdmin();
+                    
+                    // Also refresh default tasks
+                    initializeTasks();
+                    
+                    showRefreshMessage('Tasks refreshed successfully!', 'success');
+                    console.log('Tasks refreshed from admin side');
+                    
+                } catch (error) {
+                    console.error('Error refreshing tasks:', error);
+                    showRefreshMessage('Error refreshing tasks', 'error');
+                } finally {
+                    // Reset button
+                    refreshBtn.innerHTML = originalText;
+                    refreshBtn.disabled = false;
+                }
+            }, 1000);
+        }
+        
+        // Add new tasks to the UI
+        function addNewTasksToUI(newTaskNames, taskData) {
+            const tasksContainer = document.querySelector('.assigned-tasks-container');
+            
+            newTaskNames.forEach(taskName => {
+                const taskInfo = taskData[taskName];
+                if (!taskInfo) return;
+                
+                // Create new task card
+                const newTaskCard = createTaskCard(taskName, taskInfo);
+                tasksContainer.appendChild(newTaskCard);
+            });
+        }
+        
+        // Assignment filtering functions (frontend-only, no backend changes)
+        function getCurrentUserEmail() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                return currentUser ? JSON.parse(currentUser).email : null;
+            } catch (error) {
+                console.error('Error getting current user email:', error);
+                return null;
+            }
+        }
+
+        function getAssignment(itemId) {
+            try {
+                const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+                return assignments[itemId] || null;
+            } catch (error) {
+                console.error('Error getting assignment:', error);
+                return null;
+            }
+        }
+
+        function isItemAssignedToUser(itemId, userEmail) {
+            try {
+                const assignment = getAssignment(itemId);
+                if (!assignment) {
+                    // If no assignment exists, it's visible to all users (backward compatibility)
+                    return true;
+                }
+                
+                // Check if assigned to all users or specifically to this user
+                return assignment.assignedUsers.includes('all') || assignment.assignedUsers.includes(userEmail);
+            } catch (error) {
+                console.error('Error checking item assignment:', error);
+                // Default to true for backward compatibility
+                return true;
+            }
+        }
+
+        // Load tasks from admin (with assignment filtering)
+        function loadTasksFromAdmin() {
+            const adminTaskData = localStorage.getItem('telus_task_status');
+            if (!adminTaskData) return;
+            
+            try {
+                const adminTasks = JSON.parse(adminTaskData);
+                const tasksContainer = document.querySelector('.assigned-tasks-container');
+                const currentUserEmail = getCurrentUserEmail();
+                
+                // Get existing task cards to preserve their state
+                const existingCards = document.querySelectorAll('.task-card[data-admin-created="true"]');
+                const existingTaskStates = {};
+                
+                // Store existing task states before clearing
+                existingCards.forEach(card => {
+                    const taskName = card.querySelector('.task-name').textContent;
+                    const status = card.getAttribute('data-status');
+                    const isExpanded = card.classList.contains('expanded');
+                    existingTaskStates[taskName] = { status, isExpanded };
+                });
+                
+                // Clear existing admin-created tasks
+                existingCards.forEach(card => card.remove());
+                
+                // Add admin-created tasks with assignment filtering
+                Object.entries(adminTasks).forEach(([taskId, taskInfo]) => {
+                    if (taskInfo && taskInfo.title) {
+                        // CRITICAL FIX: Check if task is assigned to current user
+                        if (!isItemAssignedToUser(taskId, currentUserEmail)) {
+                            console.log(`Task ${taskInfo.title} not assigned to user ${currentUserEmail}, skipping`);
+                            return; // Skip this task - not assigned to current user
+                        }
+                        
+                        console.log(`Task ${taskInfo.title} is assigned to user ${currentUserEmail}, displaying`);
+                        
+                        // Use the actual task status from admin data, not user state
+                        const taskStatus = taskInfo.status || 'pending';
+                        
+                        const newTaskCard = createTaskCard(taskInfo.title, {
+                            ...taskInfo,
+                            status: taskStatus, // Use admin status, not user state
+                            assignedDate: taskInfo.dateCreated ? new Date(taskInfo.dateCreated).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric' 
+                            }) : 'Today',
+                            dueDate: taskInfo.dueDate ? new Date(taskInfo.dueDate).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric' 
+                            }) : 'No due date',
+                            assignedBy: 'Administrator'
+                        });
+                        
+                        // Mark as admin-created
+                        newTaskCard.setAttribute('data-admin-created', 'true');
+                        newTaskCard.setAttribute('data-task-id', taskId);
+                        
+                        // Restore expansion state if it existed
+                        const existingState = existingTaskStates[taskInfo.title];
+                        if (existingState && existingState.isExpanded) {
+                            newTaskCard.classList.add('expanded');
+                            const content = newTaskCard.querySelector('.task-card-content');
+                            if (content) content.style.display = 'block';
+                        }
+                        
+                        tasksContainer.appendChild(newTaskCard);
+                    }
+                });
+                
+                updateTaskCounts();
+                console.log('Tasks loaded from admin with assignment filtering applied');
+            } catch (error) {
+                console.error('Error loading admin tasks:', error);
+            }
+        }
+        
+        // Create a new task card element
+        function createTaskCard(taskName, taskInfo) {
+            const taskCard = document.createElement('div');
+            taskCard.className = 'task-card';
+            taskCard.setAttribute('data-priority', taskInfo.priority || 'medium');
+            taskCard.setAttribute('data-status', taskInfo.status || 'pending');
+            taskCard.onclick = function() { toggleTaskDetails(this); };
+            
+            const priorityClass = `priority-${taskInfo.priority || 'medium'}`;
+            const priorityText = taskInfo.priority === 'high' ? 'High Priority' : 
+                               taskInfo.priority === 'low' ? 'Low Priority' : 'Medium Priority';
+            const priorityIcon = taskInfo.status === 'completed' ? 'fa-check-circle' : 'fa-circle';
+            
+            const statusText = taskInfo.status === 'completed' ? 'Completed' : priorityText;
+            const statusClass = taskInfo.status === 'completed' ? 'priority-completed' : priorityClass;
+            
+            const dueDateText = taskInfo.status === 'completed' ? 
+                `Completed: ${taskInfo.dueDate}` : `Due: ${taskInfo.dueDate}`;
+            
+            taskCard.innerHTML = `
+                <div class="task-card-header">
+                    <div class="task-info">
+                        <h3 class="task-name">${taskName}</h3>
+                        <div class="task-meta">
+                            <span class="task-assigned">Assigned: ${taskInfo.assignedDate || 'Today'}</span>
+                            <span class="task-due">${dueDateText}</span>
+                        </div>
+                    </div>
+                    <div class="task-details">
+                        <div class="task-assigned-by">Assigned by: ${taskInfo.assignedBy || 'Admin'}</div>
+                        <div class="priority-badge ${statusClass}">
+                            <i class="fas ${priorityIcon}"></i>
+                            ${statusText}
+                        </div>
+                    </div>
+                    <div class="task-expand-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="task-card-content" style="display: none;">
+                    <div class="task-description">
+                        <p><strong>Description:</strong> ${taskInfo.description || 'Task details will be provided by the administrator.'}</p>
+                    </div>
+                    <div class="task-resources">
+                        <h4>Resources:</h4>
+                        <div class="resource-links">
+                            ${taskInfo.resources ? 
+                                taskInfo.resources.split('\n').map(resource => 
+                                    `<a href="#" class="resource-link">
+                                        <i class="fas fa-file"></i>
+                                        ${resource.trim()}
+                                    </a>`
+                                ).join('') : 
+                                `<a href="#" class="resource-link">
+                                    <i class="fas fa-info-circle"></i>
+                                    Resources will be provided by admin
+                                </a>`
+                            }
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        ${taskInfo.status === 'completed' ? 
+                            `<button class="review-again-btn" onclick="reviewTaskAgain(this)">
+                                <i class="fas fa-undo"></i>
+                                Review Again
+                            </button>` :
+                            `<button class="mark-complete-btn" onclick="markTaskComplete(this)">
+                                <i class="fas fa-check"></i>
+                                Mark as Complete
+                            </button>`
+                        }
+                    </div>
+                </div>
+            `;
+            
+            return taskCard;
+        }
+        
+        // Show refresh message
+        function showRefreshMessage(message, type) {
+            // Remove existing messages
+            const existingMessages = document.querySelectorAll('.refresh-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type} refresh-message`;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--telus-green)' : 
+                            type === 'error' ? '#dc3545' : 'var(--telus-purple)'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-weight: 500;
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+            messageDiv.textContent = message;
+            
+            // Add to page
+            document.body.appendChild(messageDiv);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 4000);
+        }
+
+        // Update admin-side task status for real-time sync
+        function updateAdminTaskStatus(taskName, status, completionDate = null) {
+            const adminTaskData = localStorage.getItem(STORAGE_KEY);
+            if (adminTaskData) {
+                try {
+                    const adminTasks = JSON.parse(adminTaskData);
+                    
+                    // Find the task by title and update ONLY status-related fields
+                    Object.keys(adminTasks).forEach(taskId => {
+                        const task = adminTasks[taskId];
+                        if (task && task.title === taskName) {
+                            // MINIMAL UPDATE: Only change status-related fields, preserve everything else
+                            if (status === 'completed') {
+                                // User completing task
+                                adminTasks[taskId].status = 'completed';
+                                adminTasks[taskId].completionDate = completionDate || new Date().toISOString();
+                                adminTasks[taskId].userResponse = `Task completed on ${completionDate || new Date().toLocaleDateString()}`;
+                                adminTasks[taskId].lastModified = new Date().toISOString();
+                            } else if (status === 'pending') {
+                                // User reverting task
+                                adminTasks[taskId].status = 'pending';
+                                adminTasks[taskId].lastModified = new Date().toISOString();
+                                // Keep completion data for history but mark as pending
+                            }
+                            
+                            console.log('Task status updated minimally:', taskId, status);
+                        }
+                    });
+                    
+                    // Save back to localStorage
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(adminTasks));
+                    
+                    // Trigger storage event for admin side sync
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: STORAGE_KEY,
+                        newValue: JSON.stringify(adminTasks),
+                        storageArea: localStorage
+                    }));
+                    
+                    // Also trigger custom event for same-tab sync
+                    window.dispatchEvent(new CustomEvent('telusDataSync', {
+                        detail: { type: 'tasks', source: 'user', data: adminTasks }
+                    }));
+                    
+                    console.log('Admin task status updated (minimal change):', taskName, status);
+                } catch (error) {
+                    console.error('Error updating admin task status:', error);
+                }
+            }
+        }
+
+        // Filter Functions (placeholder - no actual functionality)
+        function filterByStatus() {
+            console.log('Filter by Status clicked');
+            // Placeholder function - would implement status filtering logic here
+        }
+
+        function filterByDate() {
+            console.log('Filter by Date clicked');
+            // Placeholder function - would implement date filtering logic here
+        }
+
+        // Initialize tasks when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTasks();
+            loadTasksFromAdmin(); // Load admin-created tasks
+            
+            // Auto-refresh tasks from admin on page load
+            refreshTasksFromAdmin();
+            
+            // Listen for storage changes to update tasks in real-time
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'telus_task_status') {
+                    console.log('Admin tasks updated, refreshing...');
+                    loadTasksFromAdmin();
+                    showRefreshMessage('Tasks updated by administrator', 'info');
+                }
+            });
+            
+            // Listen for custom sync events
+            window.addEventListener('telusDataSync', function(e) {
+                if (e.detail.type === 'tasks' && e.detail.source === 'admin') {
+                    console.log('Admin tasks synced, refreshing...');
+                    loadTasksFromAdmin();
+                    showRefreshMessage('Tasks updated by administrator', 'info');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Document Sync</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4B286D;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5a3278;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .data-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Document Synchronization Test</h1>
+        <p>This tool helps test document creation and synchronization between admin and user dashboards.</p>
+        
+        <div>
+            <button onclick="createTestDocument()">Create Test Document</button>
+            <button onclick="createMultipleDocuments()">Create Multiple Test Documents</button>
+            <button onclick="viewCurrentDocuments()">View Current Documents</button>
+            <button onclick="clearAllDocuments()">Clear All Documents</button>
+            <button onclick="testUserDashboard()">Test User Dashboard</button>
+        </div>
+        
+        <div id="status"></div>
+        <div id="dataDisplay"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        function showData(data) {
+            const dataDiv = document.getElementById('dataDisplay');
+            dataDiv.textContent = JSON.stringify(data, null, 2);
+        }
+
+        function createTestDocument() {
+            try {
+                // Get existing documents or create empty object
+                const existingDocs = JSON.parse(localStorage.getItem('telus_document_status') || '{}');
+                
+                // Create a test document
+                const docId = 'doc_' + Date.now();
+                const testDoc = {
+                    id: docId,
+                    title: 'Test Document for Sync Verification',
+                    description: 'This document was created to test synchronization between admin and user dashboards.',
+                    status: 'pending',
+                    priority: 'medium',
+                    type: 'pdf',
+                    dateCreated: new Date().toISOString(),
+                    lastModified: new Date().toISOString(),
+                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 7 days from now
+                };
+                
+                // Add to existing documents
+                existingDocs[docId] = testDoc;
+                
+                // Save to localStorage
+                localStorage.setItem('telus_document_status', JSON.stringify(existingDocs));
+                
+                // Trigger storage event for cross-tab sync
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'telus_document_status',
+                    newValue: JSON.stringify(existingDocs),
+                    storageArea: localStorage
+                }));
+                
+                showStatus(`Test document created successfully! Document ID: ${docId}`, 'success');
+                showData(testDoc);
+                
+                console.log('Test document created:', testDoc);
+            } catch (error) {
+                showStatus(`Error creating test document: ${error.message}`, 'error');
+                console.error('Error creating test document:', error);
+            }
+        }
+
+        function createMultipleDocuments() {
+            try {
+                const existingDocs = JSON.parse(localStorage.getItem('telus_document_status') || '{}');
+                
+                const testDocs = [
+                    {
+                        title: 'Project Proposal Document',
+                        description: 'Initial project proposal for Q4 initiatives',
+                        status: 'pending',
+                        priority: 'high'
+                    },
+                    {
+                        title: 'Technical Specification',
+                        description: 'Detailed technical requirements and specifications',
+                        status: 'approved',
+                        priority: 'medium'
+                    },
+                    {
+                        title: 'User Manual Draft',
+                        description: 'Draft version of the user manual for review',
+                        status: 'pending',
+                        priority: 'low'
+                    }
+                ];
+                
+                testDocs.forEach((docData, index) => {
+                    const docId = 'doc_' + (Date.now() + index);
+                    existingDocs[docId] = {
+                        id: docId,
+                        ...docData,
+                        type: 'pdf',
+                        dateCreated: new Date().toISOString(),
+                        lastModified: new Date().toISOString(),
+                        dueDate: new Date(Date.now() + (7 + index) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                    };
+                });
+                
+                localStorage.setItem('telus_document_status', JSON.stringify(existingDocs));
+                
+                // Trigger storage event
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'telus_document_status',
+                    newValue: JSON.stringify(existingDocs),
+                    storageArea: localStorage
+                }));
+                
+                showStatus(`Created ${testDocs.length} test documents successfully!`, 'success');
+                showData(existingDocs);
+                
+            } catch (error) {
+                showStatus(`Error creating multiple documents: ${error.message}`, 'error');
+                console.error('Error creating multiple documents:', error);
+            }
+        }
+
+        function viewCurrentDocuments() {
+            try {
+                const docs = JSON.parse(localStorage.getItem('telus_document_status') || '{}');
+                const docCount = Object.keys(docs).length;
+                
+                if (docCount === 0) {
+                    showStatus('No documents found in localStorage', 'info');
+                    showData({});
+                } else {
+                    showStatus(`Found ${docCount} documents in localStorage`, 'success');
+                    showData(docs);
+                }
+                
+                // Also show counts by status
+                const statusCounts = {
+                    pending: 0,
+                    approved: 0,
+                    rejected: 0,
+                    completed: 0
+                };
+                
+                Object.values(docs).forEach(doc => {
+                    if (statusCounts.hasOwnProperty(doc.status)) {
+                        statusCounts[doc.status]++;
+                    }
+                });
+                
+                console.log('Document status counts:', statusCounts);
+                
+            } catch (error) {
+                showStatus(`Error viewing documents: ${error.message}`, 'error');
+                console.error('Error viewing documents:', error);
+            }
+        }
+
+        function clearAllDocuments() {
+            try {
+                localStorage.removeItem('telus_document_status');
+                
+                // Trigger storage event
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'telus_document_status',
+                    newValue: null,
+                    storageArea: localStorage
+                }));
+                
+                showStatus('All documents cleared from localStorage', 'success');
+                showData({});
+                
+            } catch (error) {
+                showStatus(`Error clearing documents: ${error.message}`, 'error');
+                console.error('Error clearing documents:', error);
+            }
+        }
+
+        function testUserDashboard() {
+            // Simulate the user dashboard document loading logic
+            try {
+                const docData = localStorage.getItem('telus_document_status');
+                
+                if (docData) {
+                    const documents = JSON.parse(docData);
+                    
+                    let pending = 0;
+                    let completed = 0;
+                    let underReview = 0;
+                    let approved = 0;
+                    
+                    Object.values(documents).forEach(doc => {
+                        if (doc.status === 'pending') {
+                            pending++;
+                        } else if (doc.status === 'completed' || doc.status === 'approved') {
+                            completed++;
+                            if (doc.status === 'approved') {
+                                approved++;
+                            }
+                        } else if (doc.status === 'under-review') {
+                            underReview++;
+                        }
+                    });
+                    
+                    const dashboardData = {
+                        pending: pending,
+                        completed: completed,
+                        underReview: underReview,
+                        approved: approved,
+                        total: pending + completed + underReview
+                    };
+                    
+                    showStatus('User dashboard simulation completed', 'success');
+                    showData({
+                        message: 'This is what the user dashboard would show:',
+                        documentCounts: dashboardData,
+                        rawDocuments: documents
+                    });
+                    
+                } else {
+                    showStatus('No document data found - user dashboard would show 0 for all counts', 'info');
+                    showData({
+                        message: 'User dashboard would show:',
+                        documentCounts: {
+                            pending: 0,
+                            completed: 0,
+                            underReview: 0,
+                            approved: 0,
+                            total: 0
+                        }
+                    });
+                }
+                
+            } catch (error) {
+                showStatus(`Error testing user dashboard: ${error.message}`, 'error');
+                console.error('Error testing user dashboard:', error);
+            }
+        }
+
+        // Auto-load current documents on page load
+        window.addEventListener('load', function() {
+            viewCurrentDocuments();
+        });
+    </script>
+</body>
+</html>
