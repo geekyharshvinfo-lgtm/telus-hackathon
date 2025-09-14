@@ -3801,3 +3801,193 @@ body.dashboard {
         width: 300px;
     }
 }
+
+/* User Selection Modal Styles */
+.user-selector-container {
+    position: relative;
+    width: 100%;
+}
+
+.user-selector-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--telus-white);
+    border: 2px solid var(--telus-warm-300);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+}
+
+.user-selector-display:hover {
+    border-color: var(--telus-purple);
+    background: var(--telus-warm-50);
+}
+
+.user-selector-display:focus {
+    outline: none;
+    border-color: var(--telus-purple);
+    box-shadow: 0 0 0 3px rgba(75, 40, 109, 0.1);
+}
+
+.selected-users {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.default-selection {
+    color: var(--telus-warm-600);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+}
+
+.selected-user-tag {
+    background: linear-gradient(135deg, var(--telus-purple) 0%, var(--telus-purple-light) 100%);
+    color: var(--telus-white);
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.8em;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 4px rgba(75, 40, 109, 0.2);
+}
+
+.selector-arrow {
+    color: var(--telus-warm-500);
+    font-size: var(--font-size-sm);
+    transition: transform 0.2s ease;
+}
+
+.user-selector-display:hover .selector-arrow {
+    color: var(--telus-purple);
+    transform: translateY(-1px);
+}
+
+/* User Selection Modal Animation */
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* User Selection Modal Responsive */
+@media (max-width: 768px) {
+    .user-selector-display {
+        padding: 10px 12px;
+        min-height: 44px;
+    }
+    
+    .selected-user-tag {
+        padding: 3px 10px;
+        font-size: 0.75em;
+    }
+    
+    .default-selection {
+        font-size: 0.85em;
+    }
+}
+
+/* Type badges for assignment management */
+.type-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.type-badge.task {
+    background: rgba(75, 40, 109, 0.1);
+    color: var(--telus-purple);
+    border: 1px solid rgba(75, 40, 109, 0.3);
+}
+
+.type-badge.document {
+    background: rgba(23, 162, 184, 0.1);
+    color: #17a2b8;
+    border: 1px solid rgba(23, 162, 184, 0.3);
+}
+
+/* Assignment table styles */
+.item-title-cell {
+    max-width: 200px;
+}
+
+.item-id-small {
+    color: var(--telus-warm-500);
+    font-size: 0.75em;
+    margin-top: 2px;
+    font-family: monospace;
+}
+
+.assigned-users-cell {
+    max-width: 180px;
+}
+
+.user-count-small {
+    color: var(--telus-warm-500);
+    font-size: 0.75em;
+    margin-top: 2px;
+}
+
+/* Assignment summary styles */
+.user-assignment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--telus-warm-50);
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+}
+
+.user-name {
+    font-weight: 500;
+    color: var(--telus-warm-800);
+    font-size: 0.9em;
+}
+
+.assignment-count {
+    font-size: 0.8em;
+    color: var(--telus-warm-600);
+    background: var(--telus-white);
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--telus-warm-200);
+}
+
+.no-data {
+    text-align: center;
+    color: var(--telus-warm-500);
+    font-style: italic;
+    padding: 20px;
+    font-size: 0.9em;
+}
+
+/* POD badge styles */
+.pod-badge {
+    background: var(--telus-purple);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

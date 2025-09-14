@@ -164,19 +164,25 @@ function updateOverviewStats() {
     updateOverallProgress();
 }
 
-// Load task data from localStorage
+// Load task data from localStorage with assignment filtering
 function loadTaskData() {
     const taskData = localStorage.getItem('telus_task_status');
     if (taskData) {
         const tasks = JSON.parse(taskData);
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userEmail = currentUser.email;
+        
         let pending = 0;
         let completed = 0;
         
-        Object.values(tasks).forEach(task => {
-            if (task.status === 'pending') {
-                pending++;
-            } else if (task.status === 'completed') {
-                completed++;
+        Object.entries(tasks).forEach(([taskId, task]) => {
+            // Check if task is assigned to current user
+            if (isItemAssignedToUser(taskId, userEmail)) {
+                if (task.status === 'pending') {
+                    pending++;
+                } else if (task.status === 'completed') {
+                    completed++;
+                }
             }
         });
         
@@ -188,29 +194,34 @@ function loadTaskData() {
     }
 }
 
-// Load document data from localStorage
+// Load document data from localStorage with assignment filtering
 function loadDocumentData() {
     const docData = localStorage.getItem('telus_document_status');
     
     if (docData) {
         try {
             const documents = JSON.parse(docData);
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const userEmail = currentUser.email;
             
             let pending = 0;
             let completed = 0;
             let underReview = 0;
             let approved = 0;
             
-            Object.values(documents).forEach(doc => {
-                if (doc.status === 'pending') {
-                    pending++;
-                } else if (doc.status === 'completed' || doc.status === 'approved') {
-                    completed++;
-                    if (doc.status === 'approved') {
-                        approved++;
+            Object.entries(documents).forEach(([docId, doc]) => {
+                // Check if document is assigned to current user
+                if (isItemAssignedToUser(docId, userEmail)) {
+                    if (doc.status === 'pending') {
+                        pending++;
+                    } else if (doc.status === 'completed' || doc.status === 'approved') {
+                        completed++;
+                        if (doc.status === 'approved') {
+                            approved++;
+                        }
+                    } else if (doc.status === 'under-review') {
+                        underReview++;
                     }
-                } else if (doc.status === 'under-review') {
-                    underReview++;
                 }
             });
             
@@ -631,6 +642,75 @@ function setupEnhancedStorageListeners() {
 
 // Call the enhanced setup function
 setupEnhancedStorageListeners();
+
+// Assignment filtering functions (Phase 3)
+function getAssignment(itemId) {
+    try {
+        const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+        return assignments[itemId] || null;
+    } catch (error) {
+        console.error('Error getting assignment:', error);
+        return null;
+    }
+}
+
+function isItemAssignedToUser(itemId, userEmail) {
+    try {
+        const assignment = getAssignment(itemId);
+        if (!assignment) {
+            // If no assignment exists, it's visible to all users (backward compatibility)
+            return true;
+        }
+        
+        // Check if assigned to all users or specifically to this user
+        return assignment.assignedUsers.includes('all') || assignment.assignedUsers.includes(userEmail);
+    } catch (error) {
+        console.error('Error checking item assignment:', error);
+        // Default to true for backward compatibility
+        return true;
+    }
+}
+
+function getUserAssignments(userEmail) {
+    try {
+        const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+        const userAssignments = {
+            tasks: [],
+            documents: []
+        };
+        
+        Object.entries(assignments).forEach(([itemId, assignment]) => {
+            // Check if user is assigned or if it's assigned to all users
+            if (assignment.assignedUsers.includes('all') || assignment.assignedUsers.includes(userEmail)) {
+                if (assignment.type === 'task') {
+                    userAssignments.tasks.push(itemId);
+                } else if (assignment.type === 'document') {
+                    userAssignments.documents.push(itemId);
+                }
+            }
+        });
+        
+        return userAssignments;
+    } catch (error) {
+        console.error('Error getting user assignments:', error);
+        return { tasks: [], documents: [] };
+    }
+}
+
+// Listen for assignment updates
+window.addEventListener('assignmentUpdated', function(e) {
+    console.log('Assignment updated, refreshing user dashboard...', e.detail);
+    const { type, source } = e.detail || {};
+    
+    // Refresh dashboard data when assignments change
+    loadTaskData();
+    loadDocumentData();
+    updateOverviewStats();
+    
+    if (source === 'admin') {
+        showMessage('Task assignments updated by administrator', 'info');
+    }
+});
 
 // Export functions for global access
 window.refreshActivity = refreshActivity;

@@ -567,7 +567,45 @@
             });
         }
         
-        // Load tasks from admin (new function to handle admin-created tasks)
+        // Assignment filtering functions (frontend-only, no backend changes)
+        function getCurrentUserEmail() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                return currentUser ? JSON.parse(currentUser).email : null;
+            } catch (error) {
+                console.error('Error getting current user email:', error);
+                return null;
+            }
+        }
+
+        function getAssignment(itemId) {
+            try {
+                const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+                return assignments[itemId] || null;
+            } catch (error) {
+                console.error('Error getting assignment:', error);
+                return null;
+            }
+        }
+
+        function isItemAssignedToUser(itemId, userEmail) {
+            try {
+                const assignment = getAssignment(itemId);
+                if (!assignment) {
+                    // If no assignment exists, it's visible to all users (backward compatibility)
+                    return true;
+                }
+                
+                // Check if assigned to all users or specifically to this user
+                return assignment.assignedUsers.includes('all') || assignment.assignedUsers.includes(userEmail);
+            } catch (error) {
+                console.error('Error checking item assignment:', error);
+                // Default to true for backward compatibility
+                return true;
+            }
+        }
+
+        // Load tasks from admin (with assignment filtering)
         function loadTasksFromAdmin() {
             const adminTaskData = localStorage.getItem('telus_task_status');
             if (!adminTaskData) return;
@@ -575,6 +613,7 @@
             try {
                 const adminTasks = JSON.parse(adminTaskData);
                 const tasksContainer = document.querySelector('.assigned-tasks-container');
+                const currentUserEmail = getCurrentUserEmail();
                 
                 // Get existing task cards to preserve their state
                 const existingCards = document.querySelectorAll('.task-card[data-admin-created="true"]');
@@ -591,9 +630,17 @@
                 // Clear existing admin-created tasks
                 existingCards.forEach(card => card.remove());
                 
-                // Add admin-created tasks, preserving user states
+                // Add admin-created tasks with assignment filtering
                 Object.entries(adminTasks).forEach(([taskId, taskInfo]) => {
                     if (taskInfo && taskInfo.title) {
+                        // CRITICAL FIX: Check if task is assigned to current user
+                        if (!isItemAssignedToUser(taskId, currentUserEmail)) {
+                            console.log(`Task ${taskInfo.title} not assigned to user ${currentUserEmail}, skipping`);
+                            return; // Skip this task - not assigned to current user
+                        }
+                        
+                        console.log(`Task ${taskInfo.title} is assigned to user ${currentUserEmail}, displaying`);
+                        
                         // Use the actual task status from admin data, not user state
                         const taskStatus = taskInfo.status || 'pending';
                         
@@ -630,7 +677,7 @@
                 });
                 
                 updateTaskCounts();
-                console.log('Tasks loaded from admin, preserving user states');
+                console.log('Tasks loaded from admin with assignment filtering applied');
             } catch (error) {
                 console.error('Error loading admin tasks:', error);
             }

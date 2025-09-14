@@ -1374,6 +1374,19 @@ function getTaskFormFields() {
             <textarea id="taskResources" name="resources" rows="3" placeholder="List any resources, links, or materials needed for this task"></textarea>
         </div>
         <div class="form-group">
+            <label for="taskAssignTo">Assign To</label>
+            <div class="user-selector-container">
+                <div class="user-selector-display" id="taskUserSelector" onclick="openUserSelectionModal('task')">
+                    <div class="selected-users" id="taskSelectedUsers">
+                        <span class="default-selection">All Users (Default)</span>
+                    </div>
+                    <i class="fas fa-chevron-down selector-arrow"></i>
+                </div>
+                <input type="hidden" id="taskAssignTo" name="assignTo" value="all">
+            </div>
+            <div class="form-help-text">Click to select specific users or leave as "All Users" for everyone.</div>
+        </div>
+        <div class="form-group">
             <label for="taskDueDate" class="required">Due Date *</label>
             <input type="date" id="taskDueDate" name="dueDate" required>
         </div>
@@ -1414,6 +1427,19 @@ function getDocumentFormFields() {
         <div class="form-group">
             <label for="docDescription" class="required">Description *</label>
             <textarea id="docDescription" name="description" rows="4" required placeholder="Describe the document content and purpose"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="docAssignTo">Assign To</label>
+            <div class="user-selector-container">
+                <div class="user-selector-display" id="docUserSelector" onclick="openUserSelectionModal('document')">
+                    <div class="selected-users" id="docSelectedUsers">
+                        <span class="default-selection">All Users (Default)</span>
+                    </div>
+                    <i class="fas fa-chevron-down selector-arrow"></i>
+                </div>
+                <input type="hidden" id="docAssignTo" name="assignTo" value="all">
+            </div>
+            <div class="form-help-text">Click to select specific users or leave as "All Users" for everyone.</div>
         </div>
         <div class="form-group">
             <label for="docFile">Document PDF Sample (Optional)</label>
@@ -1754,9 +1780,12 @@ function handleFormSubmit(e) {
     }, 1000);
 }
 
-// Save functions using SyncManager
+// Save functions using SyncManager with assignment tracking
 function saveTask(data) {
     try {
+        // Handle user assignments
+        const assignedUsers = data.assignTo ? (Array.isArray(data.assignTo) ? data.assignTo : [data.assignTo]) : ['all'];
+        
         if (window.SyncManager) {
             if (editingItemId) {
                 // Update existing task - PRESERVE USER COMPLETION DATA
@@ -1784,6 +1813,12 @@ function saveTask(data) {
                     };
                     
                     const updatedTask = window.SyncManager.updateTask(editingItemId, updatedTaskData, 'admin');
+                    
+                    // Update assignment tracking
+                    if (updatedTask) {
+                        saveAssignment('task', editingItemId, assignedUsers);
+                    }
+                    
                     console.log('Task updated preserving user completion data:', updatedTask);
                     return !!updatedTask;
                 } else {
@@ -1793,19 +1828,24 @@ function saveTask(data) {
             } else {
                 // Add new task
                 const newTask = window.SyncManager.addTask(data, 'admin');
+                
+                // Save assignment tracking for new task
+                if (newTask && newTask.id) {
+                    saveAssignment('task', newTask.id, assignedUsers);
+                }
+                
                 return !!newTask;
             }
         } else {
             // Fallback to direct localStorage manipulation
             console.warn('SyncManager not available, using fallback method');
             const tasks = JSON.parse(localStorage.getItem('telus_task_status') || '{}');
+            let taskId = editingItemId;
             
             if (editingItemId) {
                 // Update existing task - PRESERVE USER COMPLETION DATA
                 const existingTask = tasks[editingItemId];
                 if (existingTask) {
-                    // CRITICAL FIX: Use direct property assignment instead of spread operator
-                    // to avoid any potential overwriting issues
                     const preservedTask = {
                         // Core task identity
                         id: existingTask.id || editingItemId,
@@ -1835,7 +1875,7 @@ function saveTask(data) {
                 }
             } else {
                 // Add new task
-                const taskId = 'task_' + Date.now();
+                taskId = 'task_' + Date.now();
                 tasks[taskId] = {
                     id: taskId,
                     ...data,
@@ -1846,6 +1886,9 @@ function saveTask(data) {
             }
             
             localStorage.setItem('telus_task_status', JSON.stringify(tasks));
+            
+            // Save assignment tracking
+            saveAssignment('task', taskId, assignedUsers);
             
             // Trigger storage event for cross-tab sync
             window.dispatchEvent(new StorageEvent('storage', {
@@ -1870,20 +1913,36 @@ function saveTask(data) {
 
 function saveDocument(data) {
     try {
+        // Handle user assignments
+        const assignedUsers = data.assignTo ? (Array.isArray(data.assignTo) ? data.assignTo : [data.assignTo]) : ['all'];
+        
         if (window.SyncManager) {
             if (editingItemId) {
                 // Update existing document
                 const updatedDoc = window.SyncManager.updateDocument(editingItemId, data, 'admin');
+                
+                // Update assignment tracking
+                if (updatedDoc) {
+                    saveAssignment('document', editingItemId, assignedUsers);
+                }
+                
                 return !!updatedDoc;
             } else {
                 // Add new document
                 const newDoc = window.SyncManager.addDocument(data, 'admin');
+                
+                // Save assignment tracking for new document
+                if (newDoc && newDoc.id) {
+                    saveAssignment('document', newDoc.id, assignedUsers);
+                }
+                
                 return !!newDoc;
             }
         } else {
             // Fallback to direct localStorage manipulation
             console.warn('SyncManager not available, using fallback method');
             const documents = JSON.parse(localStorage.getItem('telus_document_status') || '{}');
+            let docId = editingItemId;
             
             if (editingItemId) {
                 // Update existing document
@@ -1894,7 +1953,7 @@ function saveDocument(data) {
                 };
             } else {
                 // Add new document
-                const docId = 'doc_' + Date.now();
+                docId = 'doc_' + Date.now();
                 documents[docId] = {
                     id: docId,
                     ...data,
@@ -1905,6 +1964,9 @@ function saveDocument(data) {
             }
             
             localStorage.setItem('telus_document_status', JSON.stringify(documents));
+            
+            // Save assignment tracking
+            saveAssignment('document', docId, assignedUsers);
             
             // Trigger storage event for cross-tab sync
             window.dispatchEvent(new StorageEvent('storage', {
@@ -2691,6 +2753,605 @@ function generateDefaultAvatar(name) {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=120&background=4b286d&color=ffffff&bold=true`;
 }
 
+// Generate user options for assignment dropdown
+function getUserOptionsForAssignment() {
+    try {
+        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        
+        // Combine all users (exclude current admin from assignment options)
+        const allUsers = users.filter(user => user.email && user.role !== 'admin');
+        
+        // Add demo user if not already in the list
+        const demoUserExists = allUsers.some(user => user.email === 'user@demo.com');
+        if (!demoUserExists) {
+            allUsers.unshift({
+                name: 'Demo User',
+                email: 'user@demo.com',
+                designation: 'Team Member',
+                pod: 'Platform'
+            });
+        }
+        
+        if (allUsers.length === 0) {
+            return '<option value="" disabled>No users available for assignment</option>';
+        }
+        
+        // Group users by POD for better organization
+        const usersByPod = {};
+        allUsers.forEach(user => {
+            const pod = user.pod || 'No POD';
+            if (!usersByPod[pod]) {
+                usersByPod[pod] = [];
+            }
+            usersByPod[pod].push(user);
+        });
+        
+        let optionsHTML = '';
+        
+        // Create optgroups for each POD
+        Object.keys(usersByPod).sort().forEach(pod => {
+            optionsHTML += `<optgroup label="${pod} Team">`;
+            usersByPod[pod].forEach(user => {
+                const displayName = `${user.name} (${user.designation || 'Team Member'})`;
+                optionsHTML += `<option value="${user.email}">${displayName}</option>`;
+            });
+            optionsHTML += '</optgroup>';
+        });
+        
+        return optionsHTML;
+    } catch (error) {
+        console.error('Error generating user options:', error);
+        return '<option value="" disabled>Error loading users</option>';
+    }
+}
+
+// Assignment tracking functions (Phase 2)
+function saveAssignment(type, itemId, assignedUsers) {
+    try {
+        // Get existing assignments
+        const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+        
+        // Clean assigned users array (remove 'all' if other users are selected)
+        let cleanedUsers = assignedUsers.filter(user => user && user.trim() !== '');
+        if (cleanedUsers.includes('all') && cleanedUsers.length > 1) {
+            cleanedUsers = cleanedUsers.filter(user => user !== 'all');
+        }
+        
+        // If no specific users selected or only 'all' selected, make it visible to all
+        if (cleanedUsers.length === 0 || (cleanedUsers.length === 1 && cleanedUsers[0] === 'all')) {
+            cleanedUsers = ['all'];
+        }
+        
+        // Save assignment
+        assignments[itemId] = {
+            type: type,
+            assignedUsers: cleanedUsers,
+            dateAssigned: new Date().toISOString(),
+            assignedBy: 'admin'
+        };
+        
+        localStorage.setItem('telus_user_assignments', JSON.stringify(assignments));
+        
+        console.log(`Assignment saved for ${type} ${itemId}:`, cleanedUsers);
+        
+        // Trigger assignment sync event
+        window.dispatchEvent(new CustomEvent('assignmentUpdated', {
+            detail: { 
+                type: type, 
+                itemId: itemId, 
+                assignedUsers: cleanedUsers,
+                source: 'admin' 
+            }
+        }));
+        
+        return true;
+    } catch (error) {
+        console.error('Error saving assignment:', error);
+        return false;
+    }
+}
+
+function getAssignment(itemId) {
+    try {
+        const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+        return assignments[itemId] || null;
+    } catch (error) {
+        console.error('Error getting assignment:', error);
+        return null;
+    }
+}
+
+function getUserAssignments(userEmail) {
+    try {
+        const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+        const userAssignments = {
+            tasks: [],
+            documents: []
+        };
+        
+        Object.entries(assignments).forEach(([itemId, assignment]) => {
+            // Check if user is assigned or if it's assigned to all users
+            if (assignment.assignedUsers.includes('all') || assignment.assignedUsers.includes(userEmail)) {
+                if (assignment.type === 'task') {
+                    userAssignments.tasks.push(itemId);
+                } else if (assignment.type === 'document') {
+                    userAssignments.documents.push(itemId);
+                }
+            }
+        });
+        
+        return userAssignments;
+    } catch (error) {
+        console.error('Error getting user assignments:', error);
+        return { tasks: [], documents: [] };
+    }
+}
+
+function isItemAssignedToUser(itemId, userEmail) {
+    try {
+        const assignment = getAssignment(itemId);
+        if (!assignment) {
+            // If no assignment exists, it's visible to all users (backward compatibility)
+            return true;
+        }
+        
+        // Check if assigned to all users or specifically to this user
+        return assignment.assignedUsers.includes('all') || assignment.assignedUsers.includes(userEmail);
+    } catch (error) {
+        console.error('Error checking item assignment:', error);
+        // Default to true for backward compatibility
+        return true;
+    }
+}
+
+function getAssignmentSummary() {
+    try {
+        const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+        const summary = {
+            totalAssignments: 0,
+            taskAssignments: 0,
+            documentAssignments: 0,
+            userAssignmentCounts: {}
+        };
+        
+        Object.values(assignments).forEach(assignment => {
+            summary.totalAssignments++;
+            
+            if (assignment.type === 'task') {
+                summary.taskAssignments++;
+            } else if (assignment.type === 'document') {
+                summary.documentAssignments++;
+            }
+            
+            // Count assignments per user
+            assignment.assignedUsers.forEach(userEmail => {
+                if (userEmail !== 'all') {
+                    summary.userAssignmentCounts[userEmail] = (summary.userAssignmentCounts[userEmail] || 0) + 1;
+                }
+            });
+        });
+        
+        return summary;
+    } catch (error) {
+        console.error('Error getting assignment summary:', error);
+        return {
+            totalAssignments: 0,
+            taskAssignments: 0,
+            documentAssignments: 0,
+            userAssignmentCounts: {}
+        };
+    }
+}
+
+// Assignment Management Functions (Phase 4)
+function loadAssignmentManagement() {
+    const assignmentTableBody = document.getElementById('assignmentTableBody');
+    if (!assignmentTableBody) return;
+    
+    try {
+        const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+        const tasks = JSON.parse(localStorage.getItem('telus_task_status') || '{}');
+        const documents = JSON.parse(localStorage.getItem('telus_document_status') || '{}');
+        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        
+        if (Object.keys(assignments).length === 0) {
+            assignmentTableBody.innerHTML = '<tr><td colspan="6" class="text-center">No assignments found</td></tr>';
+            return;
+        }
+        
+        assignmentTableBody.innerHTML = '';
+        
+        Object.entries(assignments).forEach(([itemId, assignment]) => {
+            const row = createAssignmentRow(itemId, assignment, tasks, documents, users);
+            assignmentTableBody.appendChild(row);
+        });
+        
+        // Update assignment summary
+        updateAssignmentSummary();
+        
+    } catch (error) {
+        console.error('Error loading assignment management:', error);
+        assignmentTableBody.innerHTML = '<tr><td colspan="6" class="text-center">Error loading assignments</td></tr>';
+    }
+}
+
+function createAssignmentRow(itemId, assignment, tasks, documents, users) {
+    const row = document.createElement('tr');
+    
+    // Get item details
+    const item = assignment.type === 'task' ? tasks[itemId] : documents[itemId];
+    const itemTitle = item ? item.title : 'Unknown Item';
+    const itemStatus = item ? item.status : 'unknown';
+    
+    // Get assigned user names
+    const assignedUserNames = assignment.assignedUsers.map(email => {
+        if (email === 'all') return 'All Users';
+        const user = users.find(u => u.email === email);
+        return user ? user.name : email;
+    }).join(', ');
+    
+    // Status badge
+    const statusBadge = itemStatus === 'completed' || itemStatus === 'approved'
+        ? '<span class="status-badge success">Completed</span>'
+        : itemStatus === 'pending'
+        ? '<span class="status-badge warning">Pending</span>'
+        : itemStatus === 'under-review'
+        ? '<span class="status-badge info">Under Review</span>'
+        : '<span class="status-badge secondary">Unknown</span>';
+    
+    // Type badge
+    const typeBadge = assignment.type === 'task'
+        ? '<span class="type-badge task"><i class="fas fa-tasks"></i> Task</span>'
+        : '<span class="type-badge document"><i class="fas fa-file-alt"></i> Document</span>';
+    
+    // Date assigned
+    const dateAssigned = assignment.dateAssigned 
+        ? new Date(assignment.dateAssigned).toLocaleDateString()
+        : 'Unknown';
+    
+    row.innerHTML = `
+        <td>
+            <div class="item-title-cell">
+                <strong>${itemTitle}</strong>
+                <div class="item-id-small">ID: ${itemId}</div>
+            </div>
+        </td>
+        <td>${typeBadge}</td>
+        <td>
+            <div class="assigned-users-cell">
+                ${assignedUserNames}
+                <div class="user-count-small">${assignment.assignedUsers.length} user(s)</div>
+            </div>
+        </td>
+        <td>${statusBadge}</td>
+        <td>${dateAssigned}</td>
+        <td>
+            <button class="action-btn view" onclick="viewAssignmentDetails('${itemId}')" title="View Assignment Details">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" onclick="editAssignment('${itemId}')" title="Edit Assignment">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" onclick="confirmDeleteAssignment('${itemId}')" title="Remove Assignment">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    
+    return row;
+}
+
+function updateAssignmentSummary() {
+    const summary = getAssignmentSummary();
+    
+    // Update summary cards
+    updateElement('totalAssignments', summary.totalAssignments);
+    updateElement('taskAssignments', summary.taskAssignments);
+    updateElement('documentAssignments', summary.documentAssignments);
+    
+    // Update user assignment breakdown
+    const userBreakdown = document.getElementById('userAssignmentBreakdown');
+    if (userBreakdown) {
+        let breakdownHTML = '';
+        const sortedUsers = Object.entries(summary.userAssignmentCounts)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 5); // Top 5 users
+        
+        if (sortedUsers.length === 0) {
+            breakdownHTML = '<div class="no-data">No specific user assignments</div>';
+        } else {
+            sortedUsers.forEach(([email, count]) => {
+                const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                const user = users.find(u => u.email === email);
+                const userName = user ? user.name : email;
+                
+                breakdownHTML += `
+                    <div class="user-assignment-item">
+                        <span class="user-name">${userName}</span>
+                        <span class="assignment-count">${count} assignments</span>
+                    </div>
+                `;
+            });
+        }
+        
+        userBreakdown.innerHTML = breakdownHTML;
+    }
+}
+
+function viewAssignmentDetails(itemId) {
+    const assignment = getAssignment(itemId);
+    if (!assignment) {
+        showMessage('Assignment not found', 'error');
+        return;
+    }
+    
+    const tasks = JSON.parse(localStorage.getItem('telus_task_status') || '{}');
+    const documents = JSON.parse(localStorage.getItem('telus_document_status') || '{}');
+    const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    
+    const item = assignment.type === 'task' ? tasks[itemId] : documents[itemId];
+    const itemTitle = item ? item.title : 'Unknown Item';
+    const itemDescription = item ? item.description : 'No description available';
+    
+    // Get assigned user details
+    const assignedUserDetails = assignment.assignedUsers.map(email => {
+        if (email === 'all') return { name: 'All Users', email: 'all', designation: 'Everyone' };
+        const user = users.find(u => u.email === email);
+        return user ? { 
+            name: user.name, 
+            email: user.email, 
+            designation: user.designation || 'Team Member',
+            pod: user.pod || 'No POD'
+        } : { name: email, email: email, designation: 'Unknown' };
+    });
+    
+    // Create assignment details modal
+    const assignmentDetailModal = `
+        <div style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(2px);
+        " onclick="this.remove()">
+            <div style="
+                background: white;
+                padding: 0;
+                border-radius: 16px;
+                max-width: 700px;
+                width: 95%;
+                max-height: 90vh;
+                overflow: hidden;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                animation: modalSlideIn 0.3s ease-out;
+            " onclick="event.stopPropagation()">
+                <style>
+                    @keyframes modalSlideIn {
+                        from { transform: translateY(-20px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                </style>
+                
+                <!-- Header -->
+                <div style="
+                    background: linear-gradient(135deg, var(--telus-purple), #8e44ad);
+                    color: white;
+                    padding: 25px 30px;
+                    border-radius: 16px 16px 0 0;
+                ">
+                    <h3 style="margin: 0; font-size: 1.4em; display: flex; align-items: center;">
+                        <i class="fas fa-user-check" style="margin-right: 12px; font-size: 1.2em;"></i>
+                        Assignment Details
+                    </h3>
+                    <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 0.95em;">
+                        Complete assignment information and user details
+                    </p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 30px; max-height: 60vh; overflow-y: auto;">
+                    <!-- Item Information -->
+                    <div style="
+                        background: #f8f9fa;
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin-bottom: 25px;
+                        border-left: 4px solid var(--telus-purple);
+                    ">
+                        <h4 style="margin: 0 0 15px 0; color: var(--telus-purple); font-size: 1.1em;">
+                            <i class="fas fa-${assignment.type === 'task' ? 'tasks' : 'file-alt'}" style="margin-right: 8px;"></i>
+                            ${assignment.type === 'task' ? 'Task' : 'Document'} Information
+                        </h4>
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #495057;">Title:</strong><br>
+                            <span style="color: #212529; font-size: 1.1em;">${itemTitle}</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #495057;">Description:</strong><br>
+                            <div style="
+                                background: white;
+                                padding: 12px;
+                                border-radius: 6px;
+                                border: 1px solid #dee2e6;
+                                margin-top: 5px;
+                                color: #212529;
+                                line-height: 1.5;
+                            ">
+                                ${itemDescription}
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <strong style="color: #495057;">Item ID:</strong><br>
+                                <span style="color: #6c757d; font-family: monospace;">${itemId}</span>
+                            </div>
+                            <div>
+                                <strong style="color: #495057;">Date Assigned:</strong><br>
+                                <span style="color: #212529;">${new Date(assignment.dateAssigned).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Assigned Users -->
+                    <div style="
+                        background: #e8f5e8;
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin-bottom: 25px;
+                        border-left: 4px solid #28a745;
+                    ">
+                        <h4 style="margin: 0 0 15px 0; color: #155724; font-size: 1.1em;">
+                            <i class="fas fa-users" style="margin-right: 8px;"></i>
+                            Assigned Users (${assignedUserDetails.length})
+                        </h4>
+                        <div style="display: grid; gap: 12px;">
+                            ${assignedUserDetails.map(user => `
+                                <div style="
+                                    background: white;
+                                    padding: 15px;
+                                    border-radius: 8px;
+                                    border: 1px solid #c3e6cb;
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                ">
+                                    <div>
+                                        <div style="font-weight: 600; color: #212529;">${user.name}</div>
+                                        <div style="color: #6c757d; font-size: 0.9em;">${user.designation}</div>
+                                        ${user.pod && user.pod !== 'No POD' ? `<div style="color: #6c757d; font-size: 0.8em;">${user.pod} Team</div>` : ''}
+                                    </div>
+                                    <div style="color: #6c757d; font-size: 0.9em;">
+                                        ${user.email}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div style="
+                    background: #f8f9fa;
+                    padding: 25px 30px;
+                    border-radius: 0 0 16px 16px;
+                    border-top: 1px solid #e9ecef;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                ">
+                    <div style="color: #6c757d; font-size: 0.9em;">
+                        <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                        Assigned by ${assignment.assignedBy || 'admin'}
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="editAssignment('${itemId}'); this.closest('div[style*=\"position: fixed\"]').remove();" 
+                                style="
+                                    background: linear-gradient(135deg, #007bff, #0056b3);
+                                    color: white;
+                                    border: none;
+                                    padding: 12px 24px;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    font-size: 0.95em;
+                                    transition: all 0.2s ease;
+                                    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+                                "
+                                onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(0, 123, 255, 0.4)';"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 123, 255, 0.3)';">
+                            <i class="fas fa-edit" style="margin-right: 8px;"></i>
+                            Edit Assignment
+                        </button>
+                        <button onclick="this.closest('div[style*=\"position: fixed\"]').remove();" 
+                                style="
+                                    background: #6c757d;
+                                    color: white;
+                                    border: none;
+                                    padding: 12px 20px;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 500;
+                                    font-size: 0.95em;
+                                    transition: all 0.2s ease;
+                                "
+                                onmouseover="this.style.background='#5a6268';"
+                                onmouseout="this.style.background='#6c757d';">
+                            <i class="fas fa-times" style="margin-right: 8px;"></i>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', assignmentDetailModal);
+}
+
+function editAssignment(itemId) {
+    const assignment = getAssignment(itemId);
+    if (!assignment) {
+        showMessage('Assignment not found', 'error');
+        return;
+    }
+    
+    // Get the original item to edit its assignment
+    if (assignment.type === 'task') {
+        editTask(itemId);
+    } else if (assignment.type === 'document') {
+        editDocument(itemId);
+    }
+}
+
+function confirmDeleteAssignment(itemId) {
+    confirmCallback = () => deleteAssignment(itemId);
+    showConfirmModal('Are you sure you want to remove this assignment? The item will become visible to all users.');
+}
+
+function deleteAssignment(itemId) {
+    try {
+        const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+        
+        if (assignments[itemId]) {
+            delete assignments[itemId];
+            localStorage.setItem('telus_user_assignments', JSON.stringify(assignments));
+            
+            // Trigger assignment update event
+            window.dispatchEvent(new CustomEvent('assignmentUpdated', {
+                detail: { 
+                    type: 'assignment_deleted', 
+                    itemId: itemId, 
+                    source: 'admin' 
+                }
+            }));
+            
+            // Refresh assignment management if currently viewing
+            if (currentSection === 'assignments') {
+                loadAssignmentManagement();
+            }
+            
+            logAdminActivity('Assignment Deleted', `Removed assignment for item ${itemId}`);
+            showMessage('Assignment removed successfully! Item is now visible to all users.', 'success');
+        } else {
+            showMessage('Assignment not found', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting assignment:', error);
+        showMessage('Error removing assignment', 'error');
+    }
+    closeConfirmModal();
+}
+
 // Export functions for global access
 window.switchToSection = switchToSection;
 window.addNewTask = addNewTask;
@@ -2719,3 +3380,362 @@ window.refreshAllData = refreshAllData;
 window.refreshActivity = refreshActivity;
 window.exportAnalytics = exportAnalytics;
 window.logout = logout;
+window.loadAssignmentManagement = loadAssignmentManagement;
+window.viewAssignmentDetails = viewAssignmentDetails;
+window.editAssignment = editAssignment;
+window.confirmDeleteAssignment = confirmDeleteAssignment;
+window.openUserSelectionModal = openUserSelectionModal;
+
+// User Selection Modal Functions
+function openUserSelectionModal(formType) {
+    const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    
+    // Add demo user if not already in the list
+    const demoUserExists = users.some(user => user.email === 'user@demo.com');
+    if (!demoUserExists) {
+        users.unshift({
+            name: 'Demo User',
+            email: 'user@demo.com',
+            designation: 'Team Member',
+            pod: 'Platform'
+        });
+    }
+    
+    // Group users by POD
+    const usersByPod = {};
+    users.forEach(user => {
+        if (user.email && user.role !== 'admin') {
+            const pod = user.pod || 'No POD';
+            if (!usersByPod[pod]) {
+                usersByPod[pod] = [];
+            }
+            usersByPod[pod].push(user);
+        }
+    });
+    
+    // Create modal HTML
+    const modalHTML = `
+        <div id="userSelectionModal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            backdrop-filter: blur(2px);
+        " onclick="closeUserSelectionModal()">
+            <div style="
+                background: white;
+                border-radius: 16px;
+                max-width: 600px;
+                width: 95%;
+                max-height: 80vh;
+                overflow: hidden;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                animation: modalSlideIn 0.3s ease-out;
+            " onclick="event.stopPropagation()">
+                
+                <!-- Header -->
+                <div style="
+                    background: linear-gradient(135deg, var(--telus-purple), #8e44ad);
+                    color: white;
+                    padding: 20px 25px;
+                    border-radius: 16px 16px 0 0;
+                ">
+                    <h3 style="margin: 0; font-size: 1.3em; display: flex; align-items: center;">
+                        <i class="fas fa-users" style="margin-right: 10px;"></i>
+                        Select Users to Assign
+                    </h3>
+                    <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 0.9em;">
+                        Choose specific users or leave as "All Users" for everyone
+                    </p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 25px; max-height: 50vh; overflow-y: auto;">
+                    <!-- All Users Option -->
+                    <div style="
+                        background: #f8f9fa;
+                        border: 2px solid #e9ecef;
+                        border-radius: 12px;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    " onclick="selectAllUsers('${formType}')" 
+                       onmouseover="this.style.borderColor='var(--telus-purple)'; this.style.background='#f3e5f5';"
+                       onmouseout="this.style.borderColor='#e9ecef'; this.style.background='#f8f9fa';">
+                        <div style="display: flex; align-items: center;">
+                            <div style="
+                                width: 20px;
+                                height: 20px;
+                                border: 2px solid var(--telus-purple);
+                                border-radius: 4px;
+                                margin-right: 12px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: var(--telus-purple);
+                            " id="allUsersCheckbox">
+                                <i class="fas fa-check" style="color: white; font-size: 12px;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #212529;">All Users (Default)</div>
+                                <div style="color: #6c757d; font-size: 0.9em;">Visible to everyone in the organization</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- User Groups by POD -->
+                    ${Object.keys(usersByPod).sort().map(pod => `
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="
+                                color: var(--telus-purple);
+                                font-size: 1.1em;
+                                margin: 0 0 12px 0;
+                                padding-bottom: 8px;
+                                border-bottom: 2px solid #e9ecef;
+                            ">
+                                <i class="fas fa-users" style="margin-right: 8px;"></i>
+                                ${pod} Team
+                            </h4>
+                            <div style="display: grid; gap: 8px;">
+                                ${usersByPod[pod].map(user => `
+                                    <div style="
+                                        background: white;
+                                        border: 2px solid #e9ecef;
+                                        border-radius: 8px;
+                                        padding: 12px;
+                                        cursor: pointer;
+                                        transition: all 0.2s ease;
+                                    " onclick="toggleUserSelection('${user.email}', '${formType}')"
+                                       onmouseover="this.style.borderColor='var(--telus-purple)'; this.style.background='#f3e5f5';"
+                                       onmouseout="updateUserHoverState(this, '${user.email}');"
+                                       data-user-email="${user.email}">
+                                        <div style="display: flex; align-items: center;">
+                                            <div style="
+                                                width: 18px;
+                                                height: 18px;
+                                                border: 2px solid #dee2e6;
+                                                border-radius: 4px;
+                                                margin-right: 12px;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                            " class="user-checkbox" data-email="${user.email}">
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 600; color: #212529;">${user.name}</div>
+                                                <div style="color: #6c757d; font-size: 0.85em;">${user.designation || 'Team Member'}</div>
+                                            </div>
+                                            <div style="color: #6c757d; font-size: 0.8em;">
+                                                ${user.email}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <!-- Footer -->
+                <div style="
+                    background: #f8f9fa;
+                    padding: 20px 25px;
+                    border-radius: 0 0 16px 16px;
+                    border-top: 1px solid #e9ecef;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <div style="color: #6c757d; font-size: 0.9em;">
+                        <span id="selectedCount">1 user selected (All Users)</span>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="applyUserSelection('${formType}')" style="
+                            background: linear-gradient(135deg, var(--telus-purple), #8e44ad);
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            font-size: 0.95em;
+                            transition: all 0.2s ease;
+                        ">
+                            <i class="fas fa-check" style="margin-right: 8px;"></i>
+                            Apply Selection
+                        </button>
+                        <button onclick="closeUserSelectionModal()" style="
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            padding: 12px 20px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 500;
+                            font-size: 0.95em;
+                            transition: all 0.2s ease;
+                        ">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Initialize selection state
+    window.selectedUsers = ['all'];
+    window.currentFormType = formType;
+}
+
+function selectAllUsers(formType) {
+    window.selectedUsers = ['all'];
+    updateSelectionDisplay();
+    updateSelectedCount();
+}
+
+function toggleUserSelection(userEmail, formType) {
+    if (!window.selectedUsers) window.selectedUsers = ['all'];
+    
+    // If "all" is currently selected, clear it when selecting specific users
+    if (window.selectedUsers.includes('all') && userEmail !== 'all') {
+        window.selectedUsers = [];
+    }
+    
+    // Toggle user selection
+    const index = window.selectedUsers.indexOf(userEmail);
+    if (index > -1) {
+        window.selectedUsers.splice(index, 1);
+    } else {
+        window.selectedUsers.push(userEmail);
+    }
+    
+    // If no users selected, default back to "all"
+    if (window.selectedUsers.length === 0) {
+        window.selectedUsers = ['all'];
+    }
+    
+    updateSelectionDisplay();
+    updateSelectedCount();
+}
+
+function updateSelectionDisplay() {
+    // Update all users checkbox
+    const allUsersCheckbox = document.getElementById('allUsersCheckbox');
+    if (allUsersCheckbox) {
+        if (window.selectedUsers.includes('all')) {
+            allUsersCheckbox.style.background = 'var(--telus-purple)';
+            allUsersCheckbox.style.borderColor = 'var(--telus-purple)';
+            allUsersCheckbox.innerHTML = '<i class="fas fa-check" style="color: white; font-size: 12px;"></i>';
+        } else {
+            allUsersCheckbox.style.background = 'white';
+            allUsersCheckbox.style.borderColor = '#dee2e6';
+            allUsersCheckbox.innerHTML = '';
+        }
+    }
+    
+    // Update individual user checkboxes
+    const userCheckboxes = document.querySelectorAll('.user-checkbox');
+    userCheckboxes.forEach(checkbox => {
+        const email = checkbox.getAttribute('data-email');
+        if (window.selectedUsers.includes(email)) {
+            checkbox.style.background = 'var(--telus-purple)';
+            checkbox.style.borderColor = 'var(--telus-purple)';
+            checkbox.innerHTML = '<i class="fas fa-check" style="color: white; font-size: 10px;"></i>';
+        } else {
+            checkbox.style.background = 'white';
+            checkbox.style.borderColor = '#dee2e6';
+            checkbox.innerHTML = '';
+        }
+    });
+}
+
+function updateUserHoverState(element, userEmail) {
+    if (!window.selectedUsers.includes(userEmail)) {
+        element.style.borderColor = '#e9ecef';
+        element.style.background = 'white';
+    }
+}
+
+function updateSelectedCount() {
+    const countElement = document.getElementById('selectedCount');
+    if (countElement) {
+        if (window.selectedUsers.includes('all')) {
+            countElement.textContent = '1 user selected (All Users)';
+        } else {
+            const count = window.selectedUsers.length;
+            countElement.textContent = `${count} user${count !== 1 ? 's' : ''} selected`;
+        }
+    }
+}
+
+function applyUserSelection(formType) {
+    // Map form types to their correct element IDs
+    const elementMapping = {
+        'task': 'task',
+        'document': 'doc'
+    };
+    
+    const prefix = elementMapping[formType] || formType;
+    const selectedUsersDisplay = document.getElementById(`${prefix}SelectedUsers`);
+    const hiddenInput = document.getElementById(`${prefix}AssignTo`);
+    
+    console.log(`Applying user selection for ${formType}, prefix: ${prefix}`);
+    console.log('Selected users:', window.selectedUsers);
+    console.log('Display element:', selectedUsersDisplay);
+    console.log('Hidden input:', hiddenInput);
+    
+    if (selectedUsersDisplay && hiddenInput) {
+        if (window.selectedUsers.includes('all')) {
+            selectedUsersDisplay.innerHTML = '<span class="default-selection">All Users (Default)</span>';
+            hiddenInput.value = 'all';
+        } else {
+            // Get user names for display
+            const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            const demoUser = { name: 'Demo User', email: 'user@demo.com' };
+            const allUsers = [demoUser, ...users];
+            
+            const selectedUserNames = window.selectedUsers.map(email => {
+                const user = allUsers.find(u => u.email === email);
+                return user ? user.name : email;
+            });
+            
+            selectedUsersDisplay.innerHTML = selectedUserNames.map(name => 
+                `<span class="selected-user-tag">${name}</span>`
+            ).join('');
+            
+            hiddenInput.value = window.selectedUsers.join(',');
+        }
+        
+        console.log('Updated display:', selectedUsersDisplay.innerHTML);
+        console.log('Updated hidden input value:', hiddenInput.value);
+    } else {
+        console.error('Could not find display or input elements:', {
+            displayId: `${prefix}SelectedUsers`,
+            inputId: `${prefix}AssignTo`,
+            display: selectedUsersDisplay,
+            input: hiddenInput
+        });
+    }
+    
+    closeUserSelectionModal();
+}
+
+function closeUserSelectionModal() {
+    const modal = document.getElementById('userSelectionModal');
+    if (modal) {
+        modal.remove();
+    }
+    window.selectedUsers = null;
+    window.currentFormType = null;
+}

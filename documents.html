@@ -710,7 +710,45 @@
             }
         });
 
-        // Load documents from admin (new function to handle admin-created documents)
+        // Assignment filtering functions (frontend-only, no backend changes)
+        function getCurrentUserEmail() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                return currentUser ? JSON.parse(currentUser).email : null;
+            } catch (error) {
+                console.error('Error getting current user email:', error);
+                return null;
+            }
+        }
+
+        function getAssignment(itemId) {
+            try {
+                const assignments = JSON.parse(localStorage.getItem('telus_user_assignments') || '{}');
+                return assignments[itemId] || null;
+            } catch (error) {
+                console.error('Error getting assignment:', error);
+                return null;
+            }
+        }
+
+        function isItemAssignedToUser(itemId, userEmail) {
+            try {
+                const assignment = getAssignment(itemId);
+                if (!assignment) {
+                    // If no assignment exists, it's visible to all users (backward compatibility)
+                    return true;
+                }
+                
+                // Check if assigned to all users or specifically to this user
+                return assignment.assignedUsers.includes('all') || assignment.assignedUsers.includes(userEmail);
+            } catch (error) {
+                console.error('Error checking item assignment:', error);
+                // Default to true for backward compatibility
+                return true;
+            }
+        }
+
+        // Load documents from admin (with assignment filtering)
         function loadDocumentsFromAdmin() {
             const adminDocumentData = localStorage.getItem('telus_document_status');
             const userDocumentStatus = localStorage.getItem(USER_DOCUMENT_STATUS_KEY);
@@ -725,6 +763,7 @@
                 const userStatus = userDocumentStatus ? JSON.parse(userDocumentStatus) : {};
                 const documentsContainer = document.querySelector('.assigned-tasks-container');
                 const noDocumentsMessage = document.querySelector('.no-documents-message');
+                const currentUserEmail = getCurrentUserEmail();
                 
                 console.log('Loading admin documents:', Object.keys(adminDocuments).length, 'documents found');
                 
@@ -752,10 +791,18 @@
                     }
                 });
                 
-                // Add or update admin-created documents
+                // Add or update admin-created documents with assignment filtering
                 let documentsAdded = 0;
                 Object.entries(adminDocuments).forEach(([docId, docInfo]) => {
                     if (docInfo && docInfo.title) {
+                        // CRITICAL FIX: Check if document is assigned to current user
+                        if (!isItemAssignedToUser(docId, currentUserEmail)) {
+                            console.log(`Document ${docInfo.title} not assigned to user ${currentUserEmail}, skipping`);
+                            return; // Skip this document - not assigned to current user
+                        }
+                        
+                        console.log(`Document ${docInfo.title} is assigned to user ${currentUserEmail}, displaying`);
+                        
                         const documentName = docInfo.title;
                         const existingDoc = existingDocuments[documentName];
                         
@@ -809,7 +856,7 @@
                     }
                 }
                 
-                console.log('Documents loaded successfully:', documentsAdded, 'new documents added');
+                console.log('Documents loaded with assignment filtering applied:', documentsAdded, 'new documents added');
                 updateDocumentCounts();
             } catch (error) {
                 console.error('Error loading admin documents:', error);
