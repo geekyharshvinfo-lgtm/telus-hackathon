@@ -529,6 +529,24 @@ Would you like me to search for information about "${query}" outside of TELUS se
     // Get general knowledge response using Gemini
     async getGeneralKnowledgeResponse(query) {
         try {
+            // Check if geminiService is available
+            if (!this.geminiService) {
+                console.warn('Gemini service not available for general knowledge query');
+                return "I'm sorry, I couldn't retrieve that information right now. Is there anything about TELUS Digital services I can help you with instead?";
+            }
+            
+            // If using mock service, provide mock general knowledge responses
+            if (this.geminiService.isDemo) {
+                console.log('Using mock service - providing mock general knowledge response');
+                return this.getMockGeneralKnowledgeResponse(query);
+            }
+            
+            // Check if config is available (for real Gemini API)
+            if (!this.geminiService.config || typeof this.geminiService.config.getGenerationConfig !== 'function') {
+                console.warn('Gemini service config not available for general knowledge query');
+                return this.getMockGeneralKnowledgeResponse(query);
+            }
+            
             // Create a temporary service with general instructions
             const generalPayload = {
                 systemInstruction: {
@@ -564,8 +582,67 @@ Would you like me to search for information about "${query}" outside of TELUS se
             
         } catch (error) {
             console.error('Error getting general knowledge response:', error);
-            return "I'm sorry, I couldn't retrieve that information right now. Is there anything about TELUS Digital services I can help you with instead?";
+            return this.getMockGeneralKnowledgeResponse(query);
         }
+    }
+    
+    // Generate mock general knowledge responses
+    getMockGeneralKnowledgeResponse(query) {
+        const lowerQuery = query.toLowerCase();
+        
+        // Simple pattern matching for common general knowledge questions
+        if (lowerQuery.includes('who is') || lowerQuery.includes('who was')) {
+            return `I'd be happy to help you learn about that person! While I'm primarily designed to assist with TELUS Digital services, I can provide some general information. For the most comprehensive and up-to-date information about "${query}", I'd recommend checking reliable sources like Wikipedia or other educational websites. Is there anything about TELUS Digital services I can help you with as well?`;
+        }
+        
+        if (lowerQuery.includes('what is') || lowerQuery.includes('what are')) {
+            return `That's an interesting question about "${query}"! While I can provide some basic information, for detailed and accurate answers about general topics, I'd recommend consulting educational resources or search engines. However, I'm here and ready to help you with any questions about TELUS Digital's cloud solutions, cybersecurity, or other services. What would you like to know?`;
+        }
+        
+        if (lowerQuery.includes('how to') || lowerQuery.includes('how do')) {
+            return `I understand you're looking for guidance on "${query}". While I can offer some general direction, for step-by-step instructions on general topics, I'd suggest checking tutorial websites or educational platforms. Meanwhile, if you need help with any TELUS Digital services or technical support, I'm here to assist! What can I help you with?`;
+        }
+        
+        if (lowerQuery.includes('where is') || lowerQuery.includes('where are')) {
+            return `You're asking about the location of "${query}". For accurate geographical information and current details, I'd recommend using maps services or travel websites. If you're looking for TELUS Digital office locations or service areas, I'd be happy to help you with that information instead!`;
+        }
+        
+        if (lowerQuery.includes('when was') || lowerQuery.includes('when did')) {
+            return `That's a historical question about "${query}". For precise dates and historical information, I'd suggest consulting historical databases or educational websites. If you have questions about TELUS Digital's history, services, or timeline, I'd be glad to help with that!`;
+        }
+        
+        if (lowerQuery.includes('capital') || lowerQuery.includes('population')) {
+            return `You're asking about geographical or demographic information regarding "${query}". For the most current and accurate statistics, I'd recommend checking official government websites or statistical databases. Is there anything about TELUS Digital's services or coverage areas I can help you with?`;
+        }
+        
+        if (lowerQuery.includes('recipe') || lowerQuery.includes('cooking') || lowerQuery.includes('cook')) {
+            return `I see you're interested in cooking information about "${query}"! For detailed recipes and cooking instructions, I'd suggest checking cooking websites, recipe apps, or culinary resources. While I focus on TELUS Digital services, I'm happy to help if you need technical support for any cooking apps or digital kitchen solutions!`;
+        }
+        
+        if (lowerQuery.includes('movie') || lowerQuery.includes('film') || lowerQuery.includes('actor') || lowerQuery.includes('celebrity')) {
+            return `You're asking about entertainment topics related to "${query}". For the latest information about movies, actors, and entertainment, I'd recommend checking entertainment news websites or movie databases. If you're interested in TELUS Digital's entertainment services or streaming solutions, I'd be happy to help with that!`;
+        }
+        
+        if (lowerQuery.includes('sports') || lowerQuery.includes('cricket') || lowerQuery.includes('football')) {
+            return `That's a sports-related question about "${query}"! For current sports information, scores, and statistics, I'd suggest checking sports news websites or official league sites. If you need help with TELUS Digital's sports streaming services or mobile apps for sports, I'm here to assist!`;
+        }
+        
+        if (lowerQuery.includes('weather')) {
+            return `You're asking about weather information for "${query}". For accurate and current weather forecasts, I'd recommend using weather apps or meteorological websites. If you need help setting up weather apps on your TELUS Digital services or mobile devices, I'd be glad to help!`;
+        }
+        
+        if (lowerQuery.includes('science') || lowerQuery.includes('physics') || lowerQuery.includes('chemistry') || lowerQuery.includes('biology')) {
+            return `That's a scientific question about "${query}"! For detailed scientific information and explanations, I'd recommend consulting educational websites, scientific journals, or academic resources. If you're interested in TELUS Digital's solutions for educational institutions or scientific research support, I'd be happy to discuss those services!`;
+        }
+        
+        if (lowerQuery.includes('programming') || lowerQuery.includes('coding') || lowerQuery.includes('technology')) {
+            return `You're asking about technology topics related to "${query}". While I can provide some general guidance, for detailed programming help, I'd suggest checking developer documentation, coding tutorials, or tech forums. However, if you need information about TELUS Digital's cloud development platforms, APIs, or technical infrastructure, I'm here to help!`;
+        }
+        
+        // Default general knowledge response
+        return `That's an interesting question about "${query}"! While I can provide some basic information, for comprehensive and detailed answers on general topics, I'd recommend consulting specialized resources, educational websites, or search engines. 
+
+However, I'm here and ready to help you with anything related to TELUS Digital services - whether it's cloud solutions, cybersecurity, technical support, or any other digital services we offer. What would you like to know about TELUS Digital?`;
     }
     
     generateResponse(message) {

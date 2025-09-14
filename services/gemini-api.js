@@ -237,15 +237,47 @@ class GeminiAPIService {
             // Check if API key is properly configured
             if (!this.config.getApiKey() || 
                 this.config.getApiKey() === 'YOUR_GEMINI_API_KEY_HERE' ||
-                this.config.getApiKey() === 'AIzaSyA2skLFA5n2Lb628UL2CJwXK50EXk_3API' ||
                 this.config.getApiKey() === 'AIzaSyDhKGOJhJGKJHGKJHGKJHGKJHGKJHGKJHG') {
                 console.warn('Gemini API key not configured properly. Please set a valid API key in config/gemini-config.js');
                 console.warn('Current API key:', this.config.getApiKey());
                 return false;
             }
             
-            const testResponse = await this.generateResponse('Hello');
-            return testResponse.success;
+            // Test with a simple API call instead of full generateResponse to avoid side effects
+            try {
+                console.log('Testing Gemini API connection...');
+                const testPayload = {
+                    contents: [{
+                        role: 'user',
+                        parts: [{ text: 'Hello' }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        maxOutputTokens: 10
+                    }
+                };
+                
+                const response = await fetch(this.config.getApiUrl(), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testPayload)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Gemini API health check successful');
+                    return true;
+                } else {
+                    const errorText = await response.text();
+                    console.warn('Gemini API health check failed:', response.status, errorText);
+                    return false;
+                }
+            } catch (apiError) {
+                console.warn('Gemini API connection test failed:', apiError.message);
+                return false;
+            }
         } catch (error) {
             console.error('Gemini API health check failed:', error);
             return false;
