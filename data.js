@@ -199,23 +199,38 @@ const DataManager = {
 
     // Register new user
     registerUser: function(name, email, password) {
-        // Check if user already exists
-        if (users.find(user => user.email === email)) {
-            return { success: false, message: "User already exists" };
+        try {
+            // Check if user already exists in hardcoded users
+            if (users.find(user => user.email === email)) {
+                return { success: false, message: "User already exists" };
+            }
+            
+            // Check if user already exists in registered users (localStorage)
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            if (registeredUsers.find(user => user.email === email)) {
+                return { success: false, message: "User already exists" };
+            }
+            
+            const newUser = {
+                email: email,
+                password: password,
+                name: name,
+                role: "user",
+                dateCreated: new Date().toISOString()
+            };
+            
+            // Add to registered users in localStorage instead of hardcoded array
+            registeredUsers.push(newUser);
+            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+            
+            // Log activity
+            this.logActivity('register', `New user registered: ${name}`);
+            
+            return { success: true, user: newUser };
+        } catch (error) {
+            console.error('Error registering user:', error);
+            return { success: false, message: "Registration failed. Please try again." };
         }
-        
-        const newUser = {
-            email: email,
-            password: password,
-            name: name,
-            role: "user"
-        };
-        users.push(newUser);
-        
-        // Log activity
-        this.logActivity('register', `New user registered: ${name}`);
-        
-        return { success: true, user: newUser };
     },
 
     // Activity logging

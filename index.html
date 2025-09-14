@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TELUS Digital - Login</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Hide chatbot on landing page */
+        .chatbot-container {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Main Content -->
@@ -87,5 +93,20 @@
     <script src="services/gemini-api.js"></script>
     <script src="chatbot.js"></script>
     <script src="landing-script.js"></script>
+    <script>
+        // Prevent chatbot initialization on landing page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Override chatbot initialization
+            if (window.telusChatbot) {
+                window.telusChatbot = null;
+            }
+            
+            // Remove any existing chatbot elements
+            const existingChatbot = document.getElementById('chatbotContainer');
+            if (existingChatbot) {
+                existingChatbot.remove();
+            }
+        });
+    </script>
 </body>
 </html>
